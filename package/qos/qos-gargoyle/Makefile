@@ -21,6 +21,12 @@ define Package/qos-gargoyle/description
   A set of QoS scripts designed for use with Gargoyle Web Interface
 endef
 
+define Build/Prepare
+	mkdir -p $(PKG_BUILD_DIR)
+	$(CP) ./src/* $(PKG_BUILD_DIR)/
+endef
+
+
 define Build/Configure
 endef
 
@@ -50,11 +56,9 @@ define Package/qos-gargoyle/install
 endef
 
 define Package/qos-gargoyle/prerm
-[ -n $${PKG_INSTROOT} ] || {
-	/etc/init.d/qos_gargoyle stop 2>/dev/null
-	/etc/init.d/qos_gargoyle disable 2>/dev/null
-	exit 0
-}
+	$${IPKG_INSTROOT}/etc/init.d/qos_gargoyle stop 2>/dev/null
+	$${IPKG_INSTROOT}/etc/init.d/qos_gargoyle disable 2>/dev/null
+	ls >/dev/null 2>&1
 endef
 
 $(eval $(call BuildPackage,qos-gargoyle))
