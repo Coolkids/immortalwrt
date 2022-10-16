@@ -108,19 +108,19 @@ typedef struct history_struct
 	uint32_t ip[4];
 	uint32_t num_nodes;
 
-	time64_t reset_interval;
-	time64_t reset_time;
+	time_t reset_interval;
+	time_t reset_time;
 	unsigned char is_constant_interval;
 
-	time64_t first_start;
-	time64_t first_end;
-	time64_t last_end;
+	time_t first_start;
+	time_t first_end;
+	time_t last_end;
 
 	uint64_t* history_bws;
 } ip_bw_history;
 #pragma pack(pop)
 
-time64_t* get_interval_starts_for_history(ip_bw_history history);
+time_t* get_interval_starts_for_history(ip_bw_history history);
 
 extern void free_ip_bw_histories(ip_bw_history* histories, int num_histories);
 
@@ -132,7 +132,7 @@ extern int get_ip_bandwidth_usage_for_rule_id(char* id,  char* ip, ip_bw** data,
 
 
 extern int set_bandwidth_history_for_rule_id(char* id, unsigned char zero_unset, unsigned long num_ips, ip_bw_history* data, unsigned long max_wait_milliseconds);
-extern int set_bandwidth_usage_for_rule_id(char* id, unsigned char zero_unset, unsigned long num_ips, time64_t last_backup, ip_bw* data, unsigned long max_wait_milliseconds);
+extern int set_bandwidth_usage_for_rule_id(char* id, unsigned char zero_unset, unsigned long num_ips, time_t last_backup, ip_bw* data, unsigned long max_wait_milliseconds);
 
 
 
@@ -141,7 +141,7 @@ extern int save_history_to_file(ip_bw_history* data, unsigned long num_ips, char
 
 
 
-extern ip_bw* load_usage_from_file(char* in_file_path, unsigned long* num_ips, time64_t* last_backup);
+extern ip_bw* load_usage_from_file(char* in_file_path, unsigned long* num_ips, time_t* last_backup);
 extern ip_bw_history* load_history_from_file(char* in_file_path, unsigned long* num_ips);
 
 extern void print_usage(FILE* out, ip_bw* usage, unsigned long num_ips);
@@ -155,7 +155,7 @@ extern void unlock_bandwidth_semaphore_on_exit(void);
 
 
 /* sets kernel timezone minuteswest to match user timezone */
-extern int get_minutes_west(time64_t now);
+extern int get_minutes_west(time_t now);
 extern void set_kernel_timezone(void);
 
 

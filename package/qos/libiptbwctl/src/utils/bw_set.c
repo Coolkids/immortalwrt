@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 	char *id = NULL;
 	char* in_file_path = NULL;
 	FILE* in_file = NULL;
-	time64_t last_backup = 0;
+	time_t last_backup = 0;
 	int last_backup_from_cl = 0;
 	int is_history_file = 0;
 
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 		else
 		{
 			unsigned long num_ips;
-			time64_t last_backup;
+			time_t last_backup;
 			ip_bw* usage_data = load_usage_from_file(in_file_path, &num_ips, &last_backup);
 			if(usage_data != NULL)
 			{
