@@ -123,7 +123,7 @@
 +	int valid_arg = 0;
 +	long int num_read;
 +	uint64_t read_64;
-+	time_t read_time;
++	time64_t read_time;
 +
 +	/* set defaults first time we get here */
 +	if(*flags == 0)
@@ -360,7 +360,7 @@
 +	{
 +		/* determine current time in seconds since epoch, with offset for current timezone */
 +		int minuteswest = get_minutes_west();
-+		time_t now;
++		time64_t now;
 +		time(&now);
 +		now = now - (minuteswest*60);
 +
@@ -502,7 +502,7 @@
 +#endif
 +{
 +	struct ipt_bandwidth_info *info = (struct ipt_bandwidth_info *)match->data;
-+	time_t now;
++	time64_t now;
 +	
 +	print_bandwidth_args(info);
 +	
@@ -613,7 +613,7 @@
 +
 +int get_minutes_west(void)
 +{
-+	time_t now;
++	time64_t now;
 +	struct tm* utc_info;
 +	struct tm* tz_info;
 +	int utc_day;
@@ -748,13 +748,13 @@
 +
 +	unsigned char cmp;
 +	unsigned char reset_is_constant_interval;
-+	time_t reset_interval; //specific fixed type (see above) or interval length in seconds
-+	time_t reset_time; //seconds from start of month/week/day/hour/minute to do reset, or start point of interval if it is a constant interval
++	time64_t reset_interval; //specific fixed type (see above) or interval length in seconds
++	time64_t reset_time; //seconds from start of month/week/day/hour/minute to do reset, or start point of interval if it is a constant interval
 +	uint64_t bandwidth_cutoff;
 +	uint64_t current_bandwidth;
-+	time_t next_reset;
-+	time_t previous_reset;
-+	time_t last_backup_time;
++	time64_t next_reset;
++	time64_t previous_reset;
++	time64_t last_backup_time;
 +
 +	uint32_t num_intervals_to_save;
 +
@@ -1608,7 +1608,7 @@
 +
 +void set_kernel_timezone(void)
 +{
-+	time_t now;
++	time64_t now;
 +	struct tm* utc_info;
 +	struct tm* tz_info;
 +	int utc_day;
