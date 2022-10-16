@@ -997,7 +997,7 @@ void restore_backup_for_id(char* id, char* quota_backup_dir, unsigned char is_in
 {
 	char* quota_file_path = dynamic_strcat(3, quota_backup_dir, "/quota_", id);
 	unsigned long num_ips = 0;
-	time64_t last_backup = 0;
+	time_t last_backup = 0;
 	ip_bw* loaded_backup_data = load_usage_from_file(quota_file_path, &num_ips, &last_backup);
 	if(loaded_backup_data != NULL)
 	{
