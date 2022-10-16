@@ -3433,7 +3433,7 @@
 +
 +}
 +
-+static int ipt_bandwidth_set_ctl(struct sock *sk, int cmd, void *user, u_int32_t len)
++static int ipt_bandwidth_set_ctl(struct sock *sk, int cmd, void *user, unsigned int len)
 +{
 +	/* check for timezone shift & adjust if necessary */
 +	char* buffer;
