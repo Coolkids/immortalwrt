@@ -3000,7 +3000,7 @@
 +}
 +
 +
-+static int ipt_bandwidth_get_ctl(struct sock *sk, int cmd, sockptr_t *user, int *len)
++static int ipt_bandwidth_get_ctl(struct sock *sk, int cmd, void *user, int *len)
 +{
 +	/* check for timezone shift & adjust if necessary */
 +	char* buffer;
