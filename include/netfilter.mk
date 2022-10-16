@@ -103,17 +103,13 @@ $(eval $(call nf_add,IPT_PHYSDEV,CONFIG_NETFILTER_XT_MATCH_PHYSDEV, $(P_XT)xt_ph
 $(eval $(call nf_add,IPT_FILTER,CONFIG_NETFILTER_XT_MATCH_STRING, $(P_XT)xt_string))
 $(eval $(call nf_add,IPT_FILTER,CONFIG_NETFILTER_XT_MATCH_BPF, $(P_XT)xt_bpf))
 
+
 # imq
 
 $(eval $(call nf_add,IPT_IMQ,CONFIG_IP_NF_TARGET_IMQ, $(P_V4)ipt_IMQ))
 $(eval $(call nf_add,IPT_IMQ,CONFIG_NETFILTER_XT_TARGET_IMQ, $(P_XT)xt_IMQ))
 
-# gargoyle-qos
 
-$(eval $(call nf_add,IPT_BANDWIDTH,CONFIG_IP_NF_MATCH_BANDWIDTH, $(P_V4)ipt_bandwidth))
-$(eval $(call nf_add,IPT_TIMERANGE,CONFIG_IP_NF_MATCH_TIMERANGE, $(P_V4)ipt_timerange))
-$(eval $(call nf_add,IPT_WEBMON,CONFIG_IP_NF_MATCH_WEBMON, $(P_V4)ipt_webmon))
-$(eval $(call nf_add,IPT_WEBURL,CONFIG_IP_NF_MATCH_WEBURL, $(P_V4)ipt_weburl))
 
 # ipopt
 
@@ -397,3 +393,23 @@ IPT_BUILTIN += $(EBTABLES_IP6-y)
 IPT_BUILTIN += $(EBTABLES_WATCHERS-y)
 
 endif # __inc_netfilter
+
+
+IPT_WEBURL-m :=
+IPT_WEBURL-$(CONFIG_NETFILTER_XT_MATCH_WEBURL) += $(P_XT)xt_weburl
+IPT_BUILTIN += $(IPT_WEBURL-y)
+
+
+IPT_WEBMON-m :=
+IPT_WEBMON-$(CONFIG_NETFILTER_XT_MATCH_WEBMON) += $(P_XT)xt_webmon
+IPT_BUILTIN += $(IPT_WEBMON-y)
+
+
+IPT_TIMERANGE-m :=
+IPT_TIMERANGE-$(CONFIG_NETFILTER_XT_MATCH_TIMERANGE) += $(P_XT)xt_timerange
+IPT_BUILTIN += $(IPT_TIMERANGE-y)
+
+
+IPT_BANDWIDTH-m :=
+IPT_BANDWIDTH-$(CONFIG_NETFILTER_XT_MATCH_BANDWIDTH) += $(P_XT)xt_bandwidth
+IPT_BUILTIN += $(IPT_BANDWIDTH-y)
