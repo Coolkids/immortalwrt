@@ -83,9 +83,7 @@ function action_load_data(type)
 	if type == "download" then
 		device = "imq0"
 	elseif type == "upload" then
-		local qos = require "luci.model.qos_gargoyle"
-		local wan = qos.get_wan()
-		device = wan and wan:ifname() or ""
+		device = "pppoe-wan"
 	end
 
 	if device then

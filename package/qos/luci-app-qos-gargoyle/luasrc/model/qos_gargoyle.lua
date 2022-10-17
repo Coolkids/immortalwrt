@@ -26,6 +26,5 @@ function cbi_add_dpi_protocols(field)
 end
 
 function get_wan()
-	local net = require "luci.model.network".init()
-	return net:get_wannet()
+	return "pppoe-wan"
 end

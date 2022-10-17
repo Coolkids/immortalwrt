@@ -57,7 +57,7 @@ table.cbi-section-table td.cbi-section-table-cell {
 
 		XHR.poll(3, '<%=dsp.build_url("admin", "QOS", "qos_gargoyle", "load_data", leaf)%>',
 			null, function(res) {
-				if (res.readyState == 4 && tbs) {
+				if (res.status == 200 && tbs) {
 					var timestamp = new Date().getTime();
 					var timeDiff = timestamp - lastTime;
 					lastTime = timestamp;
