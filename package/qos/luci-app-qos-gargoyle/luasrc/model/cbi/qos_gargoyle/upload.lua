@@ -98,6 +98,7 @@ rule_s.create    = function(e, t)
 end
 
 o = rule_s:option(ListValue, "class", translate("Service Class"))
+
 for _, s in ipairs(upload_classes) do o:value(s.name, s.alias) end
 
 o = rule_s:option(Value, "proto", translate("Transport Protocol"))
@@ -106,7 +107,7 @@ o:value("tcp", "TCP")
 o:value("udp", "UDP")
 o:value("icmp", "ICMP")
 o:value("gre", "GRE")
-o.size = "10"
+
 o.cfgvalue = function(...)
 	local v = Value.cfgvalue(...)
 	return v and v:upper() or ""
@@ -119,6 +120,7 @@ o = rule_s:option(Value, "family", translate("Family"))
 o:value("any", translate("All"))
 o:value("ipv4", "ipv4")
 o:value("ipv6", "ipv6")
+
 o.default = "any"
 
 o = rule_s:option(Value, "source", translate("Source IP(s)"))
@@ -172,6 +174,7 @@ if qos.has_ndpi() then
 		local v = Value.cfgvalue(...)
 		return v or translate("All")
 	end
+	
 end
 
 o = rule_s:option(Value, "test_order", translate("Priority"))

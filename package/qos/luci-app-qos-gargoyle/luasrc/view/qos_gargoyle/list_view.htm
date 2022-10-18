@@ -12,9 +12,7 @@
 <style title="text/css">
 /* container for entire page. fixes bootstrap theme's ridiculously small page width */
 .container {
-	max-width: none;
-	margin: 0 30px;
-	width: auto;
+	overflow-x: auto;
 }
 /* column for configuration section name */
 table th {
@@ -31,6 +29,21 @@ table td {
 /* sort buttons column */
 table.cbi-section-table td.cbi-section-table-cell {
 	text-align: center;
+}
+#cbi-qos_gargoyle-upload_rule > table {
+    width: max-content;
+}
+#cbi-qos_gargoyle-download_rule > table {
+    width: max-content;
+}
+
+.cbi-dropdown:not(.btn):not(.cbi-button), .cbi-dynlist {
+	min-width: unset !important;
+	max-width: unset !important;
+}
+
+.table.cbi-section-table input[type="text"] {
+	width:5em !important;
 }
 </style>
 

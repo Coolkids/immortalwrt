@@ -112,7 +112,7 @@ o:value("tcp", "TCP")
 o:value("udp", "UDP")
 o:value("icmp", "ICMP")
 o:value("gre", "GRE")
-o.size = "10"
+
 o.cfgvalue = function(...)
 	local v = Value.cfgvalue(...)
 	return v and v:upper() or ""
@@ -178,6 +178,7 @@ if qos.has_ndpi() then
 		local v = Value.cfgvalue(...)
 		return v or translate("All")
 	end
+	
 end
 
 o = rule_s:option(Value, "test_order", translate("Priority"))
