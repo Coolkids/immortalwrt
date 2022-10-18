@@ -49,8 +49,7 @@ o:value("ipv6", "ipv6")
 o.default = "any"
 
 o = s:option(Value, "source", translate("Source IP(s)"),
-	translate("Packet's source ip, can optionally have /[mask] after it (see -s option in iptables "
-	.. "man page)."))
+	translate("Packet's source ip, can optionally have /[mask] after it (see -s option in <br />iptables man page)."))
 o:value("", translate("All"))
 wa.cbi_add_knownips(o)
 o.datatype = "or(ipmask4, ipmask6)"
@@ -61,8 +60,7 @@ o:value("", translate("All"))
 o.datatype = "or(port, portrange)"
 
 o = s:option(Value, "destination", translate("Destination IP(s)"),
-	translate("Packet's destination ip, can optionally have /[mask] after it (see -d option in "
-	.. "iptables man page)."))
+	translate("Packet's destination ip, can optionally have /[mask] after it (see -d option <br />in iptables man page)."))
 o:value("", translate("All"))
 wa.cbi_add_knownips(o)
 o.datatype = "or(ipmask4, ipmask6)"

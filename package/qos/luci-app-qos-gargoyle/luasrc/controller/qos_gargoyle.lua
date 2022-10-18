@@ -69,7 +69,7 @@ function action_troubleshooting_data()
 			mon_data = i18n.translate("No data found")
 		end
 	else
-		mon_data = i18n.translate("\"Active Congestion Control\" not enabled")
+		mon_data = i18n.translate("'Active Congestion Control' not enabled")
 	end
 
 	data.mon = mon_data

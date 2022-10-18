@@ -39,8 +39,8 @@ m = Map(qos_gargoyle, translate("Download Settings"))
 m.template = "qos_gargoyle/list_view"
 
 class_s = m:section(TypedSection, "download_class", translate("Service Classes"),
-	translate("Each service class is specified by four parameters: percent bandwidth at capacity, "
-	.. "realtime bandwidth and maximum bandwidth and the minimimze round trip time flag."))
+	translate("Each service class is specified by four parameters: percent bandwidth at <br />capacity, realtime bandwidth and maximum bandwidth and the minimimze round <br />trip time flag.")
+	)
 class_s.anonymous = true
 class_s.addremove = true
 class_s.template  = "cbi/tblsection"
@@ -89,9 +89,7 @@ o.rawhtml = true
 o.value   = "<em class=\"ld-download\">*</em>"
 
 rule_s = m:section(TypedSection, "download_rule", translate("Classification Rules"),
-	translate("Packets are tested against the rules in the order specified -- rules toward the top "
-	.. "have priority. As soon as a packet matches a rule it is classified, and the rest of the rules "
-	.. "are ignored. The order of the rules can be altered using the arrow controls.")
+	translate("Packets are tested against the rules in the order specified -- rules toward <br />the top have priority. As soon as a packet matches a rule it is classified, <br />and the rest of the rules are ignored. The order of the rules can be altered <br />using the arrow controls.")
 	)
 rule_s.addremove = true
 rule_s.sortable  = true
