@@ -1,3 +1,0 @@
-[submodule "ndpi-netfilter"]
-	path = package/qos/ndpi-netfilter
-	url = https://github.com/Coolkids/ndpi-netfilter.git
