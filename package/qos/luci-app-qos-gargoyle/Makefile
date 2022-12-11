@@ -14,7 +14,7 @@ PKG_LICENSE:=Apache-2.0
 PKG_MAINTAINER:=Xingwang Liao <kuoruan@gmail.com>
 
 LUCI_TITLE:=LuCI Support for Gargoyle QoS
-LUCI_DEPENDS:=+qos-gargoyle
+LUCI_DEPENDS:=+qos-gargoyle +iptables-mod-ndpi
 LUCI_PKGARCH:=all
 
 define Package/$(PKG_NAME)/conffiles
