@@ -84,7 +84,7 @@ Signed-off-by: Qi Liu <liuqi_colin@msn.com>
 +	}
 +
  	/* As a last resort look for /etc/config/fstab on "rootfs" partition */
- 	return mount_extroot("/tmp/overlay");
+ 	return mount_extroot(NULL);
  }
 --- /dev/null
 +++ b/libfstools/fstype.h
