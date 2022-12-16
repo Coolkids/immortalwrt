@@ -1,0 +1,9 @@
+--- a/block.c
++++ b/block.c
+@@ -1591,7 +1591,7 @@ static int main_extroot(int argc, char *
+        /* As a last resort look for /etc/config/fstab on "rootfs" partition */
+-       return mount_extroot(NULL);
++       return mount_extroot("/tmp/overlay");
+ }
+
+ static int main_mount(int argc, char **argv)
