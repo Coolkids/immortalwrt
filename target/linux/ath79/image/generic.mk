@@ -1010,6 +1010,19 @@ define Device/dlink_dir-505
 endef
 TARGET_DEVICES += dlink_dir-505
 
+define Device/dlink_dir-629-a1
+  $(Device/seama)
+  SOC := qca9558
+  IMAGE_SIZE := 7616k
+  DEVICE_VENDOR := D-Link
+  DEVICE_MODEL := DIR-629
+  DEVICE_VARIANT := A1
+  DEVICE_PACKAGES := -uboot-envtools
+  SEAMA_MTDBLOCK := 6
+  SEAMA_SIGNATURE := wrgn83_dlob.hans_dir629
+endef
+TARGET_DEVICES += dlink_dir-629-a1
+
 define Device/dlink_dir-825-b1
   SOC := ar7161
   DEVICE_VENDOR := D-Link
@@ -1295,6 +1308,18 @@ define Device/engenius_ews511ap
   IMAGE_SIZE := 16000k
 endef
 TARGET_DEVICES += engenius_ews511ap
+
+define Device/engenius_ews660ap
+  $(Device/senao_loader_okli)
+  SOC := qca9558
+  DEVICE_VENDOR := EnGenius
+  DEVICE_MODEL := EWS660AP
+  DEVICE_PACKAGES := ath10k-firmware-qca988x-ct kmod-ath10k-ct
+  IMAGE_SIZE := 11584k
+  LOADER_FLASH_OFFS := 0x220000
+  SENAO_IMGNAME := ar71xx-generic-ews660ap
+endef
+TARGET_DEVICES += engenius_ews660ap
 
 define Device/enterasys_ws-ap3705i
   SOC := ar9344
@@ -1621,13 +1646,15 @@ define Device/letv_lba-047-ch
   SOC := qca9531
   DEVICE_VENDOR := Letv
   DEVICE_MODEL := LBA-047-CH
+  DEVICE_PACKAGES := -uboot-envtools
+  FACTORY_SIZE := 14528k
   IMAGE_SIZE := 15936k
   LOADER_FLASH_OFFS := 0x50000
   KERNEL := kernel-bin | append-dtb | lzma | uImage lzma -M 0x4f4b4c49
-  IMAGES += factory.bin
-  IMAGE/factory.bin := append-kernel | pad-to $$$$(BLOCKSIZE) | \
-	append-rootfs | pad-rootfs | check-size | pad-to 14528k | \
-	append-loader-okli-uimage $(1) | pad-to 64k
+  IMAGES += kernel.bin rootfs.bin
+  IMAGE/kernel.bin := append-loader-okli-uimage $(1) | pad-to 64k
+  IMAGE/rootfs.bin := append-kernel | pad-to $$$$(BLOCKSIZE) | \
+	append-rootfs | pad-rootfs | check-size $$$$(FACTORY_SIZE)
 endef
 TARGET_DEVICES += letv_lba-047-ch
 
