@@ -4,15 +4,15 @@ function main(){
 case $1 in
 "feed")
 	echo "update feed"
-	feed()
+	feed
 	echo "update feed finish"
 	;;
 "ip1")
-	switch1()
+	switch1
 	echo "switch iptables 1.8.7"
 	;;
 "ip2")
-	switch2()
+	switch2
 	echo "switch iptables 1.8.8"
 	;;
 *)
@@ -40,4 +40,4 @@ rm -rf package/network/utils/iptables/
 cp -r ../iptables2 package/network/utils/iptables
 }
 
-main()
+main
