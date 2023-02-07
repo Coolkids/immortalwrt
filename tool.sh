@@ -39,3 +39,5 @@ function switch2(){
 rm -rf package/network/utils/iptables/
 cp -r ../iptables2 package/network/utils/iptables
 }
+
+main()
