@@ -120,6 +120,20 @@ define U-Boot/fastrhino-r68s-rk3568
     lunzn_fastrhino-r68s
 endef
 
+define U-Boot/nanopi-r5c-rk3568
+  $(U-Boot/Default/rk3568)
+  NAME:=FriendlyARM NanoPi R5C
+  BUILD_DEVICES:= \
+    friendlyarm_nanopi-r5c
+endef
+
+define U-Boot/nanopi-r5s-rk3568
+  $(U-Boot/Default/rk3568)
+  NAME:=FriendlyARM NanoPi R5S
+  BUILD_DEVICES:= \
+    friendlyarm_nanopi-r5s
+endef
+
 UBOOT_TARGETS := \
   nanopi-r4s-rk3399 \
   nanopi-r4s-enterprise-rk3399 \
@@ -130,7 +144,9 @@ UBOOT_TARGETS := \
   orangepi-r1-plus-rk3328 \
   orangepi-r1-plus-lts-rk3328 \
   fastrhino-r66s-rk3568 \
-  fastrhino-r68s-rk3568
+  fastrhino-r68s-rk3568 \
+  nanopi-r5c-rk3568 \
+  nanopi-r5s-rk3568
 
 UBOOT_CONFIGURE_VARS += USE_PRIVATE_LIBGCC=yes
 
