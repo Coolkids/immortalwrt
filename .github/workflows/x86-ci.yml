@@ -47,7 +47,8 @@ jobs:
       - name: Generate configuration file
         run: |
           rm -f ./.config*
-          cp .github/.config .
+          cp .github/.config ./.config
+          make defconfig
 
       - name: Make download
         run: |
@@ -57,6 +58,7 @@ jobs:
 
       - name: Compile firmware
         run: |
+          make package/feeds/luci/luci-base/compile V=s
           make -j$(nproc) || make -j1 V=s
           echo "======================="
           echo "Space usage:"

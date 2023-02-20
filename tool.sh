@@ -29,7 +29,6 @@ rm -rf ./feeds/packages/net/mosdns/
 ./scripts/feeds install -a
 ./scripts/feeds install -p diy2 luci-app-passwall
 ./scripts/feeds install -p mosdns mosdns-v5
-make defconfig
 }
 
 function switch1(){
