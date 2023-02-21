@@ -26,6 +26,12 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: master
+      
+      - name: Set variables
+        run: |
+          sudo -E timedatectl set-timezone Asia/Shanghai
+          echo "RELEASE_NAME=Released on $(date +%Y%m%d%H%M)" >> $GITHUB_ENV
+          echo "TAG_NAME=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
 
       - name: Space cleanup
         env:
@@ -103,5 +109,6 @@ jobs:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
           file: ./artifact/firmware/*
           overwrite: true
-          tag: ${{ github.ref }}
+          name: ${{ env.RELEASE_NAME }}
+          tag_name: ${{ env.TAG_NAME }}
           file_glob: true
