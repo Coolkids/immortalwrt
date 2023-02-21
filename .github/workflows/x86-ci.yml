@@ -109,6 +109,6 @@ jobs:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
           file: ./artifact/firmware/*
           overwrite: true
-          name: ${{ env.RELEASE_NAME }}
-          tag_name: ${{ env.TAG_NAME }}
+          release_name: ${{ env.RELEASE_NAME }}
+          tag: ${{ env.TAG_NAME }}
           file_glob: true
