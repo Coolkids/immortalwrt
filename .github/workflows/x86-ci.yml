@@ -74,7 +74,7 @@ jobs:
           mkdir -p ./artifact/package
           mkdir -p ./artifact/buildinfo
           rm -rf $(find ./bin/targets/ -type d -name "packages")
-          cp -rf $(find ./bin/targets/ -type f) ./artifact/firmware/
+          cp -rf $(find ./bin/targets/ -type f -name "immortalwrt-x86-64-generic-squashfs-*") ./artifact/firmware/
           cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./artifact/package/
           cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
 
@@ -102,5 +102,6 @@ jobs:
         with:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
           file: ./artifact/firmware/*
+          overwrite: true
           tag: ${{ github.ref }}
           file_glob: true
