@@ -66,18 +66,19 @@ CONFIGURE_ARGS += $(if $(CONFIG_QAT_ENGINE_ENABLE_MULTITHREAD)        ,--enable-
 CONFIGURE_ARGS += $(if $(CONFIG_QAT_ENGINE_DISABLE_LENSTRA)           ,--disable-qat_lenstra_protection)
 CONFIGURE_ARGS += $(if $(CONFIG_QAT_ENGINE_DISABLE_AUTOINIT_ONFORK)   ,--disable-qat_auto_engine_init_on_fork)
 CONFIGURE_ARGS += $(if $(CONFIG_QAT_C2XXX)                            ,--enable-qat16_driver)
+CONFIGURE_ARGS += --enable-qat_provider
 
 MAKE_VARS += \
 	CROSS_COMPILE="$(KERNEL_CROSS)" \
 	KERNEL_SOURCE_ROOT="$(LINUX_DIR)" \
 	PATH_AUTOCNF="include/generated/autoconf.h" \
-	WITH_ICP_TARGET="1" 
+	WITH_ICP_TARGET="3" 
 
 define Package/openssl-qat/install
-	$(INSTALL_DIR) $(1)/usr/lib/engines-1.1
+	$(INSTALL_DIR) $(1)/usr/lib/engines-3
 	$(INSTALL_DIR) $(1)/usr/share/quickassist/QAT_Engine/config
-	$(CP) $(PKG_BUILD_DIR)/.libs/qatengine.so $(1)/usr/lib/engines-1.1
-	$(CP) $(PKG_BUILD_DIR)/qatengine.la $(1)/usr/lib/engines-1.1
+	$(CP) $(PKG_BUILD_DIR)/.libs/qatengine.so $(1)/usr/lib/engines-3
+	$(CP) $(PKG_BUILD_DIR)/qatengine.la $(1)/usr/lib/engines-3
 	$(CP) $(PKG_BUILD_DIR)/qat/config/c3xxx $(1)/usr/share/quickassist/QAT_Engine/config
 endef
 
