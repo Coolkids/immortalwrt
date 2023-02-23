@@ -53,7 +53,7 @@ jobs:
       - name: Generate configuration file
         run: |
           rm -f ./.config*
-          cp .github/.config ./.config
+          cp .github/x86.config ./.config
           make defconfig
 
       - name: Make download
@@ -72,7 +72,6 @@ jobs:
           df -h
           echo "======================="
           du -h ./ --max-depth=1
-          du -h /mnt/openwrt/ --max-depth=1 || true
 
       - name: Prepare artifact
         run: |
@@ -112,3 +111,25 @@ jobs:
           release_name: ${{ env.RELEASE_NAME }}
           tag: ${{ env.TAG_NAME }}
           file_glob: true
+
+      - name: Delete loder releases
+        uses: dev-drprasad/delete-older-releases@v0.2.0
+        with:
+          keep_latest: 5
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+
+      - name: ServerChan · Server酱通知
+        uses: easychen/github-action-server-chan@v1.0.0
+        with:
+          sendkey: ${{ secrets.SENDKEY }}
+          title: "openwrt x86固件编译完成"
+          desp: ${{ env.RELEASE_NAME }}
+
+
+
+
+
+
+
+
