@@ -1,5 +1,5 @@
 
-name: OpenWrt-CI
+name: Pi4b OpenWrt-CI
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
 
   build_openwrt:
 
-    name: Build OpenWrt firmware
+    name: Build Pi4b OpenWrt firmware
 
     runs-on: ubuntu-22.04
 
@@ -30,8 +30,8 @@ jobs:
       - name: Set variables
         run: |
           sudo -E timedatectl set-timezone Asia/Shanghai
-          echo "RELEASE_NAME=x84_64 Released on $(date +%Y%m%d%H%M)" >> $GITHUB_ENV
-          echo "TAG_NAME=x86$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
+          echo "RELEASE_NAME=Pi4b Released on $(date +%Y%m%d%H%M)" >> $GITHUB_ENV
+          echo "TAG_NAME=Pi4b$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
 
       - name: Space cleanup
         env:
@@ -53,7 +53,7 @@ jobs:
       - name: Generate configuration file
         run: |
           rm -f ./.config*
-          cp .github/x86.config ./.config
+          cp .github/pi4b.config ./.config
           make defconfig
 
       - name: Make download
@@ -123,7 +123,7 @@ jobs:
         uses: easychen/github-action-server-chan@v1.0.0
         with:
           sendkey: ${{ secrets.SENDKEY }}
-          title: "openwrt x86固件编译完成"
+          title: "openwrt 树莓派4b固件编译完成"
           desp: ${{ env.RELEASE_NAME }}
 
 
