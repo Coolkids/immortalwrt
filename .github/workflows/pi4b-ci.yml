@@ -54,6 +54,7 @@ jobs:
         run: |
           rm -f ./.config*
           cp .github/pi4b.config ./.config
+          cp .github/patch/001-nDPI-pi4b-compile.patch ./package/qos/ndpi-netfilter/patches
           make defconfig
 
       - name: Make download
