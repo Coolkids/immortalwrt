@@ -23,10 +23,12 @@ esac
 
 function feed(){
 ./scripts/feeds update -a
-rm -rf ./feeds/luci/applications/luci-app-passwall
-rm -rf ./feeds/packages/net/mosdns/
+rm -rf ./feeds/luci/applications/\{luci-app-passwall, luci-app-smartdns\}
+rm -rf ./feeds/packages/net/\{mosdns, smartdns\}
 
 ./scripts/feeds install -a
+./scripts/feeds install -p custom smartdns
+./scripts/feeds install -p custom luci-app-smartdns
 ./scripts/feeds install -p diy2 luci-app-passwall
 ./scripts/feeds install -p mosdns mosdns-v5
 }
