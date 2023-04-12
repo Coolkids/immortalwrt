@@ -82,6 +82,7 @@ jobs:
           cp -rf $(find ./bin/targets/ -type f -name "immortalwrt-*") ./artifact/firmware/
           cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./artifact/package/
           cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
+          sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "ARM_bcm2711" ${{ env.RELEASE_NAME }}
 
       - name: Deliver buildinfo
         uses: actions/upload-artifact@v2
@@ -101,12 +102,6 @@ jobs:
           name: OpenWrt_firmware
           path: ./artifact/firmware/
 
-      - name: ServerChan · Server酱通知
-        uses: easychen/github-action-server-chan@v1.0.0
-        with:
-          sendkey: ${{ secrets.SENDKEY }}
-          title: "openwrt 树莓派4b固件编译完成"
-          desp: ${{ env.RELEASE_NAME }}
 
 
 
