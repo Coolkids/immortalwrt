@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2022 OpenWrt.org
+# Copyright (C) 2014-2015 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -48,7 +48,7 @@ define Package/fstools/config
 		depends on PACKAGE_fstools
 		depends on NAND_SUPPORT
 		bool "Support extroot functionality with UBIFS"
-		default n
+		default y
 		help
 			This option makes it possible to use extroot functionality if the root filesystem resides on an UBIFS partition
 
@@ -82,14 +82,14 @@ define Package/block-mount
   SECTION:=base
   CATEGORY:=Base system
   TITLE:=Block device mounting and checking
-  DEPENDS:=+fstools +ubox +libubox +libuci +libblobmsg-json +libjson-c
+  DEPENDS:=+ubox +libubox +libuci +libblobmsg-json +libjson-c +fstools
 endef
 
 define Package/blockd
   SECTION:=base
   CATEGORY:=Base system
   TITLE:=Block device automounting
-  DEPENDS:=+block-mount +fstools +libubus +kmod-fs-autofs4 +libblobmsg-json +libjson-c
+  DEPENDS:=+block-mount +libubus +kmod-fs-autofs4 +libblobmsg-json +libjson-c
 endef
 
 define Package/fstools/install
