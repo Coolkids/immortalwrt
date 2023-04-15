@@ -5,7 +5,7 @@ agentid=`echo -n $3`
 arch=`echo -n $4`
 release=`echo -n $5`
 da=`date "+%Y-%m-%d %H:%M:%S"`
-ms="固件类型: $arch\nRELEASE_NAME: $release"
+ms="固件类型: $arch\nRELEASE NAME: $release"
 url="https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=$(curl -s "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=$corpid&corpsecret=$corpsecret"|/usr/bin/jq '.access_token'|sed 's/"//g')"
 
 msjson='{
@@ -17,7 +17,7 @@ msjson='{
 			{
 				"title":"Github Actions固件编译完成 时间:'${da}'",
 				"description" :"'${ms}'",
-				"picurl":"https://raw.githubusercontent.com/Coolkids/immortalwrt/master/.github/banner.png"
+				"picurl":"https://raw.githubusercontent.com/Coolkids/immortalwrt/master/.github/banner.jpg"
 			}
 		]
 	},
