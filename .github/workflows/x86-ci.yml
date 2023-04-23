@@ -3,8 +3,10 @@ name: OpenWrt-CI
 
 on:
   push:
-    branches: 
-      - master
+  # branches: 
+  #   - master
+    tags:
+      - 'v*'
   # schedule:
   #   - cron: 0 20 * * *
   #release:
@@ -110,8 +112,8 @@ jobs:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
           file: ./artifact/firmware/*
           overwrite: true
-          release_name: ${{ env.RELEASE_NAME }}
-          tag: ${{ env.TAG_NAME }}
+          release_name: ${{ github.ref }}
+          tag: ${{ github.ref }}
           file_glob: true
 
       - name: Delete loder releases

@@ -3,8 +3,10 @@ name: Pi4b OpenWrt-CI
 
 on:
   push:
-    branches: 
-      - master
+  # branches: 
+  #   - master
+    tags:
+      - 'v*'
   # schedule:
   #   - cron: 0 20 * * *
   #release:
