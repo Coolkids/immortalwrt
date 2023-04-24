@@ -32,8 +32,8 @@ jobs:
       - name: Set variables
         run: |
           sudo -E timedatectl set-timezone Asia/Shanghai
-          echo "RELEASE_NAME=Released on $(date +%Y%m%d%H%M)" >> $GITHUB_ENV
-          echo "TAG_NAME=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
+          echo "RELEASE_NAME=Released on ${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
 
       - name: Space cleanup
         env:
@@ -112,8 +112,8 @@ jobs:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
           file: ./artifact/firmware/*
           overwrite: true
-          release_name: ${{ github.ref }}
-          tag: ${{ github.ref }}
+          release_name: ${{ github.ref_name }}
+          tag: ${{ github.ref_name }}
           file_glob: true
 
       - name: Delete loder releases
