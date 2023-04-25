@@ -32,8 +32,6 @@ jobs:
       - name: Set variables
         run: |
           sudo -E timedatectl set-timezone Asia/Shanghai
-          echo "RELEASE_NAME=Released on ${{ github.ref_name }}" >> $GITHUB_ENV
-          echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
 
       - name: Space cleanup
         env:
@@ -85,7 +83,7 @@ jobs:
           cp -rf $(find ./bin/targets/ -type f -name "sha256sums") ./artifact/firmware/
           cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./artifact/package/
           cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
-          sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" ${{ env.RELEASE_NAME }}
+          sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "Released on ${{ github.ref_name }}"
 
       - name: Deliver buildinfo
         uses: actions/upload-artifact@v2
