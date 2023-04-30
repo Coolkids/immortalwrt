@@ -81,6 +81,13 @@ define U-Boot/nanopi-r4s-rk3399
     friendlyarm_nanopi-r4s
 endef
 
+define U-Boot/nanopi-r4se-rk3399
+  $(U-Boot/Default/rk3399)
+  NAME:=NanoPi R4SE
+  BUILD_DEVICES:= \
+    friendlyarm_nanopi-r4se
+endef
+
 define U-Boot/nanopi-r4s-enterprise-rk3399
   $(U-Boot/Default/rk3399)
   NAME:=NanoPi R4S Enterprise Edition
@@ -126,6 +133,13 @@ define U-Boot/fastrhino-r68s-rk3568
     lunzn_fastrhino-r68s
 endef
 
+define U-Boot/mrkaio-m68s-rk3568
+  $(U-Boot/Default/rk3568)
+  NAME:=Mrkaio M68S
+  BUILD_DEVICES:= \
+    ezpro_mrkaio-m68s
+endef
+
 define U-Boot/nanopi-r5c-rk3568
   $(U-Boot/Default/rk3568)
   NAME:=FriendlyARM NanoPi R5C
@@ -142,6 +156,7 @@ endef
 
 UBOOT_TARGETS := \
   nanopi-r4s-rk3399 \
+  nanopi-r4se-rk3399 \
   nanopi-r4s-enterprise-rk3399 \
   rock-pi-4-rk3399 \
   rockpro64-rk3399 \
@@ -152,6 +167,7 @@ UBOOT_TARGETS := \
   roc-cc-rk3328 \
   fastrhino-r66s-rk3568 \
   fastrhino-r68s-rk3568 \
+  mrkaio-m68s-rk3568 \
   nanopi-r5c-rk3568 \
   nanopi-r5s-rk3568
 
