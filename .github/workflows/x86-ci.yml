@@ -3,8 +3,6 @@ name: OpenWrt-CI
 
 on:
   push:
-    branches: 
-      - master
     tags:
       - 'v*'
   # schedule:
@@ -16,7 +14,7 @@ jobs:
 
   build_openwrt:
 
-    name: Build OpenWrt firmware
+    name: Build x86_64 OpenWrt firmware
 
     runs-on: ubuntu-22.04
 
