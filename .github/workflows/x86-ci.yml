@@ -1,5 +1,5 @@
 
-name: OpenWrt-CI
+name: OpenWrt-releases-CI
 
 on:
   push:

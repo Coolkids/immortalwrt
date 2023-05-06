@@ -1,5 +1,5 @@
 
-name: Pi4b OpenWrt-CI
+name: Pi4b OpenWrt-releases-CI
 
 on:
   push:
