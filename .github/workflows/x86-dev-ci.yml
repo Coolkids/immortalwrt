@@ -49,6 +49,10 @@ jobs:
       - name: Update feeds
         run: |
           ./tool.sh feed
+          cd feeds/packages
+          wget https://patch-diff.githubusercontent.com/raw/openwrt/packages/pull/20940.patch
+          git apply 20940.patch
+          cd -
 
       - name: Generate configuration file
         run: |
