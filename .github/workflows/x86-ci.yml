@@ -23,7 +23,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: master
       
@@ -84,19 +84,19 @@ jobs:
           sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "Released on ${{ github.ref_name }}"
 
       - name: Deliver buildinfo
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: OpenWrt_buildinfo
           path: ./artifact/buildinfo/
 
       - name: Deliver package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: OpenWrt_package
           path: ./artifact/package/
 
       - name: Deliver firmware
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: OpenWrt_firmware
           path: ./artifact/firmware/
