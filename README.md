@@ -1,6 +1,6 @@
 <img src="https://avatars.githubusercontent.com/u/53193414?s=200&v=4" alt="logo" width="200" height="200" align="right">
 
-# Project ImmortalWrt
+# Project ImmortalWrt [![OpenWrt-releases-CI](https://github.com/Coolkids/immortalwrt/actions/workflows/x86-ci.yml/badge.svg)](https://github.com/Coolkids/immortalwrt/actions/workflows/x86-ci.yml)
 
 ImmortalWrt is a fork of [OpenWrt](https://openwrt.org), with more packages ported, more devices supported, better performance, and special optimizations for mainland China users.<br/>
 Compared the official one, we allow to use hacks or non-upstreamable patches / modifications to achieve our purpose. Source from anywhere.
