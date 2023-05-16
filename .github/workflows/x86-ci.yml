@@ -103,7 +103,7 @@ jobs:
 
       - name: Upload release asset
         #if: github.event == 'release'
-        uses: svenstaro/upload-release-action@v2
+        uses: svenstaro/upload-release-action@v2.5.0
         with:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
           file: ./artifact/firmware/*
@@ -113,7 +113,7 @@ jobs:
           file_glob: true
 
       - name: Delete loder releases
-        uses: dev-drprasad/delete-older-releases@v0.2.0
+        uses: dev-drprasad/delete-older-releases@v0.2.1
         with:
           keep_latest: 5
         env:
