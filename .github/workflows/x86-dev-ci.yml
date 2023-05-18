@@ -60,18 +60,10 @@ jobs:
         run: |
           make download -j8 || make download -j1 V=s
           rm -rf $(find ./dl/ -size -1024c)
-          df -h
-
+          
       - name: Compile firmware
         run: |
-          make -j$(nproc) || make package/feeds/luci/luci-base/compile V=s
           make -j$(nproc) || make -j1 V=s
-          echo "======================="
-          echo "Space usage:"
-          echo "======================="
-          df -h
-          echo "======================="
-          du -h ./ --max-depth=1
 
       - name: Prepare artifact
         run: |
