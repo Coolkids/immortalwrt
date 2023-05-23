@@ -168,7 +168,7 @@ TARGET_DEVICES += glinet_gl-mt3000
 define Device/livinet_zr-3020
   DEVICE_VENDOR := Livinet
   DEVICE_MODEL := ZR-3020
-  DEVICE_DTS := mt7981-livinet-zr-3020
+  DEVICE_DTS := mt7981b-livinet-zr-3020
   DEVICE_DTS_DIR := ../dts
   DEVICE_PACKAGES := kmod-mt7981-firmware mt7981-wo-firmware
   UBINIZE_OPTS := -E 5
@@ -247,14 +247,14 @@ endef
 
 define Device/qihoo_360-t7-stock
   DEVICE_MODEL := 360 T7 (stock layout)
-  DEVICE_DTS := mt7981-qihoo-360-t7-stock
+  DEVICE_DTS := mt7981b-qihoo-360-t7-stock
   $(call Device/qihoo_360-t7-common)
 endef
 TARGET_DEVICES += qihoo_360-t7-stock
 
 define Device/qihoo_360-t7-ubootmod
   DEVICE_MODEL := 360 T7 (modified U-Boot layout)
-  DEVICE_DTS := mt7981-qihoo-360-t7-ubootmod
+  DEVICE_DTS := mt7981b-qihoo-360-t7-ubootmod
   $(call Device/qihoo_360-t7-common)
 endef
 TARGET_DEVICES += qihoo_360-t7-ubootmod
@@ -362,3 +362,26 @@ ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
 endif
 endef
 TARGET_DEVICES += xiaomi_redmi-router-ax6000-ubootmod
+
+define Device/zyxel_ex5601-t0-stock
+  DEVICE_VENDOR := Zyxel
+  DEVICE_MODEL := EX5601-T0  (stock layout)
+  DEVICE_DTS := mt7986a-zyxel-ex5601-t0-stock
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-mt7986-firmware mt7986-wo-firmware
+  SUPPORTED_DEVICES := mediatek,mt7986a-rfb-snand
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 256k
+  PAGESIZE := 4096
+  IMAGE_SIZE := 65536k
+  KERNEL_IN_UBI := 1
+  IMAGES += factory.bin
+  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  KERNEL = kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  KERNEL_INITRAMFS = kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd
+  DTC_FLAGS += -@ --space 32768
+endef
+TARGET_DEVICES += zyxel_ex5601-t0-stock
