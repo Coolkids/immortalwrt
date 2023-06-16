@@ -1,0 +1,10 @@
+#!/bin/bash
+read -p "扩展ext分区 将格式化/dev/$1  [y/n]:" ok
+
+if [ $ok == 'y' ] ;
+then
+  umount /mnt/$1
+  mkfs.ext4 /dev/$1
+  mount /dev/$1 /mnt/$1
+  tar -C /overlay -cvf - . | tar -C /mnt/$1 -xf -
+fi 
