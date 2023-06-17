@@ -1,21 +1,7 @@
+From 30fd21cfb1e64ef20035559a8246f5fbf682c40e Mon Sep 17 00:00:00 2001
 From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-To: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Sebastian Reichel <sebastian.reichel@collabora.com>,
-	Shreeya Patel <shreeya.patel@collabora.com>,
-	Kever Yang <kever.yang@rock-chips.com>,
-	Finley Xiao <finley.xiao@rock-chips.com>,
-	Vincent Legoll <vincent.legoll@gmail.com>
-Cc: devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel@collabora.com
-Subject: [PATCH v2 4/8] nvmem: rockchip-otp: Generalize rockchip_otp_wait_status()
-Date: Thu,  4 May 2023 23:06:44 +0300	[thread overview]
-Message-ID: <20230504200648.1119866-5-cristian.ciocaltea@collabora.com> (raw)
-In-Reply-To: <20230504200648.1119866-1-cristian.ciocaltea@collabora.com>
+Date: Sun, 11 Jun 2023 15:03:14 +0100
+Subject: [PATCH] nvmem: rockchip-otp: Generalize rockchip_otp_wait_status()
 
 In preparation to support additional Rockchip OTP memory devices with
 different register layout, generalize rockchip_otp_wait_status() to
@@ -24,6 +10,9 @@ accept a new parameter for specifying the offset of the status register.
 Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
 Tested-by: Vincent Legoll <vincent.legoll@gmail.com>
 Reviewed-by: Heiko Stuebner <heiko@sntech.de>
+Signed-off-by: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
+Message-ID: <20230611140330.154222-11-srinivas.kandagatla@linaro.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
  drivers/nvmem/rockchip-otp.c | 11 ++++++-----
  1 file changed, 6 insertions(+), 5 deletions(-)
