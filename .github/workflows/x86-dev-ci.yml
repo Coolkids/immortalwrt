@@ -65,6 +65,11 @@ jobs:
         run: |
           make -j$(nproc) || make -j1 V=s
 
+      - name: Clean Build Files
+        run: |
+          rm -rf ./staging_dir
+          rm -rf ./build_dir
+
       - name: Prepare artifact
         run: |
           mkdir -p ./artifact/firmware
@@ -75,7 +80,10 @@ jobs:
           cp -rf $(find ./bin/targets/ -type f -name "sha256sums") ./artifact/firmware/
           cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./artifact/package/
           cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
-          sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "dev on ${{ github.ref_name }}"
+
+      - name: Clean Bin Files
+        run: |
+          rm -rf ./bin
 
       - name: Deliver buildinfo
         uses: actions/upload-artifact@v3
@@ -94,6 +102,10 @@ jobs:
         with:
           name: OpenWrt_firmware
           path: ./artifact/firmware/
+
+      - name: Push Msg
+        run: |
+          sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "dev on ${{ github.ref_name }}"
 
 
 
