@@ -53,7 +53,7 @@ jobs:
       - name: Generate configuration file
         run: |
           rm -f ./.config*
-          cp .github/x86.config ./.config
+          cp .github/x86_dev.config ./.config
           make defconfig
 
       - name: Make download
