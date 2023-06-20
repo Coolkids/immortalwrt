@@ -1,24 +1,8 @@
 diff --git forkSrcPrefix/ndpi-netfilter/src/main.c forkDstPrefix/ndpi-netfilter/src/main.c
-index 024ca4bb7998b8fb74e93276656129246ff21ef2..800379d596a27458ac98cb210b46ed23f1e9235e 100644
+index 024ca4bb7998b8fb74e93276656129246ff21ef2..14edaecfa95b4f52bd9cec1c3a2970f01524f118 100644
 --- forkSrcPrefix/ndpi-netfilter/src/main.c
 +++ forkDstPrefix/ndpi-netfilter/src/main.c
-@@ -109,15 +109,11 @@ static char risk_name[]="risks";
- #endif
- 
- #ifdef USE_LIVEPATCH
--#if IS_ENABLED(CONFIG_LIVEPATCH)
- #include <linux/livepatch.h>
- #include <linux/rculist_nulls.h>
- 
- typedef void (*ndpi_conntrack_destroy_ptr) (struct nf_conntrack *);
- ndpi_conntrack_destroy_ptr __rcu nf_conntrack_destroy_cb;
--#else
--#error "CONFIG_LIVEPATCH not enabled"
--#endif
- #endif
- 
- #define PROC_REMOVE(pde,net) proc_remove(pde)
-@@ -3244,7 +3240,7 @@ static int __init ndpi_mt_init(void)
+@@ -3244,7 +3244,7 @@ static int __init ndpi_mt_init(void)
  	ndpi_size_flow_struct = ndpi_detection_get_sizeof_ndpi_flow_struct();
  	set_ndpi_malloc(malloc_wrapper);
  	set_ndpi_free(free_wrapper);
@@ -27,7 +11,7 @@ index 024ca4bb7998b8fb74e93276656129246ff21ef2..800379d596a27458ac98cb210b46ed23
  	if(request_module("nf_conntrack") < 0) {
  		pr_err("xt_ndpi: nf_conntrack required!\n");
  		return -EOPNOTSUPP;
-@@ -3259,6 +3255,7 @@ static int __init ndpi_mt_init(void)
+@@ -3259,6 +3259,7 @@ static int __init ndpi_mt_init(void)
  		return -EOPNOTSUPP;
  	}
  #endif
