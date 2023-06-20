@@ -45,14 +45,7 @@ MAKE_FLAGS += \
 	NDPI_PATH=$(PKG_BUILD_DIR)/ndpi-netfilter
 
 define Build/Compile
-	(cd $(PKG_BUILD_DIR)/src/lib &&\
-		gcc -g -O2 -fPIC -DPIC -DNDPI_LIB_COMPILATION -I../../src/include/ -I../../src/lib/third_party/include/ ndpi_network_list_compile.c -o ndpi_network_list_compile &&\
-		./ndpi_network_list_compile -o ndpi_network_list.c.inc ndpi_network_list_amazon_aws.yaml \
-		ndpi_network_list_cloudflare.yaml ndpi_network_list_microsoft_365.yaml \
-		ndpi_network_list_microsoft_azure.yaml ndpi_network_list_mining.yaml \
-		ndpi_network_list_ms_one_drive.yaml ndpi_network_list_ms_outlook.yaml \
-		ndpi_network_list_other.yaml ndpi_network_list_skype_teams.yaml \
-		ndpi_network_list_tor.yaml ndpi_network_list_whatsapp.yaml ndpi_network_list_zoom.yaml )
+	(cd $(PKG_BUILD_DIR)/src/lib ; make ndpi_network_list.c.inc )
 	make $(MAKE_FLAGS) -C $(PKG_BUILD_DIR)/ndpi-netfilter
 endef
 
