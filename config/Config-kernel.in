@@ -1065,7 +1065,6 @@ endif
 config KERNEL_MPTCP
 	bool "Enable IPv4 MultiPath TCP support"
 	default n
-	depends on !(LINUX_4_4||LINUX_5_4)
 	help
 	  IPv4 MultiPath TCP to kernel support.
 
@@ -1114,7 +1113,6 @@ if KERNEL_IPV6
 		bool "Enable IPv6 MultiPath TCP support"
 		default n
 		depends on KERNEL_MPTCP
-		depends on !(LINUX_4_4||LINUX_5_4)
 		help
 		  IPv6 MultiPath TCP to kernel support.
 
