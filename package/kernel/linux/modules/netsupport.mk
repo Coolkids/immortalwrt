@@ -1468,7 +1468,7 @@ define KernelPackage/inet-mptcp-diag
   TITLE:=INET diag support for MultiPath TCP
   DEPENDS:=kmod-mptcp +kmod-inet-diag
   KCONFIG:= CONFIG_INET_MPTCP_DIAG=y
-  FILES:= $(LINUX_DIR)/net/mptcp/mptcp_diag.ko@ge5.6
+  FILES:= $(LINUX_DIR)/net/mptcp/mptcp_diag.ko
   AUTOLOAD:=$(call AutoProbe,mptcp_diag)
 endef
 
