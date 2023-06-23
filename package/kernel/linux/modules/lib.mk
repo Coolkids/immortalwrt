@@ -329,7 +329,7 @@ define KernelPackage/livepatch
     CONFIG_KALLSYMS_ALL=y \
     CONFIG_HAVE_LIVEPATCH=y \
     CONFIG_LIVEPATCH=y 
-  FILES:= $(LINUX_DIR)/kernel/livepatch/livepatch.ko
+  FILES:= $(LINUX_DIR)/kernel/module/livepatch.ko
   AUTOLOAD:=$(call AutoProbe,livepatch)
 endef
 
