@@ -65,5 +65,22 @@ define KernelPackage/ipt-ndpi
   AUTOLOAD:=$(call AutoProbe,xt_ndpi)
 endef
 
+define KernelPackage/livepatch
+  SUBMENU:=Libraries
+  TITLE:=Kernel Live Patching
+  KCONFIG:= CONFIG_LIVEPATCH
+  FILES:= $(LINUX_DIR)/kernel/livepatch/livepatch.ko
+  AUTOLOAD:=$(call AutoProbe,livepatch)
+endef
+
+define KernelPackage/livepatch/description
+    Say Y here if you want to support kernel live patching.
+    This option has no runtime impact until a kernel "patch"
+    module uses the interface provided by this option to register
+    a patch, causing calls to patched functions to be redirected
+    to new function code contained in the patch module.
+endef
+
 $(eval $(call BuildPackage,iptables-mod-ndpi))
 $(eval $(call KernelPackage,ipt-ndpi))
+$(eval $(call KernelPackage,livepatch))
