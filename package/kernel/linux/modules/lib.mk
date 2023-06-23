@@ -318,27 +318,3 @@ define KernelPackage/oid-registry
 endef
 
 $(eval $(call KernelPackage,oid-registry))
-
-define KernelPackage/livepatch
-  SUBMENU:=$(LIB_MENU)
-  TITLE:=Kernel Live Patching
-  KCONFIG:= \
-    CONFIG_DYNAMIC_FTRACE_WITH_ARGS=y \
-    CONFIG_MODULES=y \
-    CONFIG_SYSFS=y \
-    CONFIG_KALLSYMS_ALL=y \
-    CONFIG_HAVE_LIVEPATCH=y \
-    CONFIG_LIVEPATCH=y 
-  FILES:= $(LINUX_DIR)/kernel/module/livepatch.ko
-  AUTOLOAD:=$(call AutoProbe,livepatch)
-endef
-
-define KernelPackage/livepatch/description
-    Say Y here if you want to support kernel live patching.
-    This option has no runtime impact until a kernel "patch"
-    module uses the interface provided by this option to register
-    a patch, causing calls to patched functions to be redirected
-    to new function code contained in the patch module.
-endef
-
-$(eval $(call KernelPackage,livepatch))

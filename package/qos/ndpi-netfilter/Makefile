@@ -59,8 +59,7 @@ endef
 define KernelPackage/ipt-ndpi
   SUBMENU:=Netfilter Extensions
   TITLE:= nDPI net netfilter module
-  KCONFIG:= CONFIG_LIVEPATCH=y
-  DEPENDS:=+kmod-nf-conntrack +kmod-nf-conntrack-netlink +kmod-ipt-compat-xtables +kmod-ipt-conntrack-label +kmod-livepatch
+  DEPENDS:=+kmod-nf-conntrack +kmod-nf-conntrack-netlink +kmod-ipt-compat-xtables +kmod-ipt-conntrack-label
   FILES:= \
 	$(PKG_BUILD_DIR)/ndpi-netfilter/src/xt_ndpi.ko
   AUTOLOAD:=$(call AutoProbe,xt_ndpi)
