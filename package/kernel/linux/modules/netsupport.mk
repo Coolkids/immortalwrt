@@ -1437,7 +1437,7 @@ $(eval $(call KernelPackage,inet-diag))
 define KernelPackage/mptcp
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=MultiPath TCP support
-  KCONFIG:=CONFIG_MPTCP@ge5.6=y
+  KCONFIG:=CONFIG_MPTCP=y
   AUTOLOAD:=$(call AutoProbe,mptcp)
 endef
 
@@ -1452,7 +1452,7 @@ define KernelPackage/mptcp_ipv6
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=MultiPath TCP IPv6 support
   DEPENDS:=@IPV6 +kmod-mptcp
-  KCONFIG:=CONFIG_MPTCP_IPV6@ge5.6=y
+  KCONFIG:=CONFIG_MPTCP_IPV6=y
   AUTOLOAD:=$(call AutoProbe,mptcp_ipv6)
 endef
 
@@ -1467,7 +1467,7 @@ define KernelPackage/inet-mptcp-diag
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=INET diag support for MultiPath TCP
   DEPENDS:=kmod-mptcp +kmod-inet-diag
-  KCONFIG:= CONFIG_INET_MPTCP_DIAG@ge5.6
+  KCONFIG:= CONFIG_INET_MPTCP_DIAG=y
   FILES:= $(LINUX_DIR)/net/mptcp/mptcp_diag.ko@ge5.6
   AUTOLOAD:=$(call AutoProbe,mptcp_diag)
 endef

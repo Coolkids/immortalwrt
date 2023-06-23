@@ -68,7 +68,7 @@ endef
 define KernelPackage/livepatch
   SUBMENU:=Libraries
   TITLE:=Kernel Live Patching
-  KCONFIG:= CONFIG_LIVEPATCH
+  KCONFIG:= CONFIG_LIVEPATCH=y
   FILES:= $(LINUX_DIR)/kernel/livepatch/livepatch.ko
   AUTOLOAD:=$(call AutoProbe,livepatch)
 endef
