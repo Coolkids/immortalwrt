@@ -322,7 +322,13 @@ $(eval $(call KernelPackage,oid-registry))
 define KernelPackage/livepatch
   SUBMENU:=$(LIB_MENU)
   TITLE:=Kernel Live Patching
-  KCONFIG:= CONFIG_LIVEPATCH=y
+  KCONFIG:= \
+    CONFIG_DYNAMIC_FTRACE_WITH_ARGS=y \
+    CONFIG_MODULES=y \
+    CONFIG_SYSFS=y \
+    CONFIG_KALLSYMS_ALL=y \
+    CONFIG_HAVE_LIVEPATCH=y \
+    CONFIG_LIVEPATCH=y 
   FILES:= $(LINUX_DIR)/kernel/livepatch/livepatch.ko
   AUTOLOAD:=$(call AutoProbe,livepatch)
 endef
