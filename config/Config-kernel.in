@@ -1064,7 +1064,7 @@ endif
 
 config KERNEL_MPTCP
 	bool "Enable IPv4 MultiPath TCP support"
-	default n
+	default y
 	help
 	  IPv4 MultiPath TCP to kernel support.
 
@@ -1111,7 +1111,7 @@ if KERNEL_IPV6
 		
 	config KERNEL_MPTCP_IPV6
 		bool "Enable IPv6 MultiPath TCP support"
-		default n
+		default y
 		depends on KERNEL_MPTCP
 		help
 		  IPv6 MultiPath TCP to kernel support.
@@ -1364,3 +1364,9 @@ config KERNEL_UBIFS_FS_SECURITY
 
 config KERNEL_JFFS2_FS_SECURITY
 	bool "JFFS2 Security Labels"
+
+config KERNEL_LIVEPATCH
+	bool "Enable kernel livepatch support"
+	default y
+	help
+	  kernel livepatch support.
