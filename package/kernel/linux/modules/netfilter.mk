@@ -575,7 +575,7 @@ $(eval $(call KernelPackage,ipt-nat-extra))
 define KernelPackage/ipt-imq
   TITLE:=Intermediate Queueing support
   KCONFIG:= \
-	CONFIG_IMQ \
+	CONFIG_IMQ=y \
 	CONFIG_IMQ_BEHAVIOR_BA=y \
 	CONFIG_IMQ_NUM_DEVS=2 \
 	CONFIG_NETFILTER_XT_MATCH_WEBURL \
