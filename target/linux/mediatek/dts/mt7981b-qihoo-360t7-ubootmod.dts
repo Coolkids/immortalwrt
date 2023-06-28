@@ -7,9 +7,8 @@
 #include "mt7981.dtsi"
 
 / {
-	model = "Qihoo 360T7 (modified U-Boot layout)";
+	model = "Qihoo 360T7 (custom U-Boot layout)";
 	compatible = "qihoo,360t7-ubootmod", "mediatek,mt7981";
-
 
 	aliases {
 		led-boot = &red_led;
@@ -21,6 +20,10 @@
 
 	chosen {
 		stdout-path = "serial0:115200n8";
+	};
+
+	memory {
+		reg = <0 0x40000000 0 0x10000000>;
 	};
 
 	gpio-keys {

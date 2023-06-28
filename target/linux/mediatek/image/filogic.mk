@@ -176,16 +176,16 @@ define Device/glinet_gl-mt3000
 endef
 TARGET_DEVICES += glinet_gl-mt3000
 
-define Device/livinet_zr-3020
-  DEVICE_VENDOR := Livinet
-  DEVICE_MODEL := ZR-3020
-  DEVICE_DTS := mt7981b-livinet-zr-3020
+define Device/jcg_q30-ubootmod
+  DEVICE_VENDOR := JCG
+  DEVICE_MODEL := Q30 (custom U-Boot layout)
+  DEVICE_DTS := mt7981b-jcg-q30-ubootmod
   DEVICE_DTS_DIR := ../dts
   DEVICE_PACKAGES := kmod-mt7981-firmware mt7981-wo-firmware
   UBINIZE_OPTS := -E 5
   BLOCKSIZE := 128k
   PAGESIZE := 2048
-  IMAGE_SIZE := 65536k
+  IMAGE_SIZE := 113152k
   KERNEL_IN_UBI := 1
   IMAGES += factory.bin
   IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
@@ -195,7 +195,41 @@ define Device/livinet_zr-3020
   KERNEL_INITRAMFS = kernel-bin | lzma | \
 	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd
 endef
+TARGET_DEVICES += jcg_q30-ubootmod
+
+define Device/livinet_zr-3020-common
+  DEVICE_VENDOR := Livinet
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-mt7981-firmware mt7981-wo-firmware
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_IN_UBI := 1
+  IMAGES += factory.bin
+  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  KERNEL = kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  KERNEL_INITRAMFS = kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd
+endef
+
+define Device/livinet_zr-3020
+  DEVICE_MODEL := ZR-3020 (stock layout)
+  DEVICE_DTS := mt7981b-livinet-zr-3020
+  SUPPORTED_DEVICES += mediatek,mt7981-spim-snand-gsw-rfb
+  IMAGE_SIZE := 65536k
+  $(call Device/livinet_zr-3020-common)
+endef
 TARGET_DEVICES += livinet_zr-3020
+
+define Device/livinet_zr-3020-ubootmod
+  DEVICE_MODEL := ZR-3020 (custom U-Boot layout)
+  DEVICE_DTS := mt7981b-livinet-zr-3020-ubootmod
+  IMAGE_SIZE := 98304k
+  $(call Device/livinet_zr-3020-common)
+endef
+TARGET_DEVICES += livinet_zr-3020-ubootmod
 
 define Device/netgear_wax220
   DEVICE_VENDOR := Netgear
@@ -271,6 +305,20 @@ define Device/mediatek_mt7988a-rfb-nand
 endef
 TARGET_DEVICES += mediatek_mt7988a-rfb-nand
 
+define Device/mercusys_mr90x-v1
+  DEVICE_VENDOR := Mercusys
+  DEVICE_MODEL := MR90X v1
+  DEVICE_DTS := mt7986b-mercusys-mr90x-v1
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-mt7986-firmware mt7986-wo-firmware
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 51200k
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += mercusys_mr90x-v1
+
 define Device/qihoo_360t7
   DEVICE_VENDOR := Qihoo
   DEVICE_MODEL := 360T7 (OpenWrt U-Boot layout)
@@ -297,7 +345,7 @@ TARGET_DEVICES += qihoo_360t7
 
 define Device/qihoo_360t7-ubootmod
   DEVICE_VENDOR := Qihoo
-  DEVICE_MODEL := 360T7 (modified U-Boot layout)
+  DEVICE_MODEL := 360T7 (custom U-Boot layout)
   DEVICE_DTS := mt7981b-qihoo-360t7-ubootmod
   DEVICE_DTS_DIR := ../dts
   DEVICE_PACKAGES := kmod-mt7981-firmware mt7981-wo-firmware
@@ -363,10 +411,10 @@ TARGET_DEVICES += tplink_tl-xdr6088
 
 define Device/xiaomi_redmi-router-ax6000
   DEVICE_VENDOR := Xiaomi
-  DEVICE_MODEL := Redmi Router AX6000 (modified U-Boot layout)
+  DEVICE_MODEL := Redmi Router AX6000 (custom U-Boot layout)
   DEVICE_DTS := mt7986a-xiaomi-redmi-router-ax6000
   DEVICE_DTS_DIR := ../dts
-  DEVICE_PACKAGES := kmod-leds-ws2812b
+  DEVICE_PACKAGES := kmod-leds-ws2812b kmod-mt7986-firmware mt7986-wo-firmware
   KERNEL_LOADADDR := 0x48000000
   UBINIZE_OPTS := -E 5
   BLOCKSIZE := 128k
@@ -423,7 +471,7 @@ TARGET_DEVICES += xiaomi_redmi-router-ax6000-ubootmod
 
 define Device/zyxel_ex5601-t0-stock
   DEVICE_VENDOR := Zyxel
-  DEVICE_MODEL := EX5601-T0  (stock layout)
+  DEVICE_MODEL := EX5601-T0 (stock layout)
   DEVICE_DTS := mt7986a-zyxel-ex5601-t0-stock
   DEVICE_DTS_DIR := ../dts
   DEVICE_PACKAGES := kmod-mt7986-firmware mt7986-wo-firmware

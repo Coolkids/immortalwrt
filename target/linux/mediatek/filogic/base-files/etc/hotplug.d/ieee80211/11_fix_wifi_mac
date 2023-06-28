@@ -31,10 +31,20 @@ case "$board" in
 		# mac-address instead.
 		[ "$PHYNBR" = "0" ] && echo "$addr" > /sys${DEVPATH}/macaddress
 		[ "$PHYNBR" = "1" ] && macaddr_setbit_la $(macaddr_add $addr 1) > /sys${DEVPATH}/macaddress
-	;;
-	livinet,zr-3020)
+		;;
+	jcg,q30-ubootmod)
+		[ "$PHYNBR" = "1" ] && \
+			macaddr_setbit_la "$(mtd_get_mac_binary Factory 0x4)" > /sys${DEVPATH}/macaddress
+		;;
+	livinet,zr-3020|\
+	livinet,zr-3020-ubootmod)
 		addr=$(mtd_get_mac_ascii config2 wifi5gmac)
 		[ "$PHYNBR" = "1" ] && echo $macaddr > /sys${DEVPATH}/macaddress
+		;;
+	mercusys,mr90x-v1)
+		addr=$(get_mac_binary "/tmp/tp_data/default-mac" 0)
+		[ "$PHYNBR" = "0" ] && echo "$addr" > /sys${DEVPATH}/macaddress
+		[ "$PHYNBR" = "1" ] && macaddr_add $addr -1 > /sys${DEVPATH}/macaddress
 		;;
 	netgear,wax220)
 		hw_mac_addr=$(mtd_get_mac_ascii u-boot-env mac)
