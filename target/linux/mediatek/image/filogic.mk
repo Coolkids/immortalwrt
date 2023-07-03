@@ -141,6 +141,27 @@ define Device/bananapi_bpi-r3
 endef
 TARGET_DEVICES += bananapi_bpi-r3
 
+define Device/cetron_ct3003-ubootmod
+  DEVICE_VENDOR := CETRON
+  DEVICE_MODEL := CT3003 (custom U-Boot layout)
+  DEVICE_DTS := mt7981b-cetron-ct3003-ubootmod
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-mt7981-firmware mt7981-wo-firmware
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 113152k
+  KERNEL_IN_UBI := 1
+  IMAGES += factory.bin
+  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  KERNEL = kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  KERNEL_INITRAMFS = kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd
+endef
+TARGET_DEVICES += cetron_ct3003-ubootmod
+
 define Device/cudy_wr3000-v1
   DEVICE_VENDOR := Cudy
   DEVICE_MODEL := WR3000
@@ -156,7 +177,7 @@ define Device/cudy_wr3000-v1
   KERNEL_INITRAMFS := kernel-bin | lzma | \
 	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
   IMAGE/sysupgrade.bin := append-kernel | pad-to 128k | append-rootfs | pad-rootfs | check-size | append-metadata
-  DEVICE_PACKAGES := kmod-mt7981-firmware
+  DEVICE_PACKAGES := kmod-mt7981-firmware mt7981-wo-firmware
 endef
 TARGET_DEVICES += cudy_wr3000-v1
 
@@ -175,6 +196,31 @@ define Device/glinet_gl-mt3000
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
 endef
 TARGET_DEVICES += glinet_gl-mt3000
+
+define Device/h3c_magic-nx30-pro
+  DEVICE_VENDOR := H3C
+  DEVICE_MODEL := Magic NX30 Pro
+  DEVICE_DTS := mt7981b-h3c-magic-nx30-pro
+  DEVICE_DTS_DIR := ../dts
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_IN_UBI := 1
+  UBOOTENV_IN_UBI := 1
+  IMAGE_SIZE := 65536k
+  IMAGES := sysupgrade.itb
+  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
+  KERNEL := kernel-bin | gzip
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+        fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  IMAGE/sysupgrade.itb := append-kernel | \
+        fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | append-metadata
+  DEVICE_PACKAGES := kmod-mt7981-firmware mt7981-wo-firmware
+  ARTIFACTS := preloader.bin bl31-uboot.fip
+  ARTIFACT/preloader.bin := mt7981-bl2 spim-nand-ddr3
+  ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot h3c_magic-nx30-pro
+endef
+TARGET_DEVICES += h3c_magic-nx30-pro
 
 define Device/jcg_q30-ubootmod
   DEVICE_VENDOR := JCG
