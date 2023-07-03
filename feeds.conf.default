@@ -7,5 +7,5 @@ src-git telephony https://github.com/openwrt/telephony.git
 #src-git-full oldpackages http://git.openwrt.org/packages.git
 #src-link custom /usr/src/openwrt/custom-feed
 src-git diy1 https://github.com/xiaorouji/openwrt-passwall.git;packages
-src-git diy2 https://github.com/xiaorouji/openwrt-passwall.git;luci
+src-git diy2 https://github.com/xiaorouji/openwrt-passwall.git;luci-smartdns-new-version
 src-git custom https://github.com/Coolkids/custom-packages.git
