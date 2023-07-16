@@ -5,9 +5,9 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
-PKG_VERSION:=2023.07-rc3
+PKG_VERSION:=2023.07.02
 PKG_RELEASE:=1
-PKG_HASH:=42ec083674bd30fa4c16e78c3f5f453c08d9f737595a77b5dda595ac3a09d82f
+PKG_HASH:=6b6a48581c14abb0f95bd87c1af4d740922406d7b801002a9f94727fdde021d5
 
 PKG_MAINTAINER:=Tobias Maedel <openwrt@tbspace.de>
 
@@ -144,14 +144,14 @@ endef
 
 define U-Boot/fastrhino-r66s-rk3568
   $(U-Boot/Default/rk3568)
-  NAME:=Lunzn FastRhino R66S
+  NAME:=FastRhino R66S
   BUILD_DEVICES:= \
     lunzn_fastrhino-r66s
 endef
 
 define U-Boot/fastrhino-r68s-rk3568
   $(U-Boot/Default/rk3568)
-  NAME:=Lunzn FastRhino R68S
+  NAME:=FastRhino R68S
   BUILD_DEVICES:= \
     lunzn_fastrhino-r68s
 endef
@@ -165,18 +165,24 @@ endef
 
 define U-Boot/nanopi-r5c-rk3568
   $(U-Boot/Default/rk3568)
-  NAME:=FriendlyARM NanoPi R5C
+  NAME:=NanoPi R5C
   BUILD_DEVICES:= \
     friendlyarm_nanopi-r5c
 endef
 
 define U-Boot/nanopi-r5s-rk3568
   $(U-Boot/Default/rk3568)
-  NAME:=FriendlyARM NanoPi R5S
+  NAME:=NanoPi R5S
   BUILD_DEVICES:= \
     friendlyarm_nanopi-r5s
 endef
 
+define U-Boot/roc-pc-rk3568
+  $(U-Boot/Default/rk3568)
+  NAME:=Station P2
+  BUILD_DEVICES:= \
+    firefly_roc-rk3568-pc
+endef
 
 # RK3588 boards
 
@@ -187,9 +193,26 @@ define U-Boot/Default/rk3588
   DDR:=$(RK3588_DDR)
 endef
 
+define U-Boot/rock5b-rk3588
+  $(U-Boot/Default/rk3588)
+  NAME:=Rock 5B
+  BUILD_DEVICES:= \
+    radxa_rock-5b
+endef
+
+
+# RK3588S boards
+
+define U-Boot/nanopi-r6c-rk3588s
+  $(U-Boot/Default/rk3588)
+  NAME:=NanoPi R6C
+  BUILD_DEVICES:= \
+    friendlyarm_nanopi-r6c
+endef
+
 define U-Boot/nanopi-r6s-rk3588s
   $(U-Boot/Default/rk3588)
-  NAME:=FriendlyARM NanoPi R6S
+  NAME:=NanoPi R6S
   BUILD_DEVICES:= \
     friendlyarm_nanopi-r6s
 endef
@@ -213,6 +236,9 @@ UBOOT_TARGETS := \
   mrkaio-m68s-rk3568 \
   nanopi-r5c-rk3568 \
   nanopi-r5s-rk3568 \
+  roc-pc-rk3568 \
+  rock5b-rk3588 \
+  nanopi-r6c-rk3588s \
   nanopi-r6s-rk3588s
 
 UBOOT_CONFIGURE_VARS += USE_PRIVATE_LIBGCC=yes
