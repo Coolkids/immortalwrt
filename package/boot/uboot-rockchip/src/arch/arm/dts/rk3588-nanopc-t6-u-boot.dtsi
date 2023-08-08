@@ -3,7 +3,7 @@
  * Copyright (c) 2023 Tianling Shen <cnsztl@gmail.com>
  */
 
-#include "rk3588s-u-boot.dtsi"
+#include "rk3588-u-boot.dtsi"
 
 / {
 	aliases {
