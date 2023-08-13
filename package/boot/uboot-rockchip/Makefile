@@ -5,9 +5,9 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
-PKG_VERSION:=2023.07.02
+PKG_VERSION:=2023.10-rc2
 PKG_RELEASE:=1
-PKG_HASH:=6b6a48581c14abb0f95bd87c1af4d740922406d7b801002a9f94727fdde021d5
+PKG_HASH:=b7f54b2bab765abd09ebae3bd0edeb77f2f2af1c4ccf6c286d37b01d97cb6be7
 
 PKG_MAINTAINER:=Tobias Maedel <openwrt@tbspace.de>
 
@@ -184,6 +184,27 @@ define U-Boot/nanopi-r5s-rk3568
     friendlyarm_nanopi-r5s
 endef
 
+define U-Boot/opc-h66k-rk3568
+  $(U-Boot/Default/rk3568)
+  NAME:=OPC-H66K
+  BUILD_DEVICES:= \
+    hinlink_opc-h66k
+endef
+
+define U-Boot/opc-h68k-rk3568
+  $(U-Boot/Default/rk3568)
+  NAME:=OPC-H68K
+  BUILD_DEVICES:= \
+    hinlink_opc-h68k
+endef
+
+define U-Boot/opc-h69k-rk3568
+  $(U-Boot/Default/rk3568)
+  NAME:=OPC-H69K
+  BUILD_DEVICES:= \
+    hinlink_opc-h69k
+endef
+
 define U-Boot/roc-pc-rk3568
   $(U-Boot/Default/rk3568)
   NAME:=Station P2
@@ -231,6 +252,13 @@ define U-Boot/nanopi-r6s-rk3588s
     friendlyarm_nanopi-r6s
 endef
 
+define U-Boot/rock5a-rk3588s
+  $(U-Boot/Default/rk3588)
+  NAME:=Rock 5A
+  BUILD_DEVICES:= \
+    radxa_rock-5a
+endef
+
 UBOOT_TARGETS := \
   guangmiao-g4c-rk3399 \
   nanopc-t4-rk3399 \
@@ -251,11 +279,15 @@ UBOOT_TARGETS := \
   mrkaio-m68s-rk3568 \
   nanopi-r5c-rk3568 \
   nanopi-r5s-rk3568 \
+  opc-h66k-rk3568 \
+  opc-h68k-rk3568 \
+  opc-h69k-rk3568 \
   roc-pc-rk3568 \
   nanopc-t6-rk3588 \
   rock5b-rk3588 \
   nanopi-r6c-rk3588s \
-  nanopi-r6s-rk3588s
+  nanopi-r6s-rk3588s \
+  rock5a-rk3588s
 
 UBOOT_CONFIGURE_VARS += USE_PRIVATE_LIBGCC=yes
 
