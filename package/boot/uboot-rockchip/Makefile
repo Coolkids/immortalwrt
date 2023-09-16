@@ -5,9 +5,9 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
-PKG_VERSION:=2023.10-rc2
+PKG_VERSION:=2023.10-rc3
 PKG_RELEASE:=1
-PKG_HASH:=b7f54b2bab765abd09ebae3bd0edeb77f2f2af1c4ccf6c286d37b01d97cb6be7
+PKG_HASH:=4c29d64e764060b49e7658f0cf9f86911d0b2bc081f13980a19b99cc89584ba0
 
 PKG_MAINTAINER:=Tobias Maedel <openwrt@tbspace.de>
 
@@ -80,6 +80,13 @@ define U-Boot/rock-pi-e-rk3328
   NAME:=Rock Pi E
   BUILD_DEVICES:= \
     radxa_rock-pi-e
+endef
+
+define U-Boot/rock64-rk3328
+  $(U-Boot/Default/rk3328)
+  NAME:=Rock64
+  BUILD_DEVICES:= \
+    pine64_rock64
 endef
 
 # RK3399 boards
@@ -274,6 +281,7 @@ UBOOT_TARGETS := \
   orangepi-r1-plus-lts-rk3328 \
   roc-cc-rk3328 \
   rock-pi-e-rk3328 \
+  rock64-rk3328 \
   fastrhino-r66s-rk3568 \
   fastrhino-r68s-rk3568 \
   mrkaio-m68s-rk3568 \
