@@ -26,7 +26,6 @@ function iface_remove(cfg)
 	if (!cfg || !cfg.bss || !cfg.bss[0] || !cfg.bss[0].ifname)
 		return;
 
-	hostapd.remove_iface(cfg.bss[0].ifname);
 	for (let bss in cfg.bss)
 		wdev_remove(bss.ifname);
 }
@@ -95,14 +94,14 @@ function iface_add(phy, config, phy_status)
 	let config_inline = iface_gen_config(phy, config, !!phy_status);
 
 	let bss = config.bss[0];
-	let ret = hostapd.add_iface(`bss_config=${bss.ifname}:${config_inline}`);
+	let ret = hostapd.add_iface(`bss_config=${phy}:${config_inline}`);
 	if (ret < 0)
 		return false;
 
 	if (!phy_status)
 		return true;
 
-	let iface = hostapd.interfaces[bss.ifname];
+	let iface = hostapd.interfaces[phy];
 	if (!iface)
 		return false;
 
@@ -127,6 +126,7 @@ function iface_restart(phydev, config, old_config)
 {
 	let phy = phydev.name;
 
+	hostapd.remove_iface(phy);
 	iface_remove(old_config);
 	iface_remove(config);
 
@@ -215,6 +215,7 @@ function bss_remove_file_fields(config)
 	for (let key in config.hash)
 		new_cfg.hash[key] = config.hash[key];
 	delete new_cfg.hash.wpa_psk_file;
+	delete new_cfg.hash.vlan_file;
 
 	return new_cfg;
 }
@@ -266,13 +267,13 @@ function iface_reload_config(phydev, config, old_config)
 	if (!old_config.bss || !old_config.bss[0])
 		return false;
 
-	let iface_name = old_config.bss[0].ifname;
-	let iface = hostapd.interfaces[iface_name];
+	let iface = hostapd.interfaces[phy];
 	if (!iface) {
 		hostapd.printf(`Could not find previous interface ${iface_name}`);
 		return false;
 	}
 
+	let iface_name = old_config.bss[0].ifname;
 	let first_bss = hostapd.bss[iface_name];
 	if (!first_bss) {
 		hostapd.printf(`Could not find bss of previous interface ${iface_name}`);
@@ -475,11 +476,12 @@ function iface_reload_config(phydev, config, old_config)
 		             bss_remove_file_fields(bss_list_cfg[i]))) {
 			hostapd.printf(`Update config data files for bss ${ifname}`);
 			if (bss.set_config(config_inline, i, true) < 0) {
-				hostapd.printf(`Failed to update config data files for bss ${ifname}`);
+				hostapd.printf(`Could not update config data files for bss ${ifname}`);
 				return false;
+			} else {
+				bss.ctrl("RELOAD_WPA_PSK");
+				continue;
 			}
-			bss.ctrl("RELOAD_WPA_PSK");
-			continue;
 		}
 
 		bss_reload_psk(bss, config.bss[i], bss_list_cfg[i]);
@@ -487,8 +489,6 @@ function iface_reload_config(phydev, config, old_config)
 			continue;
 
 		hostapd.printf(`Reload config for bss '${config.bss[0].ifname}' on phy '${phy}'`);
-		hostapd.printf(`old: ${bss_remove_file_fields(bss_list_cfg[i])}`);
-		hostapd.printf(`new: ${bss_remove_file_fields(config.bss[i])}`);
 		if (bss.set_config(config_inline, i) < 0) {
 			hostapd.printf(`Failed to set config for bss ${ifname}`);
 			return false;
@@ -512,8 +512,10 @@ function iface_set_config(phy, config)
 
 	hostapd.data.config[phy] = config;
 
-	if (!config)
+	if (!config) {
+		hostapd.remove_iface(phy);
 		return iface_remove(old_config);
+	}
 
 	let phydev = phy_open(phy);
 	if (!phydev) {
@@ -667,7 +669,7 @@ let main_obj = {
 			if (!config || !config.bss || !config.bss[0] || !config.bss[0].ifname)
 				return 0;
 
-			let iface = hostapd.interfaces[config.bss[0].ifname];
+			let iface = hostapd.interfaces[phy];
 			if (!iface)
 				return 0;
 
@@ -688,7 +690,6 @@ let main_obj = {
 				freq_info.csa_count = req.args.csa_count ?? 10;
 				ret = iface.switch_channel(freq_info);
 			} else {
-				iface.stop();
 				ret = iface.start(freq_info);
 			}
 			if (!ret)

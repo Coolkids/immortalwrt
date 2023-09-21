@@ -142,6 +142,16 @@
  {
  	if (!hapd)
  		return;
+@@ -3491,7 +3495,8 @@ int hostapd_remove_iface(struct hapd_int
+ 		hapd_iface = interfaces->iface[i];
+ 		if (hapd_iface == NULL)
+ 			return -1;
+-		if (!os_strcmp(hapd_iface->conf->bss[0]->iface, buf)) {
++		if (!os_strcmp(hapd_iface->phy, buf) ||
++		    !os_strcmp(hapd_iface->conf->bss[0]->iface, buf)) {
+ 			wpa_printf(MSG_INFO, "Remove interface '%s'", buf);
+ 			hapd_iface->driver_ap_teardown =
+ 				!!(hapd_iface->drv_flags &
 --- a/wpa_supplicant/Makefile
 +++ b/wpa_supplicant/Makefile
 @@ -195,8 +195,20 @@ endif
@@ -443,7 +453,7 @@
  	}
  
  	if (drv->capa.flags2 & WPA_DRIVER_FLAGS2_CONTROL_PORT_RX) {
-@@ -8874,6 +8871,50 @@ static int wpa_driver_nl80211_if_remove(
+@@ -8875,6 +8872,50 @@ static int wpa_driver_nl80211_if_remove(
  	return 0;
  }
  
@@ -494,7 +504,7 @@
  
  static int cookie_handler(struct nl_msg *msg, void *arg)
  {
-@@ -10512,6 +10553,37 @@ static int driver_nl80211_if_remove(void
+@@ -10513,6 +10554,37 @@ static int driver_nl80211_if_remove(void
  }
  
  
@@ -532,7 +542,7 @@
  static int driver_nl80211_send_mlme(void *priv, const u8 *data,
  				    size_t data_len, int noack,
  				    unsigned int freq,
-@@ -13696,6 +13768,8 @@ const struct wpa_driver_ops wpa_driver_n
+@@ -13697,6 +13769,8 @@ const struct wpa_driver_ops wpa_driver_n
  	.set_acl = wpa_driver_nl80211_set_acl,
  	.if_add = wpa_driver_nl80211_if_add,
  	.if_remove = driver_nl80211_if_remove,
