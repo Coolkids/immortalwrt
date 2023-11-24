@@ -122,7 +122,7 @@ define Device/friendlyarm_nanopi-r5c
   DEVICE_MODEL := NanoPi R5C
   SOC := rk3568
   BOOT_FLOW := pine64-img
-  DEVICE_PACKAGES := kmod-r8125 kmod-rtw88 rtl8822ce-firmware wpad-basic-openssl
+  DEVICE_PACKAGES := kmod-r8125 kmod-rtw88-8822ce rtl8822ce-firmware wpad-basic-openssl
 endef
 TARGET_DEVICES += friendlyarm_nanopi-r5c
 
@@ -204,7 +204,7 @@ define Device/radxa_rock-5a
   SOC := rk3588s
   UBOOT_DEVICE_NAME := rock5a-rk3588s
   BOOT_FLOW := pine64-img
-  DEVICE_PACKAGES := kmod-r8125
+  DEVICE_PACKAGES := kmod-r8125 kmod-hwmon-pwmfan
 endef
 TARGET_DEVICES += radxa_rock-5a
 
@@ -214,7 +214,7 @@ define Device/radxa_rock-5b
   SOC := rk3588
   UBOOT_DEVICE_NAME := rock5b-rk3588
   BOOT_FLOW := pine64-img
-  DEVICE_PACKAGES := kmod-r8125
+  DEVICE_PACKAGES := kmod-r8125 kmod-hwmon-pwmfan
 endef
 TARGET_DEVICES += radxa_rock-5b
 
