@@ -9,6 +9,14 @@ DEFAULT_SOC := mt7621
 
 DEVICE_VARS += ELECOM_HWNAME LINKSYS_HWNAME DLINK_HWID
 
+define Build/append-dlink-covr-metadata
+	echo -ne '{"supported_devices": "$(1)", "firmware": "' > $@metadata.tmp
+	$(MKHASH) md5 "$@" | head -c32 >> $@metadata.tmp
+	echo '"}' >> $@metadata.tmp
+	fwtool -I $@metadata.tmp $@
+	rm $@metadata.tmp
+endef
+
 define Build/arcadyan-trx
 	echo -ne "hsqs" > $@.hsqs
 	$(eval trx_magic=$(word 1,$(1)))
@@ -642,16 +650,39 @@ define Device/cudy_x6-v2
 endef
 TARGET_DEVICES += cudy_x6-v2
 
+define Device/dlink_covr-x1860-a1
+  $(Device/dsa-migration)
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_SIZE := 8192k
+  IMAGE_SIZE := 40960k
+  DEVICE_VENDOR := D-Link
+  DEVICE_MODEL := COVR-X1860
+  DEVICE_VARIANT := A1
+  DEVICE_PACKAGES := kmod-mt7915-firmware
+  UBINIZE_OPTS := -E 5
+  KERNEL_LOADADDR := 0x82000000
+  KERNEL := kernel-bin | relocate-kernel 0x80001000 | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb | \
+	append-squashfs4-fakeroot
+  IMAGES += factory.bin recovery.bin
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  IMAGE/recovery.bin := append-kernel | pad-to $$(KERNEL_SIZE) | \
+	append-ubi | check-size
+  IMAGE/factory.bin := $$(IMAGE/recovery.bin) | \
+	append-dlink-covr-metadata $$(DEVICE_MODEL) | \
+	dlink-sge-image $$(DEVICE_MODEL)
+endef
+TARGET_DEVICES += dlink_covr-x1860-a1
+
 define Device/dlink_dxx-1xx0-x1
   DEVICE_VENDOR := D-Link
-  DEVICE_PACKAGES := kmod-mt7615-firmware rssileds
+  DEVICE_PACKAGES := kmod-mt7615-firmware rssileds -uboot-envtools
   IMAGE_SIZE := 16064k
   IMAGES += factory.bin
-  IMAGE/factory.bin := $$(sysupgrade_bin) | \
-    check-size 11009992 | pad-to 11009992 | \
-    append-md5sum-ascii-salted ffff | \
-    append-string $$(DLINK_HWID) | \
-    check-size
+  IMAGE/factory.bin := append-kernel | append-rootfs | \
+    pad-rootfs -x 60 | append-md5sum-ascii-salted ffff | \
+    append-string $$$$(DLINK_HWID) | check-size
 endef
 
 define Device/dlink_dap-1620-b1
@@ -685,10 +716,9 @@ define Device/dlink_dir-8xx-a1
   DEVICE_VENDOR := D-Link
   DEVICE_PACKAGES := kmod-mt7615-firmware -uboot-envtools
   KERNEL := $$(KERNEL) | uimage-sgehdr
-  IMAGES += factory.bin
-  IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | \
-	check-size | append-metadata
-  IMAGE/factory.bin := append-kernel | append-rootfs | check-size
+  IMAGES += recovery.bin factory.bin
+  IMAGE/recovery.bin := append-kernel | append-rootfs | check-size
+  IMAGE/factory.bin := $$(IMAGE/recovery.bin) | dlink-sge-image $$$$(DEVICE_MODEL)
 endef
 
 define Device/dlink_dir-8xx-r1
@@ -708,8 +738,8 @@ define Device/dlink_dir-xx60-a1
   DEVICE_PACKAGES := kmod-mt7615-firmware kmod-usb3 \
 	kmod-usb-ledtrig-usbport -uboot-envtools
   KERNEL := $$(KERNEL) | uimage-sgehdr
-  IMAGES += factory.bin
-  IMAGE/factory.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-ubi | \
+  IMAGES += recovery.bin
+  IMAGE/recovery.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-ubi | \
 	check-size
 endef
 
@@ -761,6 +791,8 @@ define Device/dlink_dir-853-a3
   $(Device/dlink_dir-xx60-a1)
   DEVICE_MODEL := DIR-853
   DEVICE_VARIANT := A3
+  IMAGES += factory.bin
+  IMAGE/factory.bin := $$(IMAGE/recovery.bin) | dlink-sge-image $$(DEVICE_MODEL)
 endef
 TARGET_DEVICES += dlink_dir-853-a3
 
@@ -1635,10 +1667,21 @@ define Device/mediatek_mt7621-eval-board
 endef
 TARGET_DEVICES += mediatek_mt7621-eval-board
 
+define Device/meig_slt866
+  $(Device/dsa-migration)
+  IMAGE_SIZE := 15104k
+  DEVICE_VENDOR := MeiG
+  DEVICE_MODEL := SLT866
+  DEVICE_PACKAGES := kmod-mt7603 kmod-mt7615e kmod-mt7663-firmware-ap \
+	kmod-usb-net-qmi-wwan kmod-usb-serial-option kmod-usb3 \
+	kmod-usb-net-rndis
+endef
+TARGET_DEVICES += meig_slt866
+
 define Device/mercusys_mr70x-v1
   $(Device/dsa-migration)
   $(Device/tplink-safeloader)
-  DEVICE_VENDOR := Mercusys
+  DEVICE_VENDOR := MERCUSYS
   DEVICE_MODEL := MR70X
   DEVICE_VARIANT := v1
   DEVICE_PACKAGES := kmod-mt7915-firmware -uboot-envtools
@@ -2071,6 +2114,7 @@ TARGET_DEVICES += samknows_whitebox-v8
 
 define Device/sercomm_na502
   $(Device/nand)
+  $(Device/uimage-lzma-loader)
   IMAGE_SIZE := 20480k
   DEVICE_VENDOR := SERCOMM
   DEVICE_MODEL := NA502
@@ -2147,7 +2191,7 @@ define Device/telco-electronics_x1
   IMAGE_SIZE := 16064k
   DEVICE_VENDOR := Telco Electronics
   DEVICE_MODEL := X1
-  DEVICE_PACKAGES := kmod-usb3 kmod-mt76 -uboot-envtools
+  DEVICE_PACKAGES := kmod-usb3 kmod-mt7603 kmod-mt76x2 -uboot-envtools
 endef
 TARGET_DEVICES += telco-electronics_x1
 
@@ -2979,21 +3023,18 @@ endef
 TARGET_DEVICES += zio_freezio
 
 define Device/zte_e8820s
-  $(Device/dsa-migration)
+  $(Device/nand)
   $(Device/uimage-lzma-loader)
-  BLOCKSIZE := 128k
-  PAGESIZE := 2048
-  KERNEL_SIZE := 4096k
-  UBINIZE_OPTS := -E 5
-  IMAGE_SIZE := 32768k
-  IMAGES += factory.bin
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-  IMAGE/factory.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-ubi | \
-	check-size
   DEVICE_VENDOR := ZTE
   DEVICE_MODEL := E8820S
   DEVICE_PACKAGES := kmod-mt7603 kmod-mt76x2 kmod-usb3 \
-	kmod-usb-ledtrig-usbport
+	kmod-usb-ledtrig-usbport automount
+  DEVICE_COMPAT_VERSION := 2.0
+  DEVICE_COMPAT_MESSAGE := Partition table has changed to fit the new U-Boot
+  IMAGE_SIZE := 121728k
+  IMAGES += factory.bin
+  IMAGE/factory.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-ubi | \
+	check-size
 endef
 TARGET_DEVICES += zte_e8820s
 
@@ -3011,6 +3052,21 @@ define Device/zyxel_lte3301-plus
   KERNEL_INITRAMFS_SUFFIX := -recovery.bin
 endef
 TARGET_DEVICES += zyxel_lte3301-plus
+
+define Device/zyxel_lte5398-m904
+  $(Device/nand)
+  DEVICE_VENDOR := ZyXEL
+  DEVICE_MODEL := LTE5398-M904
+  KERNEL_SIZE := 31488k
+  DEVICE_PACKAGES := kmod-mt7603 kmod-mt7615-firmware kmod-usb3 uqmi \
+  kmod-usb-net-qmi-wwan kmod-usb-serial-option kmod-usb-ledtrig-usbport
+  KERNEL := $(KERNEL_DTB) | uImage lzma | \
+	zytrx-header $$(DEVICE_MODEL) $$(VERSION_DIST)-$$(REVISION)
+  KERNEL_INITRAMFS := $(KERNEL_DTB) | uImage lzma | \
+	zytrx-header $$(DEVICE_MODEL) 9.99(ABQU.1)$$(VERSION_DIST)-recovery
+  KERNEL_INITRAMFS_SUFFIX := -recovery.bin
+endef
+TARGET_DEVICES += zyxel_lte5398-m904
 
 define Device/zyxel_nr7101
   $(Device/nand)

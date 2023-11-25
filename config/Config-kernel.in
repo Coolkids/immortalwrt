@@ -421,7 +421,7 @@ config KERNEL_DEBUG_INFO
 config KERNEL_DEBUG_INFO_BTF
 
 	bool "Enable additional BTF type information"
-	default y if TARGET_armsr || TARGET_bcm27xx || TARGET_mediatek_filogic || TARGET_mvebu_cortexa53 || TARGET_mvebu_cortexa72 || TARGET_qualcommax || TARGET_rockchip || TARGET_sunxi || TARGET_x86_64
+	default y if TARGET_armsr || TARGET_bcm27xx || TARGET_ipq806x_chromium || TARGET_mediatek_filogic || TARGET_mvebu_cortexa53 || TARGET_mvebu_cortexa72 || TARGET_qualcommax || TARGET_rockchip || TARGET_sunxi || TARGET_x86_64
 	depends on !HOST_OS_MACOS
 	depends on KERNEL_DEBUG_INFO && !KERNEL_DEBUG_INFO_REDUCED
 	select DWARVES
@@ -445,7 +445,7 @@ config KERNEL_MODULE_ALLOW_BTF_MISMATCH
 
 config KERNEL_DEBUG_INFO_REDUCED
 	bool "Reduce debugging information"
-	default y if !(TARGET_armsr || TARGET_bcm27xx || TARGET_mediatek_filogic || TARGET_mvebu_cortexa53 || TARGET_mvebu_cortexa72 || TARGET_qualcommax || TARGET_rockchip || TARGET_sunxi || TARGET_x86_64)
+	default y if !(TARGET_armsr || TARGET_bcm27xx || TARGET_ipq806x_chromium || TARGET_mediatek_filogic || TARGET_mvebu_cortexa53 || TARGET_mvebu_cortexa72 || TARGET_qualcommax || TARGET_rockchip || TARGET_sunxi || TARGET_x86_64)
 	depends on KERNEL_DEBUG_INFO
 	help
 	  If you say Y here gcc is instructed to generate less debugging
@@ -690,10 +690,23 @@ config KERNEL_PRINTK_TIME
 	default y
 
 config KERNEL_SLUB_DEBUG
-	bool
+	bool "Enable SLUB debugging support"
+	help
+	  This enables various debugging features:
+	    - Accepts "slub_debug" kernel parameter
+	    - Provides caches debugging options (e.g. tracing, validating)
+	    - Adds /sys/kernel/slab/ attrs for reading amounts of *objects*
+	    - Enables /proc/slabinfo support
+	    - Prints info when running out of memory
+
+	  Enabling this can result in a significant increase of code size.
 
 config KERNEL_SLUB_DEBUG_ON
-	bool
+	depends on KERNEL_SLUB_DEBUG
+	bool "Boot kernel with basic caches debugging enabled"
+	help
+	  This enables by default sanity_checks, red_zone, poison and store_user
+	  debugging options for all caches.
 
 config KERNEL_SLABINFO
 	select KERNEL_SLUB_DEBUG
