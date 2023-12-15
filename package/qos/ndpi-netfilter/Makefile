@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=ndpi-netfilter
-PKG_VERSION:=9a6412b
+PKG_VERSION:=d9899c9
 PKG_RELEASE:=$(AUTORELEASE)
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
@@ -45,9 +45,6 @@ MAKE_FLAGS += \
 	NDPI_PATH=$(PKG_BUILD_DIR)/ndpi-netfilter
 
 define Build/Compile
-	(cd $(PKG_BUILD_DIR)/src/lib &&\
-		gcc -g -O2 -fPIC -DPIC -DNDPI_LIB_COMPILATION -I../../src/include/ -I../../src/lib/third_party/include/ ndpi_network_list_compile.c -o ndpi_network_list_compile &&\
-		./ndpi_network_list_compile -o ndpi_network_list.c.inc `ls ndpi_network_list_*.yaml`)
 	make $(MAKE_FLAGS) -C $(PKG_BUILD_DIR)/ndpi-netfilter
 endef
 
