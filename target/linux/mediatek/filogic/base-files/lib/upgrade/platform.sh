@@ -1,5 +1,16 @@
 REQUIRE_IMAGE_METADATA=1
 
+asus_initial_setup()
+{
+	# initialize UBI if it's running on initramfs
+	[ "$(rootfs_type)" = "tmpfs" ] || return 0
+
+	ubirmvol /dev/ubi0 -N rootfs
+	ubirmvol /dev/ubi0 -N rootfs_data
+	ubirmvol /dev/ubi0 -N jffs2
+	ubimkvol /dev/ubi0 -N jffs2 -s 0x3e000
+}
+
 xiaomi_initial_setup()
 {
 	# initialize UBI and setup uboot-env if it's running on initramfs
@@ -60,6 +71,7 @@ platform_do_upgrade() {
 		CI_ROOTPART="rootfs"
 		emmc_do_upgrade "$1"
 		;;
+	asus,rt-ax59u|\
 	asus,tuf-ax4200|\
 	asus,tuf-ax6000)
 		CI_UBIPART="UBI_DEV"
@@ -99,15 +111,14 @@ platform_do_upgrade() {
 			;;
 		esac
 		;;
-	cmcc,rax3000m-emmc-ubootmod|\
+	cudy,wr3000-v1)
+		default_do_upgrade "$1"
+		;;
 	glinet,gl-mt2500|\
 	glinet,gl-mt6000)
 		CI_KERNPART="kernel"
 		CI_ROOTPART="rootfs"
 		emmc_do_upgrade "$1"
-		;;
-	cudy,wr3000-v1)
-		default_do_upgrade "$1"
 		;;
 	h3c,magic-nx30-pro|\
 	jcg,q30|\
@@ -181,7 +192,6 @@ platform_check_image() {
 platform_copy_config() {
 	case "$(board_name)" in
 	acer,predator-w6|\
-	cmcc,rax3000m-emmc-ubootmod|\
 	glinet,gl-mt2500|\
 	glinet,gl-mt6000|\
 	jdcloud,re-cp-03|\
@@ -204,6 +214,11 @@ platform_pre_upgrade() {
 	local board=$(board_name)
 
 	case "$board" in
+	asus,rt-ax59u|\
+	asus,tuf-ax4200|\
+	asus,tuf-ax6000)
+		asus_initial_setup
+		;;
 	xiaomi,mi-router-wr30u-stock|\
 	xiaomi,redmi-router-ax6000-stock)
 		xiaomi_initial_setup
