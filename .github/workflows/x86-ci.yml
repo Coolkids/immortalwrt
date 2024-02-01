@@ -23,7 +23,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: master
       
@@ -84,19 +84,19 @@ jobs:
           rm -rf ./bin
 
       - name: Deliver buildinfo
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: OpenWrt_buildinfo
           path: ./artifact/buildinfo/
 
       - name: Deliver package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: OpenWrt_package
           path: ./artifact/package/
 
       - name: Deliver firmware
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: OpenWrt_firmware
           path: ./artifact/firmware/
@@ -113,7 +113,7 @@ jobs:
           file_glob: true
 
       - name: Delete loder releases
-        uses: dev-drprasad/delete-older-releases@v0.2.1
+        uses: dev-drprasad/delete-older-releases@v0.3.2
         with:
           keep_latest: 5
         env:
