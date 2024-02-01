@@ -380,9 +380,7 @@ define KernelPackage/phy-aquantia
   TITLE:=Aquantia Ethernet PHYs
   DEPENDS:=+kmod-libphy +kmod-hwmon-core +kmod-lib-crc-ccitt
   KCONFIG:=CONFIG_AQUANTIA_PHY
-  FILES:= \
-  $(LINUX_DIR)/drivers/net/phy/aquantia.ko@lt6.1 \
-   $(LINUX_DIR)/drivers/net/phy/aquantia/aquantia.ko@ge6.1
+  FILES:=$(LINUX_DIR)/drivers/net/phy/aquantia/aquantia.ko
   AUTOLOAD:=$(call AutoLoad,18,aquantia,1)
 endef
 
@@ -1607,11 +1605,22 @@ endef
 $(eval $(call KernelPackage,sfp))
 
 
+define KernelPackage/pcs-xpcs
+  SUBMENU:=$(NETWORK_DEVICES_MENU)
+  TITLE:=Synopsis DesignWare PCS driver
+  DEPENDS:=@(TARGET_x86_64||TARGET_armsr_armv8) +kmod-phylink
+  KCONFIG:=CONFIG_PCS_XPCS
+  FILES:=$(LINUX_DIR)/drivers/net/pcs/pcs_xpcs.ko
+  AUTOLOAD:=$(call AutoLoad,20,pcs_xpcs)
+endef
+
+$(eval $(call KernelPackage,pcs-xpcs))
+
+
 define KernelPackage/stmmac-core
   SUBMENU:=$(NETWORK_DEVICES_MENU)
   TITLE:=Synopsis Ethernet Controller core (NXP,STMMicro,others)
-  DEPENDS:=@TARGET_x86_64||TARGET_armsr_armv8 +kmod-pcs-xpcs +kmod-ptp \
-    +kmod-of-mdio
+  DEPENDS:=@TARGET_x86_64||TARGET_armsr_armv8 +kmod-pcs-xpcs +kmod-ptp
   KCONFIG:=CONFIG_STMMAC_ETH \
     CONFIG_STMMAC_SELFTESTS=n \
     CONFIG_STMMAC_PLATFORM \
@@ -1743,6 +1752,24 @@ define KernelPackage/mhi-wwan-mbim/description
 endef
 
 $(eval $(call KernelPackage,mhi-wwan-mbim))
+
+define KernelPackage/mtk-t7xx
+  SUBMENU:=$(NETWORK_DEVICES_MENU)
+  TITLE:=MediaTek PCIe 5G WWAN modem T7xx device
+  DEPENDS:=@PCI_SUPPORT +kmod-wwan
+  KCONFIG:=CONFIG_MTK_T7XX
+  FILES:=$(LINUX_DIR)/drivers/net/wwan/t7xx/mtk_t7xx.ko
+  AUTOLOAD:=$(call AutoProbe,mtk_t7xx)
+endef
+
+define KernelPackage/mtk-t7xx/description
+  Enables MediaTek PCIe based 5G WWAN modem (T7xx series) device.
+  Adapts WWAN framework and provides network interface like wwan0
+  and tty interfaces like wwan0at0 (AT protocol), wwan0mbim0
+  (MBIM protocol), etc.
+endef
+
+$(eval $(call KernelPackage,mtk-t7xx))
 
 define KernelPackage/atlantic
   SUBMENU:=$(NETWORK_DEVICES_MENU)

@@ -5,9 +5,9 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
-PKG_VERSION:=2024.01-rc4
+PKG_VERSION:=2024.01
 PKG_RELEASE:=1
-PKG_HASH:=d93b581ee4fce8d2e7fef0df41f5f5799d3f319e2d2067267ece6ddc3563bbdf
+PKG_HASH:=b99611f1ed237bf3541bdc8434b68c96a6e05967061f992443cb30aabebef5b3
 
 PKG_MAINTAINER:=Tobias Maedel <openwrt@tbspace.de>
 
@@ -89,6 +89,7 @@ define U-Boot/rock64-rk3328
     pine64_rock64
 endef
 
+
 # RK3399 boards
 
 define U-Boot/Default/rk3399
@@ -115,7 +116,8 @@ define U-Boot/nanopi-r4s-rk3399
   $(U-Boot/Default/rk3399)
   NAME:=NanoPi R4S
   BUILD_DEVICES:= \
-    friendlyarm_nanopi-r4s
+    friendlyarm_nanopi-r4s \
+    friendlyarm_nanopi-r4s-enterprise
 endef
 
 define U-Boot/nanopi-r4se-rk3399
@@ -123,13 +125,6 @@ define U-Boot/nanopi-r4se-rk3399
   NAME:=NanoPi R4SE
   BUILD_DEVICES:= \
     friendlyarm_nanopi-r4se
-endef
-
-define U-Boot/nanopi-r4s-enterprise-rk3399
-  $(U-Boot/Default/rk3399)
-  NAME:=NanoPi R4S Enterprise Edition
-  BUILD_DEVICES:= \
-    friendlyarm_nanopi-r4s-enterprise
 endef
 
 define U-Boot/rock-pi-4-rk3399
@@ -198,6 +193,7 @@ define U-Boot/roc-pc-rk3568
     firefly_roc-rk3568-pc
 endef
 
+
 # RK3588 boards
 
 define U-Boot/Default/rk3588
@@ -212,6 +208,13 @@ define U-Boot/nanopc-t6-rk3588
   NAME:=NanoPC T6
   BUILD_DEVICES:= \
     friendlyarm_nanopc-t6
+endef
+
+define U-Boot/orangepi-5-plus-rk3588
+  $(U-Boot/Default/rk3588)
+  NAME:=OrangePi 5 Plus
+  BUILD_DEVICES:= \
+    xunlong_orangepi-5-plus
 endef
 
 define U-Boot/rock5b-rk3588
@@ -238,6 +241,13 @@ define U-Boot/nanopi-r6s-rk3588s
     friendlyarm_nanopi-r6s
 endef
 
+define U-Boot/orangepi-5-rk3588s
+  $(U-Boot/Default/rk3588)
+  NAME:=OrangePi 5
+  BUILD_DEVICES:= \
+    xunlong_orangepi-5
+endef
+
 define U-Boot/rock5a-rk3588s
   $(U-Boot/Default/rk3588)
   NAME:=Rock 5A
@@ -250,7 +260,6 @@ UBOOT_TARGETS := \
   nanopc-t4-rk3399 \
   nanopi-r4s-rk3399 \
   nanopi-r4se-rk3399 \
-  nanopi-r4s-enterprise-rk3399 \
   rock-pi-4-rk3399 \
   rockpro64-rk3399 \
   nanopi-r2c-rk3328 \
@@ -268,9 +277,11 @@ UBOOT_TARGETS := \
   nanopi-r5s-rk3568 \
   roc-pc-rk3568 \
   nanopc-t6-rk3588 \
+  orangepi-5-plus-rk3588 \
   rock5b-rk3588 \
   nanopi-r6c-rk3588s \
   nanopi-r6s-rk3588s \
+  orangepi-5-rk3588s \
   rock5a-rk3588s
 
 UBOOT_CONFIGURE_VARS += USE_PRIVATE_LIBGCC=yes

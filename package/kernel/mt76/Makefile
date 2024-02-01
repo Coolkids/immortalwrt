@@ -8,9 +8,9 @@ PKG_LICENSE_FILES:=
 
 PKG_SOURCE_URL:=https://github.com/openwrt/mt76
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_DATE:=2023-12-11
-PKG_SOURCE_VERSION:=f63f87cd5b45c3779293e6062c6b26bdf57e851d
-PKG_MIRROR_HASH:=43f1b1fb75dfb4756aa1767983b338bd63154f0f6c45554029e69af49d55b914
+PKG_SOURCE_DATE:=2024-01-18
+PKG_SOURCE_VERSION:=f77188160441d5f77f08dd517632ae3f60c653b0
+PKG_MIRROR_HASH:=133a5e44624fe1933c893ee0b8ac75a847753f3490c26518c2ed9798f9ef53e0
 
 PKG_MAINTAINER:=Felix Fietkau <nbd@nbd.name>
 PKG_USE_NINJA:=0
@@ -237,9 +237,9 @@ define KernelPackage/mt7915e
   DEPENDS+=@PCI_SUPPORT +kmod-mt76-connac +kmod-hwmon-core +kmod-thermal +@DRIVER_11AX_SUPPORT +@KERNEL_RELAY
   FILES:= $(PKG_BUILD_DIR)/mt7915/mt7915e.ko
   AUTOLOAD:=$(call AutoProbe,mt7915e)
-  ifdef CONFIG_TARGET_mediatek_filogic
-    MODPARAMS.mt7915e:=wed_enable=Y
-  endif
+ifneq ($(CONFIG_TARGET_mediatek_filogic)$(CONFIG_TARGET_mediatek_mt7622),)
+  MODPARAMS.mt7915e:=wed_enable=Y
+endif
 endef
 
 define KernelPackage/mt7916-firmware

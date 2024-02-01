@@ -103,8 +103,7 @@
 		regulator-name = "usb_vbus";
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
-		gpios = <&pio 20 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
+		gpios = <&pio 20 GPIO_ACTIVE_LOW>;
 		regulator-boot-on;
 	};
 };
@@ -379,6 +378,11 @@
 	};
 
 	usb_ngff_pins: usb-ngff-pins {
+		ngff-gnss-off {
+			pins = "GPIO_6";
+			drive-strength = <8>;
+			mediatek,pull-up-adv = <1>;
+		};
 		ngff-pe-rst {
 			pins = "GPIO_7";
 			drive-strength = <8>;
@@ -396,6 +400,11 @@
 		};
 		ngff-rst {
 			pins = "GPIO_10";
+			drive-strength = <8>;
+			mediatek,pull-up-adv = <1>;
+		};
+		ngff-coex {
+			pins = "SPI1_CS";
 			drive-strength = <8>;
 			mediatek,pull-up-adv = <1>;
 		};
@@ -453,7 +462,7 @@
 		#size-cells = <1>;
 		reg = <0>;
 
-		spi-max-frequency = <52000000>;
+		spi-max-frequency = <20000000>;
 		spi-tx-bus-width = <4>;
 		spi-rx-bus-width = <4>;
 
@@ -495,7 +504,8 @@
 &spi1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&spic_pins>;
-	status = "okay";
+	/* conflicts with M.2 pin */
+	status = "disabled";
 };
 
 &ssusb {
