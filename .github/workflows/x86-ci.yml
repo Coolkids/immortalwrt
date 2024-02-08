@@ -21,6 +21,12 @@ jobs:
     if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
+      - name: mount sdb1
+        run: |
+          umount /mnt
+          mkdir -p /home/runner/work/immortalwrt
+          mount /dev/sdb1 /home/runner/work/immortalwrt
+          df -h
 
       - name: Checkout
         uses: actions/checkout@v4
