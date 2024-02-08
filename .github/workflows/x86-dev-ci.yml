@@ -25,9 +25,9 @@ jobs:
     steps:
       - name: mount sdb1
         run: |
-          umount /mnt
+          sudo umount /mnt
           mkdir -p /home/runner/work/immortalwrt
-          mount /dev/sdb1 /home/runner/work/immortalwrt
+          sudo mount /dev/sdb1 /home/runner/work/immortalwrt
           df -h
 
       - name: Checkout
