@@ -20,18 +20,15 @@ jobs:
 
     if: github.event.repository.owner.id == github.event.sender.id
 
-    steps:
-      - name: mount sdb1
-        run: |
-          sudo umount /mnt
-          mkdir -p /home/runner/work/immortalwrt
-          sudo mount /dev/sdb1 /home/runner/work/immortalwrt
-          df -h
+    env:
+      workspace: /mnt
 
+    steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: master
+          path: ${{workspace}}
       
       - name: Set variables
         run: |
@@ -52,31 +49,37 @@ jobs:
 
       - name: Update feeds
         run: |
+          cd ${{workspace}}/immortalwrt
           ./tool.sh feed
 
       - name: Generate configuration file
         run: |
+          cd ${{workspace}}/immortalwrt
           rm -f ./.config*
           cp .github/x86.config ./.config
           make defconfig
 
       - name: Make download
         run: |
+          cd ${{workspace}}/immortalwrt
           make download -j8 || make download -j1 V=s
           rm -rf $(find ./dl/ -size -1024c)
           df -h
 
       - name: Compile firmware
         run: |
+          cd ${{workspace}}/immortalwrt
           make -j$(nproc) || make -j1 V=s
 
       - name: Clean Build Files
         run: |
+          cd ${{workspace}}/immortalwrt
           rm -rf ./staging_dir
           rm -rf ./build_dir
 
       - name: Prepare artifact
         run: |
+          cd ${{workspace}}/immortalwrt
           mkdir -p ./artifact/firmware
           mkdir -p ./artifact/package
           mkdir -p ./artifact/buildinfo
@@ -88,32 +91,33 @@ jobs:
           
       - name: Clean Bin Files
         run: |
+          cd ${{workspace}}/immortalwrt
           rm -rf ./bin
 
       - name: Deliver buildinfo
         uses: actions/upload-artifact@v4
         with:
           name: OpenWrt_buildinfo
-          path: ./artifact/buildinfo/
+          path: ${{workspace}}/immortalwrt/artifact/buildinfo/
 
       - name: Deliver package
         uses: actions/upload-artifact@v4
         with:
           name: OpenWrt_package
-          path: ./artifact/package/
+          path: ${{workspace}}/immortalwrt/artifact/package/
 
       - name: Deliver firmware
         uses: actions/upload-artifact@v4
         with:
           name: OpenWrt_firmware
-          path: ./artifact/firmware/
+          path: ${{workspace}}/immortalwrt/artifact/firmware/
 
       - name: Upload release asset
         #if: github.event == 'release'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
-          file: ./artifact/firmware/*
+          file: ${{workspace}}/immortalwrt/artifact/firmware/*
           overwrite: true
           release_name: ${{ github.ref_name }}
           tag: ${{ github.ref_name }}
@@ -128,6 +132,7 @@ jobs:
 
       - name: Push Msg
         run: |
+          cd ${{workspace}}/immortalwrt
           sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "Released on ${{ github.ref_name }}"
 
 
