@@ -1,6 +1,6 @@
 --- a/arch/arm64/boot/dts/rockchip/rk3588-nanopc-t6.dts
 +++ b/arch/arm64/boot/dts/rockchip/rk3588-nanopc-t6.dts
-@@ -201,34 +201,42 @@
+@@ -204,34 +204,42 @@
  
  &cpu_l0 {
  	cpu-supply = <&vdd_cpu_lit_s0>;
@@ -22,22 +22,22 @@
 +	mem-supply = <&vdd_cpu_lit_mem_s0>;
  };
  
- &cpu_b0{
+ &cpu_b0 {
  	cpu-supply = <&vdd_cpu_big0_s0>;
 +	mem-supply = <&vdd_cpu_big0_s0>;
  };
  
- &cpu_b1{
+ &cpu_b1 {
  	cpu-supply = <&vdd_cpu_big0_s0>;
 +	mem-supply = <&vdd_cpu_big0_s0>;
  };
  
- &cpu_b2{
+ &cpu_b2 {
  	cpu-supply = <&vdd_cpu_big1_s0>;
 +	mem-supply = <&vdd_cpu_big1_s0>;
  };
  
- &cpu_b3{
+ &cpu_b3 {
  	cpu-supply = <&vdd_cpu_big1_s0>;
 +	mem-supply = <&vdd_cpu_big1_s0>;
  };

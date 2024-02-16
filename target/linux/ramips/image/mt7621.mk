@@ -1502,12 +1502,6 @@ define Device/jcg_q20
 endef
 TARGET_DEVICES += jcg_q20
 
-define Device/jcg_q20-pb-boot
-  $(Device/jcg_q20)
-  DEVICE_MODEL += (pb-boot)
-endef
-TARGET_DEVICES += jcg_q20-pb-boot
-
 define Device/jcg_y2
   $(Device/dsa-migration)
   $(Device/uimage-lzma-loader)
@@ -1521,13 +1515,23 @@ define Device/jcg_y2
 endef
 TARGET_DEVICES += jcg_y2
 
+define Device/jdcloud_re-cp-02
+  $(Device/dsa-migration)
+  $(Device/uimage-lzma-loader)
+  IMAGE_SIZE := 16000k
+  DEVICE_VENDOR := JD-Cloud
+  DEVICE_MODEL := RE-CP-02
+  DEVICE_PACKAGES := kmod-mt7915-firmware kmod-sdhci-mt7620 automount
+endef
+TARGET_DEVICES += jdcloud_re-cp-02
 
 define Device/jdcloud_re-sp-01b
+  $(Device/dsa-migration)
   IMAGE_SIZE := 27328k
   DEVICE_VENDOR := JDCloud
   DEVICE_MODEL := RE-SP-01B
-  DEVICE_PACKAGES := kmod-fs-ext4 kmod-mt7603 kmod-mt7615e \
-	kmod-mt7615-firmware kmod-sdhci-mt7620 kmod-usb3
+  DEVICE_PACKAGES := kmod-mt7603 kmod-mt7615e kmod-mt7615-firmware \
+	kmod-sdhci-mt7620 kmod-usb3 automount
 endef
 TARGET_DEVICES += jdcloud_re-sp-01b
 
