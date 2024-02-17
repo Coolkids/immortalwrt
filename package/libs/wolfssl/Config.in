@@ -28,6 +28,10 @@ config WOLFSSL_HAS_TLSV13
 	bool "Include TLS 1.3 support"
 	default y
 
+config WOLFSSL_HAS_QUIC
+	bool "Include QUIC support"
+	default y
+
 config WOLFSSL_HAS_SESSION_TICKET
 	bool "Include session ticket support"
 	default y

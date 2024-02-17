@@ -1,5 +1,5 @@
 
-name: OpenWrt-dev-CI
+name: OpenWrt-uhttpd-dev-CI
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
 
   build_openwrt:
 
-    name: Build OpenWrt dev firmware
+    name: Build OpenWrt uhttpd dev firmware
 
     runs-on: ubuntu-22.04
 
@@ -69,7 +69,7 @@ jobs:
       - name: Generate configuration file
         run: |
           rm -f ./.config*
-          cp .github/x86.config ./.config
+          cp ./configs/x86-uhttpd.config ./.config
           make defconfig
 
       - name: Make download
