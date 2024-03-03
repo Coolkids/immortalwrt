@@ -125,7 +125,7 @@ jobs:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
           file: ./artifact/firmware/*
           overwrite: true
-          release_name: ${{ github.ref_name }}
+          release_name: ${{ github.ref_name }} - uhttpd
           tag: ${{ github.ref_name }}
           file_glob: true
 
