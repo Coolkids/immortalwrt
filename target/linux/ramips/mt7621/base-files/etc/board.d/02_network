@@ -17,6 +17,7 @@ ramips_setup_interfaces()
 	h3c,tx1806|\
 	haier,har-20s2u1|\
 	hiwifi,hc5962|\
+	jdcloud,re-cp-02|\
 	mercusys,mr70x-v1|\
 	netgear,wax202|\
 	sim,simax1800t|\
@@ -74,7 +75,6 @@ ramips_setup_interfaces()
 	iodata,wn-deax1800gr|\
 	iptime,a3002mesh|\
 	jcg,q20|\
-	jcg,q20-pb-boot|\
 	jdcloud,re-sp-01b|\
 	lenovo,newifi-d1|\
 	mikrotik,routerboard-m33g|\
