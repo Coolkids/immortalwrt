@@ -1,5 +1,5 @@
 diff --git forkSrcPrefix/ndpi-netfilter/ipt/libxt_ndpi.c forkDstPrefix/ndpi-netfilter/ipt/libxt_ndpi.c
-index e19eb07efa8cd6575b06ac4391d3152920bd6852..df1133c71ca65aa61b6fbdb25252bd2b70c4aec4 100644
+index 0e4fa3279689d89e92eb192ffaa171851c4b9389..c06299441a83527def74e331ee6db58c4bd98567 100644
 --- forkSrcPrefix/ndpi-netfilter/ipt/libxt_ndpi.c
 +++ forkDstPrefix/ndpi-netfilter/ipt/libxt_ndpi.c
 @@ -653,9 +653,21 @@ static int cmp_pname(const void *p1, const void *p2) {
