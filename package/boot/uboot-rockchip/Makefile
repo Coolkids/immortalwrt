@@ -203,11 +203,32 @@ define U-Boot/nanopi-r5s-rk3568
     friendlyarm_nanopi-r5s
 endef
 
+define U-Boot/photonicat-rk3568
+  $(U-Boot/Default/rk3568)
+  NAME:=Photonicat
+  BUILD_DEVICES:= \
+    ariaboard_photonicat
+endef
+
+define U-Boot/radxa-e25-rk3568
+  $(U-Boot/Default/rk3568)
+  NAME:=E25
+  BUILD_DEVICES:= \
+    radxa_e25
+endef
+
 define U-Boot/roc-pc-rk3568
   $(U-Boot/Default/rk3568)
   NAME:=Station P2
   BUILD_DEVICES:= \
     firefly_roc-rk3568-pc
+endef
+
+define U-Boot/rock-3a-rk3568
+  $(U-Boot/Default/rk3568)
+  NAME:=Rock 3A
+  BUILD_DEVICES:= \
+    radxa_rock-3a
 endef
 
 
@@ -293,7 +314,10 @@ UBOOT_TARGETS := \
   mrkaio-m68s-rk3568 \
   nanopi-r5c-rk3568 \
   nanopi-r5s-rk3568 \
+  photonicat-rk3568 \
+  radxa-e25-rk3568 \
   roc-pc-rk3568 \
+  rock-3a-rk3568 \
   nanopc-t6-rk3588 \
   orangepi-5-plus-rk3588 \
   rock5b-rk3588 \
