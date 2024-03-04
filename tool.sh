@@ -14,7 +14,7 @@ esac
 }
 
 function feed(){
-patchs = $(pwd)
+patchs =`pwd`
 rm -rf ./feeds/*
 ./scripts/feeds update -a
 rm -rf ./feeds/luci/applications/luci-app-passwall
