@@ -14,6 +14,7 @@ esac
 }
 
 function feed(){
+patchs = $(pwd)
 rm -rf ./feeds/*
 ./scripts/feeds update -a
 rm -rf ./feeds/luci/applications/luci-app-passwall
@@ -24,7 +25,7 @@ rm -rf ./feeds/packages/net/mosdns
 ./scripts/feeds install -p custom v2ray-geodata
 ./scripts/feeds install -p mosdns mosdns
 pushd ./feeds/luci
-git apply ./patchs/001-luci-status-network-ifaces.patch
+git apply $patchs/patchs/001-luci-status-network-ifaces.patch
 popd
 
 rm -rf ./feeds/packages/libs/nghttp3
