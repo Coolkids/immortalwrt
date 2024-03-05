@@ -67,7 +67,7 @@ jobs:
       - name: Generate configuration file
         run: |
           rm -f ./.config*
-          sed 's/-SNAPSHOT//g' ./include/version.mk
+          sed -i 's/-SNAPSHOT//g' ./include/version.mk
           cp ./configs/x86-nginx.config ./.config
           make defconfig
 
