@@ -17,7 +17,8 @@ jobs:
           git config --global user.name "github-actions"
       - name: Checkout
         uses: actions/checkout@v4
-        token: ${{secrets.PUSH_TOKEN}}
+        with:
+          token: ${{secrets.PUSH_TOKEN}}
         
       - name: Merge dev into master
         run: |
