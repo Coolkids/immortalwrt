@@ -1,8 +1,9 @@
 name: OpenWrt-auto-merge-CI
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '0 0 16 * *'
+    - cron: '0 0 15 * *'
 
 jobs:
   merge_main:
@@ -30,12 +31,3 @@ jobs:
         run: |
           CURRENT_DATE=$(date +'%y.%m')
           sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "Merge dev into master v$CURRENT_DATE"
-
-
-
-
-
-
-
-
-
