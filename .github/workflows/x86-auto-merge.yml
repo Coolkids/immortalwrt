@@ -1,0 +1,41 @@
+name: OpenWrt-auto-merge-CI
+
+on:
+  schedule:
+    - cron: '0 0 16 * *'
+
+jobs:
+  merge_main:
+    name: merge dev into main
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Merge dev into master
+        run: |
+          git checkout main
+          git pull origin dev
+          git push origin main
+
+      - name: Tag release
+        id: create_tag
+        run: |
+          CURRENT_DATE=$(date +'%y.%m')
+          git tag -a v$CURRENT_DATE -m "Release $CURRENT_DATE"
+          git push origin v$CURRENT_DATE
+
+      - name: Push Msg
+        run: |
+          CURRENT_DATE=$(date +'%y.%m')
+          sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "Merge dev into master v$CURRENT_DATE"
+
+
+
+
+
+
+
+
+

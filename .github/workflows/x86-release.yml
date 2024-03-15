@@ -5,10 +5,6 @@ on:
   push:
     tags:
       - 'v*'
-  # schedule:
-  #   - cron: 0 20 * * *
-  #release:
-  #  types: [published]
 
 jobs:
 
@@ -120,7 +116,6 @@ jobs:
           path: ./artifact/firmware/
 
       - name: Upload release asset
-        #if: github.event == 'release'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
@@ -129,6 +124,8 @@ jobs:
           release_name: ${{ github.ref_name }}
           tag: ${{ github.ref_name }}
           file_glob: true
+          body: |
+		    Changes since the last release can be found at: https://github.com/${{ github.repository }}/compare/${{ steps.build.outputs.previous_tag }}...${{ steps.build.outputs.tag_name }}
 
       - name: Delete loder releases
         uses: dev-drprasad/delete-older-releases@v0.3.3
