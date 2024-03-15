@@ -13,6 +13,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
+      - name: Set Env
+        run: |
+          git config --global user.email "coolkid-bot@gmail.com"
+          git config --global user.name "Coolkid Bot"
       
       - name: Merge dev into master
         run: |
