@@ -10,15 +10,15 @@ jobs:
     name: merge dev into master
     runs-on: ubuntu-22.04
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        
+    steps:        
       - name: Set Env
         run: |
-          git config --global user.email "coolkid-bot@gmail.com"
-          git config --global user.name "Coolkid Bot"
-      
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
+      - name: Checkout
+        uses: actions/checkout@v4
+        token: ${{secrets.PUSH_TOKEN}}
+        
       - name: Merge dev into master
         run: |
           git checkout master
