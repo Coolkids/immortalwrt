@@ -131,7 +131,7 @@ jobs:
           file_glob: true
 
       - name: Delete loder releases
-        uses: dev-drprasad/delete-older-releases@v0.3.2
+        uses: dev-drprasad/delete-older-releases@v0.3.3
         with:
           keep_latest: 5
         env:
