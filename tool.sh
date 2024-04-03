@@ -28,12 +28,6 @@ pushd ./feeds/luci
 git apply $patchs/patchs/001-luci-status-network-ifaces.patch
 popd
 
-rm -rf ./feeds/packages/libs/nghttp3
-rm -rf ./feeds/packages/libs/ngtcp2
-
-cp -r ./patchs/ngtcp2 ./feeds/packages/libs
-cp -r ./patchs/nghttp3 ./feeds/packages/libs
-
 }
 
 main $1
