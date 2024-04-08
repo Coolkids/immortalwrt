@@ -573,38 +573,6 @@ endef
 
 $(eval $(call KernelPackage,ipt-nat-extra))
 
-define KernelPackage/ipt-imq
-  TITLE:=Intermediate Queueing support
-  KCONFIG:= \
-	CONFIG_IMQ=y \
-	CONFIG_IMQ_BEHAVIOR_AA=n \
-	CONFIG_IMQ_BEHAVIOR_AB=y \
-	CONFIG_IMQ_BEHAVIOR_BA=n \
-	CONFIG_IMQ_BEHAVIOR_BB=n \
-	CONFIG_IMQ_NUM_DEVS=2 \
-  CONFIG_NF_CONNTRACK=m \
-  CONFIG_NF_CONNTRACK_LABELS=y \
-  CONFIG_NETFILTER_XT_MATCH_CONNLABEL=m \
-	CONFIG_NETFILTER_XT_MATCH_WEBURL \
-	CONFIG_NETFILTER_XT_MATCH_WEBMON \
-	CONFIG_NETFILTER_XT_MATCH_TIMERANGE \
-	CONFIG_NETFILTER_XT_MATCH_BANDWIDTH \
-	CONFIG_NETFILTER_XT_TARGET_IMQ
-  FILES:= \
-	$(LINUX_DIR)/drivers/net/imq.$(LINUX_KMOD_SUFFIX) \
-	$(foreach mod,$(IPT_IMQ-m),$(LINUX_DIR)/net/$(mod).$(LINUX_KMOD_SUFFIX))
-  $(call AddDepends/ipt)
-endef
-
-define KernelPackage/ipt-imq/description
- Kernel support for Intermediate Queueing devices
-endef
-
-$(eval $(call KernelPackage,ipt-imq))
-
-
-
-
 define KernelPackage/nf-nathelper
   SUBMENU:=$(NF_MENU)
   TITLE:=Basic Conntrack and NAT helpers

@@ -199,21 +199,6 @@ Includes support for:
 
 endef
 
-
-define Package/iptables-mod-imq
-$(call Package/iptables/Module, +kmod-ipt-imq)
-  TITLE:=IMQ support
-endef
-
-define Package/iptables-mod-imq/description
-iptables extension for IMQ support.
-
- Targets:
-  - IMQ
-
-endef
-
-
 define Package/iptables-mod-ipopt
 $(call Package/iptables/Module, +kmod-ipt-ipopt)
   TITLE:=IP/Packet option extensions
