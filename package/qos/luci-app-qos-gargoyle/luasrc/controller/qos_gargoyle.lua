@@ -113,7 +113,7 @@ end
 function action_load_data(type)
     local device
     if type == "download" then
-        device = "imq0"
+        device = "ifb0"
     elseif type == "upload" then
         device = rv.wan[1].ifname
     end
