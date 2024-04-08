@@ -151,7 +151,7 @@ Extra iptables nftables nft binaries.
 endef
 
 define Package/iptables-mod-conntrack-extra
-$(call Package/iptables/Module, +kmod-ipt-conntrack-extra +kmod-ipt-raw)
+$(call Package/iptables/Module, +kmod-ipt-conntrack-extra)
   TITLE:=Extra connection tracking extensions
 endef
 
@@ -757,7 +757,6 @@ $(eval $(call BuildPlugin,iptables-mod-conntrack-label,$(IPT_CONNTRACK_LABEL-m))
 $(eval $(call BuildPlugin,iptables-mod-extra,$(IPT_EXTRA-m)))
 $(eval $(call BuildPlugin,iptables-mod-physdev,$(IPT_PHYSDEV-m)))
 $(eval $(call BuildPlugin,iptables-mod-filter,$(IPT_FILTER-m)))
-$(eval $(call BuildPlugin,iptables-mod-imq,$(IPT_IMQ-m)))
 $(eval $(call BuildPlugin,iptables-mod-ipopt,$(IPT_IPOPT-m)))
 $(eval $(call BuildPlugin,iptables-mod-ipsec,$(IPT_IPSEC-m)))
 $(eval $(call BuildPlugin,iptables-mod-nat-extra,$(IPT_NAT_EXTRA-m)))
@@ -780,7 +779,8 @@ $(eval $(call BuildPackage,ip6tables-zz-legacy))
 $(eval $(call BuildPlugin,ip6tables-extra,$(IPT_IPV6_EXTRA-m)))
 $(eval $(call BuildPlugin,ip6tables-mod-nat,$(IPT_NAT6-m)))
 
-###gargoyle
+
+
 define Package/iptables-mod-weburl
 $(call Package/iptables/Module, +kmod-ipt-weburl)
   TITLE:=weburl
