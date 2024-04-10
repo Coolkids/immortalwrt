@@ -1,5 +1,5 @@
 
-name: OpenWrt-nginx-releases-CI
+name: OpenWrt-nginx-releases-ifb-CI
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: master
+          ref: master-ifb
       
       - name: Set variables
         run: |
