@@ -1,0 +1,3 @@
+#!/bin/bash
+sysupgrade -l > /tmp/back_file_list.txt
+tar -czvf /tmp/backup-${HOSTNAME}-$(date +%F).tar.gz -T /tmp/back_file_list.txt
