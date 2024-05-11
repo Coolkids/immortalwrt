@@ -60,7 +60,7 @@ jobs:
           
       - name: Move Build Path
         run: |
-          cp -a ./. ${{ env.WORK_PATH }}
+          cp -r ./. ${{ env.WORK_PATH }}/
           
       - name: Update feeds
         working-directory: ${{ env.WORK_PATH }}
