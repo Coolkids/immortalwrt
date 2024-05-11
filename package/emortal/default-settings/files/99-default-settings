@@ -12,12 +12,9 @@ if ! uci -q get system.@imm_init[0].lang > "/dev/null"; then
 	EOF
 fi
 
-ln -sf "/sbin/ip" "/usr/bin/ip"
-
 sed -i "/log-facility/d" "/etc/dnsmasq.conf"
 echo "log-facility=/dev/null" >> "/etc/dnsmasq.conf"
 
-rm -rf "/tmp/luci-modulecache"
-rm -f "/tmp/luci-indexcache"
+ln -sf "/sbin/ip" "/usr/bin/ip"
 
 exit 0
