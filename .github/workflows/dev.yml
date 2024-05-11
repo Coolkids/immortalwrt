@@ -116,7 +116,6 @@ jobs:
           path: ${{ env.WORK_PATH }}/artifact/buildinfo/
 
       - name: Deliver package
-        working-directory: ${{ env.WORK_PATH }}
         uses: actions/upload-artifact@v4
         with:
           name: OpenWrt_package
