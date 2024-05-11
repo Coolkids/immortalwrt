@@ -784,6 +784,13 @@ define Device/dlink_dir-2660-a1
 endef
 TARGET_DEVICES += dlink_dir-2660-a1
 
+define Device/dlink_dir-3040-a1
+  $(Device/dlink_dir-xx60-a1)
+  DEVICE_MODEL := DIR-3040
+  DEVICE_VARIANT := A1
+endef
+TARGET_DEVICES += dlink_dir-3040-a1
+
 define Device/dlink_dir-3060-a1
   $(Device/dlink_dir-xx60-a1)
   DEVICE_MODEL := DIR-3060
@@ -1523,7 +1530,7 @@ define Device/jdcloud_re-cp-02
   $(Device/dsa-migration)
   $(Device/uimage-lzma-loader)
   IMAGE_SIZE := 16000k
-  DEVICE_VENDOR := JD-Cloud
+  DEVICE_VENDOR := JDCloud
   DEVICE_MODEL := RE-CP-02
   DEVICE_PACKAGES := kmod-mt7915-firmware kmod-sdhci-mt7620 automount
 endef

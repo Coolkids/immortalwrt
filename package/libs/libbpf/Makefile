@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2020-2023 Tony Ambardar <itugrok@yahoo.com>
+# Copyright (C) 2020-2024 Tony Ambardar <itugrok@yahoo.com>
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,19 +8,19 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libbpf
-PKG_VERSION:=1.3.0
+PKG_VERSION:=1.4.1
 PKG_RELEASE:=1
 
 PKG_SOURCE_URL:=https://github.com/libbpf/libbpf
-PKG_MIRROR_HASH:=669d8db696f86f640f86edc358bffa2af8dda656b8e787b095de3578bd8d94ff
+PKG_MIRROR_HASH:=46469f720ed246529e46d84a6444ae1c1a1eaf2a717a5a055c9973bb52159ec3
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_VERSION:=v1.3.0
+PKG_SOURCE_VERSION:=v1.4.1
 PKG_ABI_VERSION:=$(firstword $(subst .,$(space),$(PKG_VERSION)))
 
 PKG_MAINTAINER:=Tony Ambardar <itugrok@yahoo.com>
 PKG_CPE_ID:=cpe:/a:libbpf_project:libbpf
 
-PKG_BUILD_FLAGS:=no-mips16
+PKG_BUILD_FLAGS:=no-mips16 no-gc-sections no-lto
 PKG_BUILD_PARALLEL:=1
 PKG_INSTALL:=1
 
@@ -40,10 +40,6 @@ endef
 define Package/libbpf/description
   libbpf is a library for loading eBPF programs and reading and manipulating eBPF objects from user-space.
 endef
-
-MAKE_VARS = \
-	EXTRA_CFLAGS="$(TARGET_CFLAGS) $(TARGET_CPPFLAGS)" \
-	LDFLAGS="$(TARGET_LDFLAGS)"
 
 MAKE_FLAGS += \
 	$(if $(findstring c,$(OPENWRT_VERBOSE)),V=1,V='') \
