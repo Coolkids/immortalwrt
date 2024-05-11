@@ -1,5 +1,5 @@
 
-name: OpenWrt-nginx-dev-CI
+name: OpenWrt-dev-imq-CI
 
 on:
   push:
@@ -16,13 +16,19 @@ jobs:
 
   build_openwrt:
 
-    name: Build OpenWrt nginx dev firmware
+    name: Build OpenWrt dev firmware
 
     runs-on: ubuntu-22.04
 
     if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
+    
+      - name: Set workspace
+        run: |
+          sudo mkdir -p -m 777 /mnt/openwrt
+          echo "WORK_PATH=/mnt/openwrt" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -50,44 +56,44 @@ jobs:
           texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev yasm
           sudo -E apt-get -qq autoremove --purge
           sudo -E apt-get -qq clean
-
-          sudo mkdir -p -m 777 /mnt/openwrt/bin /mnt/openwrt/build_dir/host /mnt/openwrt/build_dir/hostpkg /mnt/openwrt/dl /mnt/openwrt/feeds /mnt/openwrt/staging_dir
-          ln -s /mnt/openwrt/bin ./bin
-          mkdir -p ./build_dir
-          ln -s -f /mnt/openwrt/build_dir/host ./build_dir/host
-          ln -s -f /mnt/openwrt/build_dir/hostpkg ./build_dir/hostpkg
-          ln -s /mnt/openwrt/dl ./dl
-          ln -s /mnt/openwrt/feeds ./feeds
-          ln -s /mnt/openwrt/staging_dir ./staging_dir
-
           df -h
-
+          
+      - name: Move Build Path
+        run: |
+          cp -a ./. ${{ env.WORK_PATH }}
+          
       - name: Update feeds
+        working-directory: ${{ env.WORK_PATH }}
         run: |
           ./tool.sh feed
 
       - name: Generate configuration file
+        working-directory: ${{ env.WORK_PATH }}
         run: |
           rm -f ./.config*
           cp ./configs/x86-nginx.config ./.config
           make defconfig
 
       - name: Make download
+        working-directory: ${{ env.WORK_PATH }}
         run: |
           make download -j8 || make download -j1 V=s
           rm -rf $(find ./dl/ -size -1024c)
           df -h
           
       - name: Compile firmware
+        working-directory: ${{ env.WORK_PATH }}
         run: |
           make -j$(nproc) || make -j1 V=s
 
       - name: Clean Build Files
+        working-directory: ${{ env.WORK_PATH }}
         run: |
           rm -rf ./staging_dir
           rm -rf ./build_dir
 
       - name: Prepare artifact
+        working-directory: ${{ env.WORK_PATH }}
         run: |
           mkdir -p ./artifact/firmware
           mkdir -p ./artifact/package
@@ -99,6 +105,7 @@ jobs:
           cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
 
       - name: Clean Bin Files
+        working-directory: ${{ env.WORK_PATH }}
         run: |
           rm -rf ./bin
 
@@ -106,19 +113,20 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: OpenWrt_buildinfo
-          path: ./artifact/buildinfo/
+          path: ${{ env.WORK_PATH }}/artifact/buildinfo/
 
       - name: Deliver package
+        working-directory: ${{ env.WORK_PATH }}
         uses: actions/upload-artifact@v4
         with:
           name: OpenWrt_package
-          path: ./artifact/package/
+          path: ${{ env.WORK_PATH }}/artifact/package/
 
       - name: Deliver firmware
         uses: actions/upload-artifact@v4
         with:
           name: OpenWrt_firmware
-          path: ./artifact/firmware/
+          path: ${{ env.WORK_PATH }}/artifact/firmware/
 
       - name: Push Msg
         run: |
