@@ -1,11 +1,8 @@
-
-name: OpenWrt-IMQ-releases-CI
-
+name: OpenWrt Releases
 on:
   push:
     tags:
       - 'v*'
-
 jobs:
 
   build_openwrt:
