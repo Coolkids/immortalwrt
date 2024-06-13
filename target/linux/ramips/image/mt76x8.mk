@@ -29,6 +29,26 @@ define Build/ravpower-wd009-factory
 endef
 
 
+define Device/7links_wlr-12xx
+  IMAGE_SIZE := 7872k
+  DEVICE_VENDOR := 7Links
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7663-firmware-ap
+  IMAGE/sysupgrade.bin := append-kernel | pad-to $$$$(BLOCKSIZE) | \
+	append-rootfs | pad-rootfs | check-size | append-metadata
+endef
+
+define Device/7links_wlr-1230
+  $(Device/7links_wlr-12xx)
+  DEVICE_MODEL := WLR-1230
+endef
+TARGET_DEVICES += 7links_wlr-1230
+
+define Device/7links_wlr-1240
+  $(Device/7links_wlr-12xx)
+  DEVICE_MODEL := WLR-1240
+endef
+TARGET_DEVICES += 7links_wlr-1240
+
 define Device/alfa-network_awusfree1
   IMAGE_SIZE := 7872k
   DEVICE_VENDOR := ALFA Network
@@ -146,6 +166,17 @@ define Device/comfast_cf-wr758ac-v2
   SUPPORTED_DEVICES += joowin,jw-wr758ac-v2
 endef
 TARGET_DEVICES += comfast_cf-wr758ac-v2
+
+define Device/cudy_tr1200-v1
+  IMAGE_SIZE := 15872k
+  DEVICE_VENDOR := Cudy
+  DEVICE_MODEL := TR1200
+  DEVICE_VARIANT := v1
+  DEVICE_PACKAGES := kmod-usb2 kmod-usb-ohci kmod-usb-ledtrig-usbport \
+	kmod-mt7615e kmod-mt7663-firmware-ap
+  SUPPORTED_DEVICES += R46
+endef
+TARGET_DEVICES += cudy_tr1200-v1
 
 define Device/cudy_wr1000
   IMAGE_SIZE := 7872k
@@ -609,6 +640,21 @@ define Device/tplink_archer-c50-v6
   DEFAULT := n
 endef
 TARGET_DEVICES += tplink_archer-c50-v6
+
+define Device/tplink_archer-mr200-v5
+  $(Device/tplink-v2)
+  IMAGE_SIZE := 7872k
+  DEVICE_MODEL := Archer MR200
+  DEVICE_VARIANT := v5
+  TPLINK_FLASHLAYOUT := 8MLmtk
+  TPLINK_HWID := 0x20000005
+  TPLINK_HWREV := 0x5
+  TPLINK_HWREVADD := 0x5
+  DEVICE_PACKAGES := kmod-mt76x0e uqmi kmod-usb2 kmod-usb-serial-option
+  IMAGES := sysupgrade.bin tftp-recovery.bin
+  IMAGE/tftp-recovery.bin := pad-extra 128k | $$(IMAGE/factory.bin)
+endef
+TARGET_DEVICES += tplink_archer-mr200-v5
 
 define Device/tplink_re200-v2
   $(Device/tplink-safeloader)
