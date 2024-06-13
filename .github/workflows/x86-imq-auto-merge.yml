@@ -15,7 +15,7 @@ jobs:
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "github-actions"
-          echo "VERSION=v$(date +'%y.%m')" >> $GITHUB_ENV
+          echo "VERSION=$(date +'%y.%m')" >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -31,12 +31,13 @@ jobs:
       - name: delete tag
         uses: dev-drprasad/delete-tag-and-release@v1.0
         with:
-          tag_name: ${{ env.VERSION }}
+          tag_name: v${{ env.VERSION }}
           github_token: ${{ secrets.PUSH_TOKEN }}
           delete_release: true
           
       - name: Tag release
         uses: mathieudutour/github-tag-action@v6.2
+        id: tag_version
         with:
           github_token: ${{ secrets.PUSH_TOKEN }}
           release_branches: master
@@ -44,4 +45,4 @@ jobs:
 
       - name: Push Msg
         run: |
-          sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "Merge dev into master ${{ env.VERSION }}"
+          sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "Merge dev into master ${{ steps.tag_version.outputs.new_tag }}"
