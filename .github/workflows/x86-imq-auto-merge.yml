@@ -36,10 +36,12 @@ jobs:
           delete_release: true
           
       - name: Tag release
-        id: create_tag
-        run: |
-          git tag -a ${{ env.VERSION }} -m "Release ${{ env.VERSION }}"
-          git push origin ${{ env.VERSION }}
+        uses: uses: anothrNick/github-tag-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PUSH_TOKEN }}
+          WITH_V: false
+          RELEASE_BRANCHES: master
+          CUSTOM_TAG: ${{ env.VERSION }}
 
       - name: Push Msg
         run: |
