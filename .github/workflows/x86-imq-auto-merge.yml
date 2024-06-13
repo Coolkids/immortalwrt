@@ -36,12 +36,11 @@ jobs:
           delete_release: true
           
       - name: Tag release
-        uses: anothrNick/github-tag-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PUSH_TOKEN }}
-          WITH_V: false
-          RELEASE_BRANCHES: master
-          CUSTOM_TAG: ${{ env.VERSION }}
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.PUSH_TOKEN }}
+          release_branches: master
+          custom_tag: ${{ env.VERSION }}
 
       - name: Push Msg
         run: |
