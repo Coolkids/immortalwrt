@@ -64,6 +64,18 @@ platform_do_upgrade() {
 	local board=$(board_name)
 
 	case "$board" in
+	abt,asr3000|\
+	nokia,ea0326gmp|\
+	tplink,tl-xdr4288|\
+	tplink,tl-xdr6086|\
+	tplink,tl-xdr6088|\
+	tplink,tl-xtr8488|\
+	xiaomi,redmi-router-ax6000-ubootmod)
+		[ -e /dev/fit0 ] && fitblk /dev/fit0
+		[ -e /dev/fitrw ] && fitblk /dev/fitrw
+		CI_KERNPART="fit"
+		nand_do_upgrade "$1"
+		;;
 	acer,predator-w6|\
 	smartrg,sdg-8612|\
 	smartrg,sdg-8614|\
@@ -86,6 +98,7 @@ platform_do_upgrade() {
 	bananapi,bpi-r3-mini|\
 	bananapi,bpi-r4|\
 	bananapi,bpi-r4-poe|\
+	cmcc,rax3000m|\
 	jdcloud,re-cp-03|\
 	mediatek,mt7988a-rfb|\
 	openwrt,one)
@@ -102,18 +115,6 @@ platform_do_upgrade() {
 			default_do_upgrade "$1"
 			;;
 		ubiblock*)
-			CI_KERNPART="fit"
-			nand_do_upgrade "$1"
-			;;
-		esac
-		;;
-	cmcc,rax3000m)
-		case "$(cmdline_get_var root)" in
-		/dev/mmc*)
-			CI_KERNPART="production"
-			emmc_do_upgrade "$1"
-			;;
-		*)
 			CI_KERNPART="fit"
 			nand_do_upgrade "$1"
 			;;
@@ -142,19 +143,9 @@ platform_do_upgrade() {
 		CI_KERNPART="fit"
 		nand_do_upgrade "$1"
 		;;
-	mercusys,mr90x-v1)
+	mercusys,mr90x-v1|\
+	tplink,re6000xd)
 		CI_UBIPART="ubi0"
-		nand_do_upgrade "$1"
-		;;
-	nokia,ea0326gmp|\
-	tplink,tl-xdr4288|\
-	tplink,tl-xdr6086|\
-	tplink,tl-xdr6088|\
-	tplink,tl-xtr8488|\
-	xiaomi,redmi-router-ax6000-ubootmod)
-		[ -e /dev/fit0 ] && fitblk /dev/fit0
-		[ -e /dev/fitrw ] && fitblk /dev/fitrw
-		CI_KERNPART="fit"
 		nand_do_upgrade "$1"
 		;;
 	ubnt,unifi-6-plus)
@@ -245,16 +236,10 @@ platform_copy_config() {
 	bananapi,bpi-r3|\
 	bananapi,bpi-r3-mini|\
 	bananapi,bpi-r4|\
-	bananapi,bpi-r4-poe)
+	bananapi,bpi-r4-poe|\
+	cmcc,rax3000m)
 		case "$(fitblk_get_bootdev)" in
 		mmcblk*)
-			emmc_copy_config
-			;;
-		esac
-		;;
-	cmcc,rax3000m)
-		case "$(cmdline_get_var root)" in
-		/dev/mmc*)
 			emmc_copy_config
 			;;
 		esac
