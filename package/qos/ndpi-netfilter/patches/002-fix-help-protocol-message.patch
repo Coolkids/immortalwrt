@@ -1,8 +1,8 @@
 diff --git forkSrcPrefix/ndpi-netfilter/ipt/libxt_ndpi.c forkDstPrefix/ndpi-netfilter/ipt/libxt_ndpi.c
-index 0e4fa3279689d89e92eb192ffaa171851c4b9389..c06299441a83527def74e331ee6db58c4bd98567 100644
+index 439c2cb767aa3dd1462c607434893da042ad0b50..25bab8970c29fcdf9f353e5af90eae35e559a066 100644
 --- forkSrcPrefix/ndpi-netfilter/ipt/libxt_ndpi.c
 +++ forkDstPrefix/ndpi-netfilter/ipt/libxt_ndpi.c
-@@ -653,9 +653,21 @@ static int cmp_pname(const void *p1, const void *p2) {
+@@ -654,9 +654,21 @@ static int cmp_pname(const void *p1, const void *p2) {
  	return 0;
  }
  
@@ -24,7 +24,7 @@ index 0e4fa3279689d89e92eb192ffaa171851c4b9389..c06299441a83527def74e331ee6db58c
  	char *pn[NDPI_NUM_BITS+1];
  
  	load_kernel_proto();
-@@ -678,6 +690,13 @@ static int ndpi_print_prot_list(int cond, char *msg) {
+@@ -679,6 +691,13 @@ static int ndpi_print_prot_list(int cond, char *msg) {
  		puts(msg);
  	qsort(&pn[0],NDPI_NUM_BITS,sizeof(pn[0]),cmp_pname);
  
@@ -38,7 +38,7 @@ index 0e4fa3279689d89e92eb192ffaa171851c4b9389..c06299441a83527def74e331ee6db58c
          for (i = 0,c = 0,l=0; i < NDPI_NUM_BITS; i++) {
  	    if(!pn[i]) break;
  	    l += snprintf(&line[l],sizeof(line)-1-l,"%-20s ", pn[i]);
-@@ -689,6 +708,7 @@ static int ndpi_print_prot_list(int cond, char *msg) {
+@@ -690,6 +709,7 @@ static int ndpi_print_prot_list(int cond, char *msg) {
  	    }
  	}
  	if(c > 0) printf("%s\n",line);
