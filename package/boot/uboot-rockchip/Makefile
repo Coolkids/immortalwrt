@@ -219,6 +219,8 @@ endef
 
 define U-Boot/radxa-e25-rk3568
   $(U-Boot/Default/rk3568)
+  DEPENDS:=+PACKAGE_u-boot-$(1):trusted-firmware-a-rk3568-e25
+  TPL:=$(RK3568_TPL_E25)
   NAME:=E25
   BUILD_DEVICES:= \
     radxa_e25
@@ -267,6 +269,13 @@ define U-Boot/rock5b-rk3588
   NAME:=Rock 5B
   BUILD_DEVICES:= \
     radxa_rock-5b
+endef
+
+define U-Boot/sige7-rk3588
+  $(U-Boot/Default/rk3588)
+  NAME:=Sige7
+  BUILD_DEVICES:= \
+    armsom_sige7
 endef
 
 
@@ -329,6 +338,7 @@ UBOOT_TARGETS := \
   nanopc-t6-rk3588 \
   orangepi-5-plus-rk3588 \
   rock5b-rk3588 \
+  sige7-rk3588 \
   nanopi-r6c-rk3588s \
   nanopi-r6s-rk3588s \
   orangepi-5-rk3588s \

@@ -20,6 +20,19 @@ define Device/ariaboard_photonicat
 endef
 TARGET_DEVICES += ariaboard_photonicat
 
+define Device/armsom_sige7
+  DEVICE_VENDOR := ArmSoM
+  DEVICE_MODEL := Sige7
+  DEVICE_ALT0_VENDOR := Bananapi
+  DEVICE_ALT0_MODEL := BPi-M7
+  SOC := rk3588
+  DEVICE_DTS := rockchip/rk3588-armsom-sige7
+  BOOT_FLOW := pine64-img
+  DEVICE_PACKAGES := kmod-brcmfmac kmod-r8125 wpad-openssl \
+	brcmfmac-firmware-43752-pcie brcmfmac-nvram-43752-pcie
+endef
+TARGET_DEVICES += armsom_sige7
+
 define Device/ezpro_mrkaio-m68s
   DEVICE_VENDOR := EZPRO
   DEVICE_MODEL := Mrkaio M68S
@@ -225,6 +238,7 @@ define Device/radxa_e25
   DEVICE_DTS := rockchip/rk3568-radxa-e25
   UBOOT_DEVICE_NAME := radxa-e25-rk3568
   BOOT_FLOW := pine64-img
+  BOOT_SCRIPT := radxa-e25
   DEVICE_PACKAGES := kmod-r8125 kmod-ata-ahci-platform
 endef
 TARGET_DEVICES += radxa_e25
@@ -280,8 +294,8 @@ endef
 TARGET_DEVICES += radxa_rock-pi-e
 
 define Device/sinovoip_bpi-r2-pro
-  DEVICE_VENDOR := Sinovoip
-  DEVICE_MODEL := Bananapi-R2 Pro
+  DEVICE_VENDOR := Bananapi
+  DEVICE_MODEL := BPi-R2 Pro
   SOC := rk3568
   SUPPORTED_DEVICES := sinovoip,rk3568-bpi-r2pro
   BOOT_FLOW := pine64-img
