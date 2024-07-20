@@ -1,18 +1,5 @@
---- linux.orig/net/netfilter/Makefile	2024-04-08 11:51:59.757511937 +0800
-+++ linux.new/net/netfilter/Makefile	2024-04-08 11:52:06.964550926 +0800
-@@ -174,6 +174,10 @@
- obj-$(CONFIG_NETFILTER_XT_TARGET_IDLETIMER) += xt_IDLETIMER.o
- 
- # matches
-+obj-$(CONFIG_NETFILTER_XT_MATCH_BANDWIDTH) += xt_bandwidth.o
-+obj-$(CONFIG_NETFILTER_XT_MATCH_TIMERANGE) += xt_timerange.o
-+obj-$(CONFIG_NETFILTER_XT_MATCH_WEBMON) += xt_webmon.o
-+obj-$(CONFIG_NETFILTER_XT_MATCH_WEBURL) += xt_weburl.o
- obj-$(CONFIG_NETFILTER_XT_MATCH_ADDRTYPE) += xt_addrtype.o
- obj-$(CONFIG_NETFILTER_XT_MATCH_BPF) += xt_bpf.o
- obj-$(CONFIG_NETFILTER_XT_MATCH_CLUSTER) += xt_cluster.o
---- linux.orig/net/netfilter/Kconfig	2024-04-08 11:51:59.757511937 +0800
-+++ linux.new/net/netfilter/Kconfig	2024-04-08 11:52:06.976550991 +0800
+--- linux.orig/net/netfilter/Kconfig	2024-07-20 11:04:22.539890067 +0800
++++ linux.new/net/netfilter/Kconfig	2024-07-20 11:04:29.778412292 +0800
 @@ -1665,6 +1665,26 @@
  
  endif # NETFILTER_XTABLES
@@ -40,8 +27,21 @@
  endmenu
  
  source "net/netfilter/ipset/Kconfig"
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/net/netfilter/weburl_deps/regexp.c	2024-04-08 11:52:06.848550298 +0800
+--- linux.orig/net/netfilter/Makefile	2024-07-20 11:04:22.539890067 +0800
++++ linux.new/net/netfilter/Makefile	2024-07-20 11:04:29.770411715 +0800
+@@ -174,6 +174,10 @@
+ obj-$(CONFIG_NETFILTER_XT_TARGET_IDLETIMER) += xt_IDLETIMER.o
+ 
+ # matches
++obj-$(CONFIG_NETFILTER_XT_MATCH_BANDWIDTH) += xt_bandwidth.o
++obj-$(CONFIG_NETFILTER_XT_MATCH_TIMERANGE) += xt_timerange.o
++obj-$(CONFIG_NETFILTER_XT_MATCH_WEBMON) += xt_webmon.o
++obj-$(CONFIG_NETFILTER_XT_MATCH_WEBURL) += xt_weburl.o
+ obj-$(CONFIG_NETFILTER_XT_MATCH_ADDRTYPE) += xt_addrtype.o
+ obj-$(CONFIG_NETFILTER_XT_MATCH_BPF) += xt_bpf.o
+ obj-$(CONFIG_NETFILTER_XT_MATCH_CLUSTER) += xt_cluster.o
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/net/netfilter/weburl_deps/regexp.c	2024-07-20 11:04:29.698406520 +0800
 @@ -0,0 +1,1197 @@
 +/*
 + * regcomp and regexec -- regsub and regerror are elsewhere
@@ -1240,8 +1240,8 @@
 +#endif
 +
 +
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/net/netfilter/weburl_deps/regexp.h	2024-04-08 11:52:06.848550298 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/net/netfilter/weburl_deps/regexp.h	2024-07-20 11:04:29.698406520 +0800
 @@ -0,0 +1,41 @@
 +/*
 + * Definitions etc. for regexp(3) routines.
@@ -1284,16 +1284,16 @@
 +void regerror(char *s);
 +
 +#endif
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/net/netfilter/weburl_deps/regmagic.h	2024-04-08 11:52:06.848550298 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/net/netfilter/weburl_deps/regmagic.h	2024-07-20 11:04:29.698406520 +0800
 @@ -0,0 +1,5 @@
 +/*
 + * The first byte of the regexp internal "program" is actually this magic
 + * number; the start node begins in the second byte.
 + */
 +#define	MAGIC	0234
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/net/netfilter/weburl_deps/regsub.c	2024-04-08 11:52:06.848550298 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/net/netfilter/weburl_deps/regsub.c	2024-07-20 11:04:29.698406520 +0800
 @@ -0,0 +1,95 @@
 +/*
 + * regsub
@@ -1390,8 +1390,8 @@
 +	}
 +	*dst++ = '\0';
 +}
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/net/netfilter/weburl_deps/tree_map.h	2024-04-08 11:52:06.848550298 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/net/netfilter/weburl_deps/tree_map.h	2024-07-20 11:04:29.698406520 +0800
 @@ -0,0 +1,1084 @@
 +/*
 + * Copyright © 2008 by Eric Bishop <eric@gargoyle-router.com>
@@ -2477,8 +2477,8 @@
 +}
 +
 +
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/net/netfilter/xt_weburl.c	2024-04-08 11:52:06.848550298 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/net/netfilter/xt_weburl.c	2024-07-20 11:04:29.698406520 +0800
 @@ -0,0 +1,627 @@
 +/*  weburl --	A netfilter module to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
@@ -2960,7 +2960,7 @@
 +	
 +
 +	/* ignore packets that are not TCP */
-+	iph = (struct iphdr*)(skb_network_header(skb));
++	iph = (struct iphdr*)(skb_network_header(linear_skb));
 +	if(iph->protocol == IPPROTO_TCP)
 +	{
 +		/* get payload */
@@ -3022,13 +3022,13 @@
 +	
 +
 +	/* ignore packets that are not TCP */
-+	iph = (struct ipv6hdr*)(skb_network_header(skb));
-+	ip6proto = ipv6_find_hdr(skb, &thoff, -1, NULL, NULL);
++	iph = (struct ipv6hdr*)(skb_network_header(linear_skb));
++	ip6proto = ipv6_find_hdr(linear_skb, &thoff, -1, NULL, NULL);
 +	if(ip6proto == IPPROTO_TCP)
 +	{
 +		/* get payload */
 +		struct tcphdr* tcp_hdr;
-+		tcp_hdr = skb_header_pointer(skb, thoff, sizeof(struct tcphdr), tcp_hdr);
++		tcp_hdr = skb_header_pointer(linear_skb, thoff, sizeof(struct tcphdr), tcp_hdr);
 +		if(tcp_hdr != NULL)
 +		{
 +			unsigned short payload_offset 	= (tcp_hdr->doff*4) + thoff;
@@ -3107,8 +3107,8 @@
 +module_init(init);
 +module_exit(fini);
 +
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/net/netfilter/xt_weburl.mod.c	2024-04-08 11:52:06.848550298 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/net/netfilter/xt_weburl.mod.c	2024-07-20 11:04:29.698406520 +0800
 @@ -0,0 +1,20 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -3130,8 +3130,8 @@
 +__attribute__((section(".modinfo"))) =
 +"depends=";
 +
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/net/netfilter/webmon_deps/tree_map.h	2024-04-08 11:52:06.883550488 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/net/netfilter/webmon_deps/tree_map.h	2024-07-20 11:04:29.720408107 +0800
 @@ -0,0 +1,1084 @@
 +/*
 + * Copyright © 2008 by Eric Bishop <eric@gargoyle-router.com>
@@ -4217,8 +4217,8 @@
 +}
 +
 +
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/net/netfilter/xt_webmon.c	2024-04-08 11:52:06.883550488 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/net/netfilter/xt_webmon.c	2024-07-20 11:04:29.720408107 +0800
 @@ -0,0 +1,1788 @@
 +/*  webmon --	A netfilter module to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
@@ -4287,7 +4287,7 @@
 +	ntohs(((uint16_t*)&addr)[5]), \
 +	ntohs(((uint16_t*)&addr)[6]), \
 +	ntohs(((uint16_t*)&addr)[7])
-+#define STRIP6 "%04hu:%04hu:%04hu:%04hu:%04hu:%04hu:%04hu:%04hu"
++#define STRIP6 "%04hx:%04hx:%04hx:%04hx:%04hx:%04hx:%04hx:%04hx"
 +
 +typedef union
 +{
@@ -5106,7 +5106,7 @@
 +	
 +
 +	/* ignore packets that are not TCP */
-+	iph = (struct iphdr*)(skb_network_header(skb));
++	iph = (struct iphdr*)(skb_network_header(linear_skb));
 +	if(iph->protocol == IPPROTO_TCP)
 +	{
 +		/* get payload */
@@ -5503,13 +5503,13 @@
 +	
 +
 +	/* ignore packets that are not TCP */
-+	iph = (struct ipv6hdr*)(skb_network_header(skb));
-+	ip6proto = ipv6_find_hdr(skb, &thoff, -1, NULL, NULL);
++	iph = (struct ipv6hdr*)(skb_network_header(linear_skb));
++	ip6proto = ipv6_find_hdr(linear_skb, &thoff, -1, NULL, NULL);
 +	if(ip6proto == IPPROTO_TCP)
 +	{
 +		/* get payload */
 +		struct tcphdr* tcp_hdr;
-+		tcp_hdr = skb_header_pointer(skb, thoff, sizeof(struct tcphdr), tcp_hdr);
++		tcp_hdr = skb_header_pointer(linear_skb, thoff, sizeof(struct tcphdr), tcp_hdr);
 +		if(tcp_hdr != NULL)
 +		{
 +			unsigned short payload_offset 	= (tcp_hdr->doff*4) + thoff;
@@ -6008,8 +6008,8 @@
 +module_init(init);
 +module_exit(fini);
 +
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/net/netfilter/xt_timerange.c	2024-04-08 11:52:06.921550693 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/net/netfilter/xt_timerange.c	2024-07-20 11:04:29.742409695 +0800
 @@ -0,0 +1,146 @@
 +/*  timerange --	An xtables extension to match multiple timeranges within a week
 + *  			Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -6157,8 +6157,8 @@
 +module_init(init);
 +module_exit(fini);
 +
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/net/netfilter/xt_timerange.mod.c	2024-04-08 11:52:06.921550693 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/net/netfilter/xt_timerange.mod.c	2024-07-20 11:04:29.742409695 +0800
 @@ -0,0 +1,20 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -6180,8 +6180,8 @@
 +__attribute__((section(".modinfo"))) =
 +"depends=";
 +
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/net/netfilter/bandwidth_deps/tree_map.h	2024-04-08 11:52:06.954550872 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/net/netfilter/bandwidth_deps/tree_map.h	2024-07-20 11:04:29.764411282 +0800
 @@ -0,0 +1,1093 @@
 +/*
 + * Copyright © 2008 by Eric Bishop <eric@gargoyle-router.com>
@@ -7276,8 +7276,8 @@
 +}
 +
 +
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/net/netfilter/xt_bandwidth.c	2024-04-08 11:52:06.954550872 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/net/netfilter/xt_bandwidth.c	2024-07-20 11:04:29.764411282 +0800
 @@ -0,0 +1,3104 @@
 +/*  bandwidth --	An xtables extension for bandwidth monitoring/control
 + *  			Can be used to efficiently monitor bandwidth and/or implement bandwidth quotas
@@ -10383,8 +10383,8 @@
 +
 +module_init(init);
 +module_exit(fini);
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/net/netfilter/xt_bandwidth.mod.c	2024-04-08 11:52:06.954550872 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/net/netfilter/xt_bandwidth.mod.c	2024-07-20 11:04:29.764411282 +0800
 @@ -0,0 +1,20 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -10406,8 +10406,8 @@
 +__attribute__((section(".modinfo"))) =
 +"depends=";
 +
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/include/linux/netfilter/xt_weburl.h	2024-04-08 11:52:06.850550309 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/include/linux/netfilter/xt_weburl.h	2024-07-20 11:04:29.699406592 +0800
 @@ -0,0 +1,45 @@
 +/*  weburl --	A netfilter module to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
@@ -10454,8 +10454,8 @@
 +	unsigned char invert;
 +};
 +#endif /*_XT_WEBURL_H*/
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/include/linux/netfilter/xt_webmon.h	2024-04-08 11:52:06.885550498 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/include/linux/netfilter/xt_webmon.h	2024-07-20 11:04:29.721408179 +0800
 @@ -0,0 +1,69 @@
 +/*  webmon --	A netfilter module to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
@@ -10526,8 +10526,8 @@
 +};
 +
 +#endif /*_XT_WEBMON_H*/
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/include/linux/netfilter/xt_timerange.h	2024-04-08 11:52:06.922550699 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/include/linux/netfilter/xt_timerange.h	2024-07-20 11:04:29.743409767 +0800
 @@ -0,0 +1,43 @@
 +/*  timerange --	An xtables extension to match multiple timeranges within a week
 + *  			Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -10572,8 +10572,8 @@
 +	unsigned char invert;
 +};
 +#endif /*_XT_TIMERANGE_H*/
---- /dev/null	2024-03-26 15:20:30.279999840 +0800
-+++ linux.new/include/linux/netfilter/xt_bandwidth.h	2024-04-08 11:52:06.956550882 +0800
+--- /dev/null	2024-07-07 00:32:04.609000000 +0800
++++ linux.new/include/linux/netfilter/xt_bandwidth.h	2024-07-20 11:04:29.765411354 +0800
 @@ -0,0 +1,111 @@
 +/*  bandwidth --	An xtables extension for bandwidth monitoring/control
 + *  			Can be used to efficiently monitor bandwidth and/or implement bandwidth quotas
