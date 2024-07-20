@@ -81,6 +81,18 @@ endef
 $(eval $(call KernelPackage,crypto-authenc))
 
 
+define KernelPackage/crypto-blake2b
+  TITLE:=Support for BLAKE2b cryptographic hash function (RFC 7693)
+  DEPENDS:=+kmod-crypto-hash
+  KCONFIG:=CONFIG_CRYPTO_BLAKE2B
+  FILES:=$(LINUX_DIR)/crypto/blake2b_generic.ko
+  AUTOLOAD:=$(call AutoLoad,09,blake2b_generic)
+  $(call AddDepends/crypto)
+endef
+
+$(eval $(call KernelPackage,crypto-blake2b))
+
+
 define KernelPackage/crypto-cbc
   TITLE:=Cipher Block Chaining CryptoAPI module
   DEPENDS:=+kmod-crypto-manager
@@ -411,7 +423,7 @@ define KernelPackage/crypto-hw-ixp4xx
   KCONFIG:= \
 	CONFIG_CRYPTO_HW=y \
 	CONFIG_CRYPTO_DEV_IXP4XX
-  FILES:=$(LINUX_DIR)/drivers/crypto/ixp4xx_crypto.ko
+  FILES:=$(LINUX_DIR)/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.ko
   AUTOLOAD:=$(call AutoProbe,ixp4xx_crypto)
   $(call AddDepends/crypto)
 endef
@@ -752,7 +764,6 @@ define KernelPackage/crypto-misc
 	CONFIG_CRYPTO_CAMELLIA \
 	CONFIG_CRYPTO_CAST5 \
 	CONFIG_CRYPTO_CAST6 \
-	CONFIG_CRYPTO_FCRYPT \
 	CONFIG_CRYPTO_KHAZAD \
 	CONFIG_CRYPTO_SERPENT \
 	CONFIG_CRYPTO_TEA \
@@ -1158,4 +1169,16 @@ define KernelPackage/crypto-xts
 endef
 
 $(eval $(call KernelPackage,crypto-xts))
+
+
+define KernelPackage/crypto-xxhash
+  TITLE:=xxHash non-cryptographic hash algorithm
+  DEPENDS:=+kmod-crypto-hash +kmod-lib-xxhash
+  KCONFIG:=CONFIG_CRYPTO_XXHASH
+  FILES:=$(LINUX_DIR)/crypto/xxhash_generic.ko
+  AUTOLOAD:=$(call AutoLoad,09,xxhash_generic)
+  $(call AddDepends/crypto)
+endef
+
+$(eval $(call KernelPackage,crypto-xxhash))
 

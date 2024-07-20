@@ -5,9 +5,9 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
-PKG_VERSION:=2024.04
+PKG_VERSION:=2024.07
 PKG_RELEASE:=1
-PKG_HASH:=18a853fe39fad7ad03a90cc2d4275aeaed6da69735defac3492b80508843dd4a
+PKG_HASH:=f591da9ab90ef3d6b3d173766d0ddff90c4ed7330680897486117df390d83c8f
 
 PKG_MAINTAINER:=Tobias Maedel <openwrt@tbspace.de>
 
@@ -219,6 +219,8 @@ endef
 
 define U-Boot/radxa-e25-rk3568
   $(U-Boot/Default/rk3568)
+  DEPENDS:=+PACKAGE_u-boot-$(1):trusted-firmware-a-rk3568-e25
+  TPL:=$(RK3568_TPL_E25)
   NAME:=E25
   BUILD_DEVICES:= \
     radxa_e25
@@ -267,6 +269,13 @@ define U-Boot/rock5b-rk3588
   NAME:=Rock 5B
   BUILD_DEVICES:= \
     radxa_rock-5b
+endef
+
+define U-Boot/sige7-rk3588
+  $(U-Boot/Default/rk3588)
+  NAME:=Sige7
+  BUILD_DEVICES:= \
+    armsom_sige7
 endef
 
 
@@ -329,6 +338,7 @@ UBOOT_TARGETS := \
   nanopc-t6-rk3588 \
   orangepi-5-plus-rk3588 \
   rock5b-rk3588 \
+  sige7-rk3588 \
   nanopi-r6c-rk3588s \
   nanopi-r6s-rk3588s \
   orangepi-5-rk3588s \
@@ -337,7 +347,6 @@ UBOOT_TARGETS := \
 UBOOT_CONFIGURE_VARS += USE_PRIVATE_LIBGCC=yes
 
 UBOOT_CUSTOMIZE_CONFIG := \
-	--disable SPL_FIT_SIGNATURE \
 	--disable TOOLS_MKEFICAPSULE \
 	--set-str MKIMAGE_DTC_PATH $(PKG_BUILD_DIR)/scripts/dtc/dtc \
 	$(if $(TPL),, \
@@ -347,6 +356,8 @@ UBOOT_CUSTOMIZE_CONFIG := \
 		--disable DFU_MMC \
 		--disable EFI_CAPSULE_ON_DISK \
 		--disable EFI_CAPSULE_FIRMWARE_RAW \
+		--disable SPL_FIT_SIGNATURE \
+		--disable USB_FUNCTION_FASTBOOT \
 	)
 
 UBOOT_MAKE_FLAGS += \
@@ -356,8 +367,7 @@ UBOOT_MAKE_FLAGS += \
 define Build/InstallDev
 	$(INSTALL_DIR) $(STAGING_DIR_IMAGE)
 ifneq ($(TPL),)
-	$(CP) $(PKG_BUILD_DIR)/idbloader.img $(STAGING_DIR_IMAGE)/$(BUILD_VARIANT)-idbloader.img
-	$(CP) $(PKG_BUILD_DIR)/u-boot.itb $(STAGING_DIR_IMAGE)/$(BUILD_VARIANT)-u-boot.itb
+	$(CP) $(PKG_BUILD_DIR)/u-boot-rockchip.bin $(STAGING_DIR_IMAGE)/$(BUILD_VARIANT)-u-boot-rockchip.bin
 else
 	$(STAGING_DIR_IMAGE)/loaderimage --pack --uboot $(PKG_BUILD_DIR)/u-boot-dtb.bin $(PKG_BUILD_DIR)/uboot.img 0x200000
 	$(CP) $(PKG_BUILD_DIR)/uboot.img $(STAGING_DIR_IMAGE)/$(BUILD_VARIANT)-uboot.img
