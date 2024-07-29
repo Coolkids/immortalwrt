@@ -42,7 +42,7 @@ for subdir in "$A_DIR"/*; do
     if [ -d "$subdir" ]; then
         # 提取子文件夹的名字
         subdir_name=$(basename "$subdir")
-        ./scripts/feeds install -p diy2 -f "$subdir_name"
+        ./scripts/feeds install -p diy1 -f "$subdir_name"
         echo "install $subdir_name"
     fi
 done
