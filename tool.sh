@@ -33,6 +33,21 @@ for subdir in "$A_DIR"/*; do
 done
 }
 
+function install_dep(){
+# 定义A和B文件夹的路径
+A_DIR="./feeds/diy1"
+
+# 遍历A文件夹中的子文件夹
+for subdir in "$A_DIR"/*; do
+    if [ -d "$subdir" ]; then
+        # 提取子文件夹的名字
+        subdir_name=$(basename "$subdir")
+        ./scripts/feeds install -p diy2 "$subdir_name"
+        echo "install $subdir_name"
+    fi
+done
+}
+
 function feed(){
 patchs=`pwd`
 rm -rf ./feeds/*
@@ -45,6 +60,7 @@ rm -rf ./feeds/packages/net/mosdns
 ./scripts/feeds install -p diy2 luci-app-passwall
 ./scripts/feeds install -p custom v2ray-geodata
 ./scripts/feeds install -p mosdns mosdns
+install_dep
 pushd ./feeds/luci
 git apply $patchs/patchs/001-luci-status-network-ifaces.patch
 popd
