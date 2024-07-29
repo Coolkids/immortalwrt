@@ -13,10 +13,31 @@ case $1 in
 esac
 }
 
+function delete_dep(){
+# 定义A和B文件夹的路径
+A_DIR="./feeds/diy1"
+B_DIR="./feeds/packages/net"
+
+# 遍历A文件夹中的子文件夹
+for subdir in "$A_DIR"/*; do
+    if [ -d "$subdir" ]; then
+        # 提取子文件夹的名字
+        subdir_name=$(basename "$subdir")
+        
+        # 在B文件夹中查找并删除同名的文件夹
+        if [ -d "$B_DIR/$subdir_name" ]; then
+            rm -rf "$B_DIR/$subdir_name"
+            echo "Deleted $B_DIR/$subdir_name"
+        fi
+    fi
+done
+}
+
 function feed(){
 patchs=`pwd`
 rm -rf ./feeds/*
 ./scripts/feeds update -a
+delete_dep
 rm -rf ./feeds/luci/applications/luci-app-passwall
 rm -rf ./feeds/packages/net/v2ray-geodata
 rm -rf ./feeds/packages/net/mosdns
@@ -28,9 +49,10 @@ pushd ./feeds/luci
 git apply $patchs/patchs/001-luci-status-network-ifaces.patch
 popd
 
-rm -rf ./feeds/packages/lang/ruby
-cp -r ./patchs/ruby ./feeds/packages/lang
+#rm -rf ./feeds/packages/lang/ruby
+#cp -r ./patchs/ruby ./feeds/packages/lang
 
 }
+
 
 main $1
