@@ -25,6 +25,25 @@ define U-Boot/Default
 endef
 
 
+# RK3308 boards
+
+define U-Boot/Default/rk3308
+  BUILD_SUBTARGET:=armv8
+  DEPENDS:=+PACKAGE_u-boot-$(1):trusted-firmware-a-rk3308
+  ATF:=$(RK3308_ATF)
+  TPL:=$(RK3308_TPL)
+endef
+
+define U-Boot/rock-pi-s-rk3308
+  $(U-Boot/Default/rk3308)
+  DEPENDS:=+PACKAGE_u-boot-$(1):trusted-firmware-a-rk3308-rock-pi-s
+  TPL:=$(RK3308_TPL_ROCK_PI_S)
+  NAME:=ROCK Pi S
+  BUILD_DEVICES:= \
+    radxa_rock-pi-s
+endef
+
+
 # RK3328 boards
 
 define U-Boot/Default/rk3328
@@ -80,6 +99,13 @@ define U-Boot/rock-pi-e-rk3328
   NAME:=Rock Pi E
   BUILD_DEVICES:= \
     radxa_rock-pi-e
+endef
+
+define U-Boot/rock-pi-e-v3-rk3328
+  $(U-Boot/Default/rk3328)
+  NAME:=ROCK Pi E v3.0
+  BUILD_DEVICES:= \
+    radxa_rock-pi-e-v3
 endef
 
 define U-Boot/rock64-rk3328
@@ -235,7 +261,7 @@ endef
 
 define U-Boot/rock-3a-rk3568
   $(U-Boot/Default/rk3568)
-  NAME:=Rock 3A
+  NAME:=ROCK 3A
   BUILD_DEVICES:= \
     radxa_rock-3a
 endef
@@ -316,6 +342,7 @@ UBOOT_TARGETS := \
   nanopi-r4se-rk3399 \
   rock-pi-4-rk3399 \
   rockpro64-rk3399 \
+  rock-pi-s-rk3308 \
   nanopi-r2c-rk3328 \
   nanopi-r2c-plus-rk3328 \
   nanopi-r2s-rk3328 \
@@ -323,6 +350,7 @@ UBOOT_TARGETS := \
   orangepi-r1-plus-lts-rk3328 \
   roc-cc-rk3328 \
   rock-pi-e-rk3328 \
+  rock-pi-e-v3-rk3328 \
   rock64-rk3328 \
   radxa-cm3-io-rk3566 \
   bpi-r2-pro-rk3568 \
