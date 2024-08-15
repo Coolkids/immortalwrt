@@ -239,7 +239,7 @@ define Device/radxa_e25
   UBOOT_DEVICE_NAME := radxa-e25-rk3568
   BOOT_FLOW := pine64-img
   BOOT_SCRIPT := radxa-e25
-  DEVICE_PACKAGES := kmod-r8125 kmod-ata-ahci-platform
+  DEVICE_PACKAGES := kmod-r8125 kmod-ata-ahci-dwc
 endef
 TARGET_DEVICES += radxa_e25
 
@@ -249,6 +249,7 @@ define Device/radxa_rock-3a
   SOC := rk3568
   SUPPORTED_DEVICES := radxa,rock3a
   BOOT_FLOW := pine64-img
+  DEVICE_PACKAGES := kmod-usb-net-cdc-ncm kmod-usb-net-rndis
 endef
 TARGET_DEVICES += radxa_rock-3a
 
@@ -292,6 +293,26 @@ define Device/radxa_rock-pi-e
   BOOT_FLOW := pine64-bin
 endef
 TARGET_DEVICES += radxa_rock-pi-e
+
+define Device/radxa_rock-pi-e-v3
+  DEVICE_VENDOR := Radxa
+  DEVICE_MODEL := ROCK Pi E v3.0
+  SOC := rk3328
+  DEVICE_DTS := rockchip/rk3328-rock-pi-e
+  BOOT_FLOW := pine64-bin
+  DEVICE_PACKAGES := kmod-rtw88-8723du kmod-usb-net-cdc-ncm kmod-usb-net-rndis wpad-openssl
+endef
+TARGET_DEVICES += radxa_rock-pi-e-v3
+
+define Device/radxa_rock-pi-s
+  DEVICE_VENDOR := Radxa
+  DEVICE_MODEL := ROCK Pi S
+  SOC := rk3308
+  BOOT_FLOW := pine64-img
+  BOOT_SCRIPT := rock-pi-s
+  DEVICE_PACKAGES := kmod-rtw88-8723ds kmod-usb-net-cdc-ncm kmod-usb-net-rndis wpad-openssl
+endef
+TARGET_DEVICES += radxa_rock-pi-s
 
 define Device/sinovoip_bpi-r2-pro
   DEVICE_VENDOR := Bananapi
