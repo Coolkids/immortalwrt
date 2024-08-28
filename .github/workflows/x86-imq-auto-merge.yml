@@ -38,8 +38,8 @@ jobs:
       - name: Tag release
         id: create_tag
         run: |
-          git tag -a ${{ env.VERSION }} -m "Release ${{ env.VERSION }}"
-          git push origin ${{ env.VERSION }}
+          git tag -a v${{ env.VERSION }} -m "Release v${{ env.VERSION }}"
+          git push origin v${{ env.VERSION }}
 
       - name: Push Msg
         run: |
