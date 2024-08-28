@@ -44,6 +44,9 @@ Package/brcmfmac-firmware-43456-sdio = $(call Package/armbian-firmware-default,B
 define Package/brcmfmac-firmware-43456-sdio/install
 	$(INSTALL_DIR) $(1)/lib/firmware/brcm
 	$(INSTALL_DATA) \
+		$(PKG_BUILD_DIR)/brcm/BCM4345C5.hcd \
+		$(1)/lib/firmware/brcm/
+	$(INSTALL_DATA) \
 		$(PKG_BUILD_DIR)/brcm/brcmfmac43456-sdio.bin \
 		$(1)/lib/firmware/brcm/
 	$(INSTALL_DATA) \
@@ -88,8 +91,11 @@ define Package/brcmfmac-nvram-4356-sdio/install
 	$(INSTALL_DATA) \
 		$(PKG_BUILD_DIR)/brcm/brcmfmac4356-sdio.txt \
 		$(1)/lib/firmware/brcm/
+	$(INSTALL_DATA) \
+		$(PKG_BUILD_DIR)/rkwifi/nvram_ap6356s.txt \
+		$(1)/lib/firmware/brcm/brcmfmac4356-sdio.AP6356S.txt
 	$(LN) \
-		brcmfmac4356-sdio.txt \
+		brcmfmac4356-sdio.AP6356S.txt \
 		$(1)/lib/firmware/brcm/brcmfmac4356-sdio.friendlyarm,nanopc-t4.txt
 endef
 $(eval $(call BuildPackage,brcmfmac-nvram-4356-sdio))
@@ -100,8 +106,11 @@ define Package/brcmfmac-nvram-43456-sdio/install
 	$(INSTALL_DATA) \
 		$(PKG_BUILD_DIR)/brcm/brcmfmac43456-sdio.txt \
 		$(1)/lib/firmware/brcm/
+	 $(INSTALL_DATA) \
+		$(PKG_BUILD_DIR)/brcm/nvram_ap6256.txt \
+		$(1)/lib/firmware/brcm/brcmfmac4356-sdio.AP6256S.txt
 	$(LN) \
-		brcmfmac43456-sdio.txt \
+		brcmfmac43456-sdio.AP6256S.txt \
 		$(1)/lib/firmware/brcm/brcmfmac43456-sdio.radxa,rockpi4a.txt
 endef
 $(eval $(call BuildPackage,brcmfmac-nvram-43456-sdio))
