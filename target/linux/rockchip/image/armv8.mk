@@ -20,6 +20,17 @@ define Device/ariaboard_photonicat
 endef
 TARGET_DEVICES += ariaboard_photonicat
 
+define Device/armsom_sige3
+  DEVICE_VENDOR := ArmSoM
+  DEVICE_MODEL := Sige3
+  SOC := rk3568
+  DEVICE_DTS := rockchip/rk3568-armsom-sige3
+  BOOT_FLOW := pine64-img
+  DEVICE_PACKAGES := kmod-brcmfmac kmod-r8125 wpad-openssl \
+	brcmfmac-firmware-43752-sdio brcmfmac-nvram-43752-sdio
+endef
+TARGET_DEVICES += armsom_sige3
+
 define Device/armsom_sige7
   DEVICE_VENDOR := ArmSoM
   DEVICE_MODEL := Sige7
@@ -253,6 +264,24 @@ define Device/radxa_rock-3a
 endef
 TARGET_DEVICES += radxa_rock-3a
 
+define Device/radxa_rock-3b
+  DEVICE_VENDOR := Radxa
+  DEVICE_MODEL := ROCK 3B
+  SOC := rk3568
+  BOOT_FLOW := pine64-img
+  DEVICE_PACKAGES := kmod-usb-net-cdc-ncm kmod-usb-net-rndis
+endef
+TARGET_DEVICES += radxa_rock-3b
+
+define Device/radxa_rock-3c
+  DEVICE_VENDOR := Radxa
+  DEVICE_MODEL := ROCK 3C
+  SOC := rk3566
+  BOOT_FLOW := pine64-img
+  DEVICE_PACKAGES := kmod-usb-net-cdc-ncm kmod-usb-net-rndis
+endef
+TARGET_DEVICES += radxa_rock-3c
+
 define Device/radxa_rock-5a
   DEVICE_VENDOR := Radxa
   DEVICE_MODEL := ROCK 5A
@@ -314,6 +343,28 @@ define Device/radxa_rock-pi-s
   DEVICE_PACKAGES := kmod-rtw88-8723ds kmod-usb-net-cdc-ncm kmod-usb-net-rndis wpad-openssl
 endef
 TARGET_DEVICES += radxa_rock-pi-s
+
+define Device/radxa_zero-3e
+  DEVICE_VENDOR := Radxa
+  DEVICE_MODEL := ZERO 3E
+  SOC := rk3566
+  DEVICE_DTS := rockchip/rk3566-radxa-zero-3e
+  UBOOT_DEVICE_NAME := radxa-zero-3-rk3566
+  BOOT_FLOW := pine64-img
+  DEVICE_PACKAGES := kmod-usb-net-cdc-ncm kmod-usb-net-rndis
+endef
+TARGET_DEVICES += radxa_zero-3e
+
+define Device/radxa_zero-3w
+  DEVICE_VENDOR := Radxa
+  DEVICE_MODEL := ZERO 3W
+  SOC := rk3566
+  DEVICE_DTS := rockchip/rk3566-radxa-zero-3w
+  UBOOT_DEVICE_NAME := radxa-zero-3-rk3566
+  BOOT_FLOW := pine64-img
+  DEVICE_PACKAGES := kmod-usb-net-cdc-ncm kmod-usb-net-rndis
+endef
+TARGET_DEVICES += radxa_zero-3w
 
 define Device/sinovoip_bpi-r2-pro
   DEVICE_VENDOR := Bananapi
