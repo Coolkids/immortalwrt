@@ -64,10 +64,6 @@ install_dep
 pushd ./feeds/luci
 git apply $patchs/patchs/001-luci-status-network-ifaces.patch
 popd
-
-rm -rf ./feeds/packages/lang/ruby
-cp -r ./patchs/ruby ./feeds/packages/lang
-
 }
 
 
