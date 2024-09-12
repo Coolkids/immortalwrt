@@ -34,8 +34,10 @@ ubootenv_add_ubi_default() {
 
 case "$board" in
 abt,asr3000|\
+cetron,ct3003-ubootmod|\
 h3c,magic-nx30-pro|\
 jcg,q30-pro|\
+konka,komi-a31|\
 netcore,n60|\
 nokia,ea0326gmp|\
 qihoo,360t7|\
@@ -73,8 +75,7 @@ jdcloud,re-cp-03)
 		;;
 	esac
 	;;
-cetron,ct3003-stock|\
-cetron,ct3003-ubootmod|\
+cetron,ct3003|\
 edgecore,eap111|\
 h3c,magic-nx30-pro-nmbm|\
 netgear,wax220|\
@@ -112,6 +113,9 @@ tplink,re6000xd)
 openembed,som7981)
 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x80000" "0x80000"
 	ubootenv_add_uci_sys_config "/dev/mtd3" "0x0" "0x100000" "0x100000"
+	;;
+openwrt,one)
+	ubootenv_add_ubi_default
 	;;
 smartrg,sdg-8733|\
 smartrg,sdg-8734)
