@@ -1,5 +1,5 @@
 diff --git forkSrcPrefix/ndpi-netfilter/src/main.c forkDstPrefix/ndpi-netfilter/src/main.c
-index 972eead74c787a594938d59011d5ea4f8a7c1b79..d9b475d515a541e0ff699e6e639e9d52d12521f3 100644
+index 042972285f328eb03ea10280cef38c267eba685b..07bbf485071b56ed52669944a7f98adc0925b2c7 100644
 --- forkSrcPrefix/ndpi-netfilter/src/main.c
 +++ forkDstPrefix/ndpi-netfilter/src/main.c
 @@ -3411,6 +3411,7 @@ static int __init ndpi_mt_init(void)

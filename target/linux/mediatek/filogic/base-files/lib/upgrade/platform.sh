@@ -70,11 +70,14 @@ platform_do_upgrade() {
 	bananapi,bpi-r4|\
 	bananapi,bpi-r4-poe|\
 	cetron,ct3003-ubootmod|\
+	cmcc,a10|\
 	cmcc,rax3000m|\
 	h3c,magic-nx30-pro|\
+	imou,lc-hx3001|\
 	jcg,q30-pro|\
 	jdcloud,re-cp-03|\
 	konka,komi-a31|\
+	livinet,zr-3020-ubootmod|\
 	mediatek,mt7981-rfb|\
 	mediatek,mt7988a-rfb|\
 	nokia,ea0326gmp|\

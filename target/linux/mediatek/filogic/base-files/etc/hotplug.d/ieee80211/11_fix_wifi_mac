@@ -97,12 +97,6 @@ case "$board" in
 		[ "$PHYNBR" = "0" ] && macaddr_add $addr 2 > /sys${DEVPATH}/macaddress
 		[ "$PHYNBR" = "1" ] && macaddr_add $addr 3 > /sys${DEVPATH}/macaddress
 		;;
-	imou,lc-hx3001-ubootmod)
-		addr=$(mtd_get_mac_ascii u-boot-env mac)
-		[ -n "$addr" ] || addr=$(macaddr_add $(mtd_get_mac_binary Factory 0x4) -1)
-		[ "$PHYNBR" = "0" ] && macaddr_add $addr 1 > /sys${DEVPATH}/macaddress
-		[ "$PHYNBR" = "1" ] && macaddr_add $addr 3 > /sys${DEVPATH}/macaddress
-		;;
 	jcg,q30-pro|\
 	netcore,n60)
 		# Originally, phy1 is phy0 mac with LA bit set. However, this would conflict
@@ -111,11 +105,6 @@ case "$board" in
 		;;
 	jdcloud,re-cp-03)
 		[ "$PHYNBR" = "1" ] && mmc_get_mac_binary factory 0xa > /sys${DEVPATH}/macaddress
-		;;
-	livinet,zr-3020|\
-	livinet,zr-3020-ubootmod)
-		[ "$PHYNBR" = "0" ] && mtd_get_mac_ascii config2 wifi2gmac > /sys${DEVPATH}/macaddress
-		[ "$PHYNBR" = "1" ] && mtd_get_mac_ascii config2 wifi5gmac > /sys${DEVPATH}/macaddress
 		;;
 	mercusys,mr90x-v1|\
 	tplink,re6000xd)
