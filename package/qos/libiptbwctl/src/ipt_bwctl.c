@@ -2,7 +2,7 @@
  *  			Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
  *
  *
- *  Copyright © 2009 by Eric Bishop <eric@gargoyle-router.com>
+ *  Copyright ?2009 by Eric Bishop <eric@gargoyle-router.com>
  *
  *  This file is free software: you may copy, redistribute and/or modify it
  *  under the terms of the GNU General Public License as published by the
@@ -18,11 +18,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "ipt_bwctl.h"
 #define malloc ipt_bwctl_safe_malloc
 #define strdup ipt_bwctl_safe_strdup
-
+#ifdef __GLIBC__
+#include <stdint.h>
+// For glibc, use the standard gettimeofday function
+#define SYS_gettimeofday gettimeofday
+#define SYS_settimeofday settimeofday
+#endif
 
 static int bandwidth_semaphore = -1;
 
