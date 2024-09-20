@@ -18,14 +18,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 #include "ipt_bwctl.h"
 #define malloc ipt_bwctl_safe_malloc
 #define strdup ipt_bwctl_safe_strdup
 #ifdef __GLIBC__
 #include <stdint.h>
-// For glibc, use the standard gettimeofday function
-#define SYS_gettimeofday gettimeofday
-#define SYS_settimeofday settimeofday
 #endif
 
 static int bandwidth_semaphore = -1;
@@ -1386,9 +1384,9 @@ void print_histories(FILE* out, char* id, ip_bw_history* histories, unsigned lon
 
 			if(output_type == 'm')
 			{
-				printf("%ld\n", history.first_start);
-				printf("%ld\n", history.first_end);
-				printf("%ld\n", history.last_end);
+				printf("%lld\n", history.first_start);
+				printf("%lld\n", history.first_end);
+				printf("%lld\n", history.last_end);
 			}
 			else
 			{
@@ -1509,8 +1507,8 @@ void set_kernel_timezone(void)
 
 	/* Get tv to pass to settimeofday(2) to be sure we avoid hour-sized warp */
 	/* (see gettimeofday(2) man page, or /usr/src/linux/kernel/time.c) */
-	syscall(SYS_gettimeofday, &tv, &old_tz);
+	gettimeofday(&tv, &old_tz);
 
 	/* set timezone */
-	syscall(SYS_settimeofday, &tv, &new_tz);
+	settimeofday(&tv, &new_tz);
 }
