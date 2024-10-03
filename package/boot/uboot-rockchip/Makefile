@@ -5,9 +5,9 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
-PKG_VERSION:=2024.07
+PKG_VERSION:=2024.10-rc4
 PKG_RELEASE:=1
-PKG_HASH:=f591da9ab90ef3d6b3d173766d0ddff90c4ed7330680897486117df390d83c8f
+PKG_HASH:=7547a5d5147b748094dc88c6d6f196519e97cca3eb66137a4acb92e9e63e0626
 
 PKG_MAINTAINER:=Sarah Maedel <openwrt@tbspace.de>
 
@@ -304,6 +304,13 @@ define U-Boot/rk3588/Default
   TPL:=$(RK3588_TPL)
 endef
 
+define U-Boot/cyber3588-aib-rk3588
+  $(U-Boot/rk3588/Default)
+  NAME:=Cyber3588 AIB
+  BUILD_DEVICES:= \
+    cyber_cyber3588-aib
+endef
+
 define U-Boot/nanopc-t6-rk3588
   $(U-Boot/rk3588/Default)
   NAME:=NanoPC T6
@@ -395,6 +402,7 @@ UBOOT_TARGETS := \
   rock-3a-rk3568 \
   rock-3b-rk3568 \
   sige3-rk3568 \
+  cyber3588-aib-rk3588 \
   nanopc-t6-rk3588 \
   orangepi-5-plus-rk3588 \
   rock5b-rk3588 \
