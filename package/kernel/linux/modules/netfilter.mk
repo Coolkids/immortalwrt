@@ -1315,7 +1315,6 @@ define KernelPackage/ipt-weburl
   TITLE:=weburl
   KCONFIG:= \
     CONFIG_NETFILTER_XT_MATCH_WEBURL=y
-
   FILES:=$(LINUX_DIR)/net/netfilter/*weburl*.$(LINUX_KMOD_SUFFIX)
   AUTOLOAD:=$(call AutoLoad,45,$(notdir $(IPT_WEBURL-m)))
   DEPENDS:= kmod-ipt-core
