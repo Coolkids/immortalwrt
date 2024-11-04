@@ -11,6 +11,9 @@ ra_mark="$ra_mask/$ra_mask"
 death_mask=0x8000
 death_mark="$death_mask"
 
+quota_up_mask="0x7f"
+quota_dn_mask="0x7f00"
+
 wan_if=""
 
 apply_xtables_rule()
@@ -65,6 +68,8 @@ mask_to_cidr()
 
 define_wan_if()
 {
+	no_wan="$(uci -q get network.wan)"
+	if [ -z "$no_wan" ] ; then return ; fi
 	if  [ -z "$wan_if" ] ;  then
 		#Wait for up to 15 seconds for the wan interface to indicate it is up.
 		wait_sec=15
@@ -520,27 +525,29 @@ initialize_quota_qos()
 		insmod sch_prio  >/dev/null 2>&1
 		insmod sch_tbf   >/dev/null 2>&1
 		insmod cls_fw    >/dev/null 2>&1
+		insmod act_connmark >/dev/null 2>&1
 
-		ifconfig imq0 down  >/dev/null 2>&1
-		ifconfig imq1 down  >/dev/null 2>&1
-		rmmod  imq          >/dev/null 2>&1
-		# Allow IMQ to fail to load 3 times (15 seconds) before we bail out
+		ifconfig ifb0 down 2>/dev/null
+		rmmod ifb 2>/dev/null
+		# Allow IFB to fail to load 3 times (15 seconds) before we bail out
 		# No particularly graceful way to get out of this one. Quotas will be active but speed limits won't be enforced.
-		insmod imq numdevs=1 hook_chains="INPUT,FORWARD" hook_tables="mangle,mangle" >/dev/null 2>&1
+		insmod ifb >&- 2>&-
+		ip link add ifb0 type ifb 2>/dev/null
 		cnt=0
-		while [ "$(ls -d /proc/sys/net/ipv4/conf/imq* 2>&- | wc -l)" -eq "0" ]
+		while [ "$(ls -d /proc/sys/net/ipv4/conf/ifb* 2>&- | wc -l)" -eq "0" ]
 			do
-				logger -t "gargoyle_firewall_util" "insmod imq failed. Waiting and trying again..."
-				sleep 5
+				logger -t "gargoyle_firewall_util" "insmod ifb failed. Waiting and trying again..."
 				cnt=`expr $cnt + 1`
 				if [ $cnt -ge 3 ] ; then
-					logger -t "gargoyle_firewall_util" "Could not insmod imq, too many retries. Stopping."
+					logger -t "gargoyle_firewall_util" "Could not insmod ifb, too many retries. Stopping."
 					cleanup_old_quota_qos
 					return
 				fi
-				insmod imq numdevs=1 hook_chains="INPUT,FORWARD" hook_tables="mangle,mangle" >/dev/null 2>&1
+				sleep 5
+				insmod ifb >&- 2>&-
+				ip link add ifb0 type ifb 2>/dev/null
 			done
-		ip link set imq0 up
+		ip link set ifb0 up
 
 		#egress/upload
 		tc qdisc del dev $wan_if root >/dev/null 2>&1
@@ -549,29 +556,33 @@ initialize_quota_qos()
 		upload_shift=0
 		for rate_kb in $unique_up ; do
 			kbit=$(echo $((rate_kb*8))kbit)
-			mark=$(($cur_band << $upload_shift))
-			tc filter add dev $wan_if parent 1:0 prio $cur_band protocol ip  handle $mark fw flowid 1:$cur_band
+			mark=$(printf "0x%x\n" $(($cur_band << $upload_shift)))
+			tc filter add dev $wan_if parent 1:0 prio $cur_band protocol ip  handle $mark/$quota_up_mask fw flowid 1:$cur_band
+			tc filter add dev $wan_if parent 1:0 prio $(($cur_band+1)) protocol ipv6 handle $mark/$quota_up_mask fw flowid 1:$cur_band
 			tc qdisc  add dev $wan_if parent 1:$cur_band handle $cur_band: tbf rate $kbit burst $kbit limit $kbit
-			cur_band=$(($cur_band+1))
+			cur_band=$(($cur_band+2))
 		done
 
 		#ingress/download
-		tc qdisc del dev imq0 root >/dev/null 2>&1
-		tc qdisc add dev imq0 handle 1:0 root prio bands $num_down_bands priomap 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+		tc qdisc del dev ifb0 root >/dev/null 2>&1
+		tc qdisc add dev ifb0 handle 1:0 root prio bands $num_down_bands priomap 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 		cur_band=2
 		download_shift=8
 		for rate_kb in $unique_down ; do
 			kbit=$(echo $((rate_kb*8))kbit)
-			mark=$(($cur_band << $download_shift))
-			tc filter add dev imq0 parent 1:0 prio $cur_band protocol ip  handle $mark fw flowid 1:$cur_band
-			tc qdisc  add dev imq0 parent 1:$cur_band handle $cur_band: tbf rate $kbit burst $kbit limit $kbit
-			cur_band=$(($cur_band+1))
+			mark=$(printf "0x%x\n" $(($cur_band << $download_shift)))
+			tc filter add dev ifb0 parent 1:0 prio $cur_band protocol ip  handle $mark/$quota_dn_mask fw flowid 1:$cur_band
+			tc filter add dev ifb0 parent 1:0 prio $(($cur_band+1)) protocol ipv6 handle $mark/$quota_dn_mask fw flowid 1:$cur_band
+			tc qdisc  add dev ifb0 parent 1:$cur_band handle $cur_band: tbf rate $kbit burst $kbit limit $kbit
+			cur_band=$(($cur_band+2))
 		done
 
-		iptables -t mangle -I ingress_quotas -i $wan_if -j IMQ --todev 0
+		tc qdisc add dev $wan_if handle ffff: ingress
+		tc filter add dev $wan_if parent ffff: protocol ip u32 match u8 0 0 action connmark action mirred egress redirect dev ifb0 flowid ffff:1
+		tc filter add dev $wan_if parent ffff: protocol ipv6 u32 match u8 0 0 action connmark action mirred egress redirect dev ifb0 flowid ffff:1
 
 		#tc -s qdisc show dev $wan_if
-		#tc -s qdisc show dev imq0
+		#tc -s qdisc show dev ifb0
 	fi
 }
 
@@ -579,6 +590,11 @@ enforce_dhcp_assignments()
 {
 	enforce_assignments=$(uci get firewall.@defaults[0].enforce_dhcp_assignments 2> /dev/null)
 	delete_chain_from_table "filter" "lease_mismatch_check"
+	ipset -X lease_mismatch_ips 2>/dev/null
+	ipset -X lease_mismatch_macs 2>/dev/null
+	ipset -X lease_mismatch_pairs 2>/dev/null
+
+	network_get_subnet lan_mask lan
 
 	local pairs1
 	local pairs2
@@ -586,16 +602,20 @@ enforce_dhcp_assignments()
 	pairs1=""
 	pairs2=""
 	if [ -e /tmp/dhcp.leases ] ; then
-		pairs1=$(cat /tmp/dhcp.leases | sed '/^[ \t]*$/d' | awk ' { print $2"^"$3"\n" ; } ' )
+		pairs1=$(cat /tmp/dhcp.leases | sed '/^[ \t]*$/d' | awk ' { print tolower($2)"^"$3"\n" ; } ' )
 	fi
-	if [ -e /etc/ethers ] ; then
-		pairs2=$(cat /etc/ethers | sed '/^[ \t]*$/d' | awk ' { print $1"^"$2"\n" ; } ' )
+	/usr/lib/gargoyle_firewall_util/cache_dhcpv4_leases.sh
+	if [ -e /tmp/dhcpv4configleases.gargoyle ] ; then
+		pairs2=$(cat /tmp/dhcpv4configleases.gargoyle | sed '/^[ \t]*$/d' | awk ' { print tolower($1)"^"$2"\n" ; } ' )
 	fi
 	pairs=$( printf "$pairs1\n$pairs2\n" | sort | uniq )
 
 
 	if [ "$enforce_assignments" = "1" ] && [ -n "$pairs" ] ; then
 		iptables -t filter -N lease_mismatch_check
+		ipset create lease_mismatch_ips hash:ip
+		ipset create lease_mismatch_macs hash:mac
+		ipset create lease_mismatch_pairs bitmap:ip,mac range "$lan_mask"
 		local p
 		for p in $pairs ; do
 			local mac
@@ -603,11 +623,14 @@ enforce_dhcp_assignments()
 			mac=$(echo $p | sed 's/\^.*$//g')
 			ip=$(echo $p | sed 's/^.*\^//g')
 			if [ -n "$ip" ] && [ -n "$mac" ] ; then
-				iptables -t filter -A lease_mismatch_check  ! -s  "$ip"  -m mac --mac-source  "$mac"  -j REJECT
-				iptables -t filter -A lease_mismatch_check  -s  "$ip"  -m mac ! --mac-source  "$mac"  -j REJECT
+				ipset add lease_mismatch_ips "$ip"
+				ipset add lease_mismatch_macs "$mac"
+				ipset add lease_mismatch_pairs "$ip,$mac"
 			fi
 		done
-		iptables -t filter -I delegate_forward -j lease_mismatch_check
+		iptables -t filter -I forwarding_rule -j lease_mismatch_check
+		iptables -t filter -I lease_mismatch_check -m set ! --match-set lease_mismatch_pairs src,src -j REJECT
+		iptables -t filter -I lease_mismatch_check -m set ! --match-set lease_mismatch_ips src -m set ! --match-set lease_mismatch_macs src -j RETURN
 	fi
 }
 
@@ -640,7 +663,7 @@ initialize_firewall()
 	enforce_dhcp_assignments
 	force_router_dns
 	add_adsl_modem_routes
-        isolate_guest_networks
+	isolate_guest_networks
 }
 
 
@@ -677,15 +700,20 @@ isolate_guest_networks()
 				if [ -n "$is_guest" ] ; then
 					echo "$lif with mac $gmac is wireless guest"
 
-					#Allow access to WAN but not other LAN hosts for anyone on guest network
-					ebtables -t filter -A FORWARD -i "$lif" --logical-out br-lan -j DROP
+					#Allow access to WAN and DHCP/DNS servers on LAN, but not other LAN hosts for anyone on guest network
+					ebtables -t filter -I FORWARD -i "$lif" -p IPV4 --ip-protocol udp --ip-destination-port 53 -j ACCEPT
+					ebtables -t filter -I FORWARD -i "$lif" -p IPV4 --ip-protocol udp --ip-destination-port 67 -j ACCEPT
+					ebtables -t filter -A FORWARD -i "$lif" --logical-out br-lan -p IPV4 --ip-destination 192.168.0.0/16 -j DROP
+					ebtables -t filter -A FORWARD -i "$lif" --logical-out br-lan -p IPV4 --ip-destination 172.16.0.0/12 -j DROP
+					ebtables -t filter -A FORWARD -i "$lif" --logical-out br-lan -p IPV4 --ip-destination 10.0.0.0/8 -j DROP
+					ebtables -t filter -A FORWARD -i "$lif" --logical-out br-lan -p IPV6 -j DROP
 
 					#Only allow DHCP/DNS access to router for anyone on guest network
 					ebtables -t filter -A INPUT -i "$lif" -p ARP -j ACCEPT
 					ebtables -t filter -A INPUT -i "$lif" -p IPV4 --ip-protocol udp --ip-destination-port 53 -j ACCEPT
 					ebtables -t filter -A INPUT -i "$lif" -p IPV4 --ip-protocol udp --ip-destination-port 67 -j ACCEPT
 					ebtables -t filter -A INPUT -i "$lif" -p IPV4 --ip-destination $lan_ip -j DROP
-
+					ebtables -t filter -A INPUT -i "$lif" -p IPV6 -j DROP
 				fi
 			done
 		done
@@ -699,3 +727,4 @@ ifup_firewall()
 	initialize_quotas
 	insert_pf_loopback_rules
 }
+
