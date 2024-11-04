@@ -1,0 +1,95 @@
+diff --git forkSrcPrefix/modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/30_network.js forkDstPrefix/modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/30_network.js
+index f9c01bcaa4c020507290b02f4fafba0af70ac6bb..f20edc92fc776cdc5101c7d54f4e2dd14a8d716e 100644
+--- forkSrcPrefix/modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/30_network.js
++++ forkDstPrefix/modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/30_network.js
+@@ -22,6 +22,52 @@ function progressbar(value, max, byte) {
+ 	}, E('div', { 'style': 'width:%.2f%%'.format(pc) }));
+ }
+ 
++function duplex(str){
++  switch(str){
++    case "full":
++      return _("full-duplex");
++    case "half":
++      return _("half-duplex");
++    default:
++      return _("unknown");
++  }
++}
++
++function renderiface(ifc){
++  return E(
++      "div",
++      { class: "ifacebox" },
++      [
++        
++        E(
++          "div",
++          { class: "ifacebox-head center " + (ifc.isUp() ? "active" : "") },
++          [
++            E("img", { 
++                      src: L.resource("icons/port_%s.png").format(ifc.isUp() ? "up"  : "down"),
++                      style: "width:16px; height:16px; margin-top:4px;margin-right:4px"
++                }),
++            E("strong", ifc.getI18n())
++          ]
++        ),
++        E(
++          "div",
++          { class: "ifacebox-body left" },
++          L.itemlist(E("span"), [
++            _("Status"),
++            ifc.isUp() ? _("Connected")+" "+duplex(ifc.getDuplex()) : _("Not connected"),
++            _("MAC address"),
++            ifc.getMAC(),
++            _("Bitrate"),
++            ifc.getSpeed() ?  ifc.getSpeed()+"Mbps" : null,
++            _('RX'),        ifc ? '%.2mB (%d %s)'.format(ifc.getRXBytes(), ifc.getRXPackets(), _('Pkts.')) : null,
++            _('TX'),        ifc ? '%.2mB (%d %s)'.format(ifc.getTXBytes(), ifc.getTXPackets(), _('Pkts.')) : null
++          ])
++        )
++      ] 
++    )
++}
++
+ function renderbox(ifc, ipv6) {
+ 	var dev = ifc.getL3Device(),
+ 	    active = (dev && ifc.getProtocol() != 'none'),
+@@ -74,7 +120,8 @@ return baseclass.extend({
+ 			fs.trimmed('/proc/sys/net/netfilter/nf_conntrack_max'),
+ 			network.getWANNetworks(),
+ 			network.getWAN6Networks(),
+-			L.resolveDefault(callOnlineUsers(), {})
++			L.resolveDefault(callOnlineUsers(), {}),
++      network.getDevices(),
+ 		]);
+ 	},
+ 
+@@ -83,7 +130,8 @@ return baseclass.extend({
+ 		    ct_max    = +data[1],
+ 		    wan_nets  = data[2],
+ 		    wan6_nets = data[3],
+-		    onlineusers = data[4];
++		    onlineusers = data[4],
++        interfaces = data[5];
+ 
+ 		var fields = [
+ 			_('Active Connections'), ct_max ? ct_count : null,
+@@ -118,8 +166,17 @@ return baseclass.extend({
+ 		for (var i = 0; i < wan6_nets.length; i++)
+ 			netstatus.appendChild(renderbox(wan6_nets[i], true));
+ 
++    var ifcs =  E("div", { class: "network-status-table" })
++    for (var i = 0; i < interfaces.length; i++){
++      const ifc = interfaces[i];
++      if(ifc.getType() == "ethernet" && ifc.getName().startsWith("eth")){
++        ifcs.appendChild(renderiface(ifc));
++      }
++    }
++
+ 		return E([
+ 			netstatus,
++      ifcs,
+ 			ctstatus
+ 		]);
+ 	}
