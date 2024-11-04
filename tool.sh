@@ -57,7 +57,7 @@ rm -rf ./feeds/luci/applications/luci-app-passwall
 rm -rf ./feeds/packages/net/v2ray-geodata
 rm -rf ./feeds/packages/net/mosdns
 rm -rf ./feeds/feeds/packages/lang/golang
-cp -r $patchs/golang ./feeds/feeds/packages/lang
+cp -r $patchs/patchs/golang ./feeds/feeds/packages/lang
 ./scripts/feeds install -a
 ./scripts/feeds install -p diy2 -f luci-app-passwall
 ./scripts/feeds install -p custom -f v2ray-geodata
@@ -66,9 +66,8 @@ install_dep
 pushd ./feeds/luci
 git apply $patchs/patchs/001-luci-status-network-ifaces.patch
 popd
-
-
 }
+
 
 
 main $1
