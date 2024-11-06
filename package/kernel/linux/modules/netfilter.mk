@@ -589,37 +589,6 @@ endef
 
 $(eval $(call KernelPackage,ipt-nat-extra))
 
-define KernelPackage/ipt-imq
-  TITLE:=Intermediate Queueing support
-  KCONFIG:= \
-	CONFIG_IMQ=y \
-	CONFIG_IMQ_BEHAVIOR_AA=n \
-	CONFIG_IMQ_BEHAVIOR_AB=y \
-	CONFIG_IMQ_BEHAVIOR_BA=n \
-	CONFIG_IMQ_BEHAVIOR_BB=n \
-	CONFIG_IMQ_NUM_DEVS=2 \
-  CONFIG_NF_CONNTRACK=m \
-  CONFIG_NF_CONNTRACK_LABELS=y \
-  CONFIG_NETFILTER_XT_MATCH_CONNLABEL=m \
-	CONFIG_NETFILTER_XT_MATCH_WEBURL \
-	CONFIG_NETFILTER_XT_MATCH_WEBMON \
-	CONFIG_NETFILTER_XT_MATCH_TIMERANGE \
-	CONFIG_NETFILTER_XT_MATCH_BANDWIDTH \
-	CONFIG_NETFILTER_XT_TARGET_IMQ
-  FILES:= \
-	$(LINUX_DIR)/drivers/net/imq.$(LINUX_KMOD_SUFFIX) \
-	$(foreach mod,$(IPT_IMQ-m),$(LINUX_DIR)/net/$(mod).$(LINUX_KMOD_SUFFIX))
-  $(call AddDepends/ipt)
-endef
-
-define KernelPackage/ipt-imq/description
- Kernel support for Intermediate Queueing devices
-endef
-
-$(eval $(call KernelPackage,ipt-imq))
-
-
-
 
 define KernelPackage/nf-nathelper
   SUBMENU:=$(NF_MENU)
@@ -848,27 +817,6 @@ define KernelPackage/ipt-cluster/description
 endef
 
 $(eval $(call KernelPackage,ipt-cluster))
-
-define KernelPackage/ipt-clusterip
-  TITLE:=Module for CLUSTERIP
-  KCONFIG:=$(KCONFIG_IPT_CLUSTERIP)
-  FILES:=$(foreach mod,$(IPT_CLUSTERIP-m),$(LINUX_DIR)/net/$(mod).ko)
-  AUTOLOAD:=$(call AutoProbe,$(notdir $(IPT_CLUSTERIP-m)))
-  $(call AddDepends/ipt,+kmod-nf-conntrack @LINUX_6_1)
-endef
-
-define KernelPackage/ipt-clusterip/description
- Netfilter (IPv4-only) module for CLUSTERIP
- The CLUSTERIP target allows you to build load-balancing clusters of
- network servers without having a dedicated load-balancing
- router/server/switch.
-
- To use it also enable iptables-mod-clusterip
-
- see `iptables -j CLUSTERIP --help` for more information.
-endef
-
-$(eval $(call KernelPackage,ipt-clusterip))
 
 
 define KernelPackage/ipt-extra
@@ -1228,15 +1176,11 @@ define KernelPackage/nft-offload
   DEPENDS:=@IPV6 +kmod-nf-flow +kmod-nft-nat
   KCONFIG:= \
 	CONFIG_NF_FLOW_TABLE_INET \
-	CONFIG_NF_FLOW_TABLE_IPV4@lt5.17 \
-	CONFIG_NF_FLOW_TABLE_IPV6@lt5.17 \
 	CONFIG_NFT_FLOW_OFFLOAD
   FILES:= \
 	$(LINUX_DIR)/net/netfilter/nf_flow_table_inet.ko \
-	$(LINUX_DIR)/net/ipv4/netfilter/nf_flow_table_ipv4.ko@lt5.17 \
-	$(LINUX_DIR)/net/ipv6/netfilter/nf_flow_table_ipv6.ko@lt5.17 \
 	$(LINUX_DIR)/net/netfilter/nft_flow_offload.ko
-  AUTOLOAD:=$(call AutoProbe,nf_flow_table_inet nf_flow_table_ipv4@lt5.17 nf_flow_table_ipv6@lt5.17 nft_flow_offload)
+  AUTOLOAD:=$(call AutoProbe,nf_flow_table_inet nft_flow_offload)
 endef
 
 $(eval $(call KernelPackage,nft-offload))
@@ -1340,43 +1284,3 @@ define KernelPackage/nft-connlimit
 endef
 
 $(eval $(call KernelPackage,nft-connlimit))
-
-define KernelPackage/ipt-weburl
-  SUBMENU:=$(NF_MENU)
-  TITLE:=weburl
-  KCONFIG:=$(KCONFIG_XT_WEBURL)
-  FILES:=$(LINUX_DIR)/net/netfilter/*weburl*.$(LINUX_KMOD_SUFFIX)
-  AUTOLOAD:=$(call AutoLoad,45,$(notdir $(IPT_WEBURL-m)))
-	DEPENDS:= kmod-ipt-core
-endef
-$(eval $(call KernelPackage,ipt-weburl))
-
-define KernelPackage/ipt-webmon
-  SUBMENU:=$(NF_MENU)
-  TITLE:=webmon
-  KCONFIG:=$(KCONFIG_XT_WEBMON)
-  FILES:=$(LINUX_DIR)/net/netfilter/*webmon*.$(LINUX_KMOD_SUFFIX)
-  AUTOLOAD:=$(call AutoLoad,45,$(notdir $(IPT_WEBMON-m)))
-	DEPENDS:= kmod-ipt-core
-endef
-$(eval $(call KernelPackage,ipt-webmon))
-
-define KernelPackage/ipt-timerange
-  SUBMENU:=$(NF_MENU)
-  TITLE:=timerange
-  KCONFIG:=$(KCONFIG_XT_TIMERANGE)
-  FILES:=$(LINUX_DIR)/net/netfilter/*timerange*.$(LINUX_KMOD_SUFFIX)
-  AUTOLOAD:=$(call AutoLoad,45,$(notdir $(IPT_TIMERANGE-m)))
-	DEPENDS:= kmod-ipt-core
-endef
-$(eval $(call KernelPackage,ipt-timerange))
-
-define KernelPackage/ipt-bandwidth
-  SUBMENU:=$(NF_MENU)
-  TITLE:=bandwidth
-  KCONFIG:=$(KCONFIG_XT_BANDWIDTH)
-  FILES:=$(LINUX_DIR)/net/netfilter/*bandwidth*.$(LINUX_KMOD_SUFFIX)
-  AUTOLOAD:=$(call AutoLoad,45,$(notdir $(IPT_BANDWIDTH-m)))
-	DEPENDS:= kmod-ipt-core
-endef
-$(eval $(call KernelPackage,ipt-bandwidth))

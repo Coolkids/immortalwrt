@@ -151,7 +151,7 @@ Extra iptables nftables nft binaries.
 endef
 
 define Package/iptables-mod-conntrack-extra
-$(call Package/iptables/Module, +kmod-ipt-conntrack-extra +kmod-ipt-raw)
+$(call Package/iptables/Module, +kmod-ipt-conntrack-extra)
   TITLE:=Extra connection tracking extensions
 endef
 
@@ -198,21 +198,6 @@ Includes support for:
   - bpf
 
 endef
-
-
-define Package/iptables-mod-imq
-$(call Package/iptables/Module, +kmod-ipt-imq)
-  TITLE:=IMQ support
-endef
-
-define Package/iptables-mod-imq/description
-iptables extension for IMQ support.
-
- Targets:
-  - IMQ
-
-endef
-
 
 define Package/iptables-mod-ipopt
 $(call Package/iptables/Module, +kmod-ipt-ipopt)
@@ -756,7 +741,6 @@ $(eval $(call BuildPlugin,iptables-mod-conntrack-label,$(IPT_CONNTRACK_LABEL-m))
 $(eval $(call BuildPlugin,iptables-mod-extra,$(IPT_EXTRA-m)))
 $(eval $(call BuildPlugin,iptables-mod-physdev,$(IPT_PHYSDEV-m)))
 $(eval $(call BuildPlugin,iptables-mod-filter,$(IPT_FILTER-m)))
-$(eval $(call BuildPlugin,iptables-mod-imq,$(IPT_IMQ-m)))
 $(eval $(call BuildPlugin,iptables-mod-ipopt,$(IPT_IPOPT-m)))
 $(eval $(call BuildPlugin,iptables-mod-ipsec,$(IPT_IPSEC-m)))
 $(eval $(call BuildPlugin,iptables-mod-nat-extra,$(IPT_NAT_EXTRA-m)))
@@ -778,30 +762,3 @@ $(eval $(call BuildPackage,ip6tables-zz-legacy))
 $(eval $(call BuildPlugin,ip6tables-extra,$(IPT_IPV6_EXTRA-m)))
 $(eval $(call BuildPlugin,ip6tables-mod-nat,$(IPT_NAT6-m)))
 
-###gargoyle
-define Package/iptables-mod-weburl
-$(call Package/iptables/Module, +kmod-ipt-weburl)
-  TITLE:=weburl
-endef
-$(eval $(call BuildPlugin,iptables-mod-weburl,$(IPT_WEBURL-m)))
-
-
-define Package/iptables-mod-webmon
-$(call Package/iptables/Module, +kmod-ipt-webmon)
-  TITLE:=webmon
-endef
-$(eval $(call BuildPlugin,iptables-mod-webmon,$(IPT_WEBMON-m)))
-
-
-define Package/iptables-mod-timerange
-$(call Package/iptables/Module, +kmod-ipt-timerange)
-  TITLE:=timerange
-endef
-$(eval $(call BuildPlugin,iptables-mod-timerange,$(IPT_TIMERANGE-m)))
-
-
-define Package/iptables-mod-bandwidth
-$(call Package/iptables/Module, +kmod-ipt-bandwidth)
-  TITLE:=bandwidth
-endef
-$(eval $(call BuildPlugin,iptables-mod-bandwidth,$(IPT_BANDWIDTH-m)))

@@ -153,6 +153,11 @@ config MBEDTLS_DEBUG_C
 	bool "MBEDTLS_DEBUG_C"
 	default n
 
+config MBEDTLS_HAVE_SSE2
+	bool "MBEDTLS_HAVE_SSE2"
+	default y
+	depends on TARGET_x86_generic || TARGET_x86_64
+
 config MBEDTLS_HKDF_C
 	bool "MBEDTLS_HKDF_C"
 	default n
