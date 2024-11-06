@@ -910,7 +910,6 @@ $(eval $(call KernelPackage,sched-ipset))
 define KernelPackage/sched-mqprio-common
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=mqprio queue common dependencies support
-  DEPENDS:=@LINUX_6_6
   HIDDEN:=1
   KCONFIG:=CONFIG_NET_SCH_MQPRIO_LIB
   FILES:=$(LINUX_DIR)/net/sched/sch_mqprio_lib.ko
@@ -926,7 +925,7 @@ $(eval $(call KernelPackage,sched-mqprio-common))
 define KernelPackage/sched-mqprio
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=Multi-queue priority scheduler (MQPRIO)
-  DEPENDS:=+kmod-sched-core +LINUX_6_6:kmod-sched-mqprio-common
+  DEPENDS:=+kmod-sched-core +kmod-sched-mqprio-common
   KCONFIG:=CONFIG_NET_SCH_MQPRIO
   FILES:=$(LINUX_DIR)/net/sched/sch_mqprio.ko
   AUTOLOAD:=$(call AutoProbe, sch_mqprio)
@@ -1361,7 +1360,7 @@ define KernelPackage/9pnet
   KCONFIG:= \
 	CONFIG_NET_9P \
 	CONFIG_NET_9P_DEBUG=n \
-	CONFIG_NET_9P_FD=n@ge5.17
+	CONFIG_NET_9P_FD=n
   FILES:= \
 	$(LINUX_DIR)/net/9p/9pnet.ko
   AUTOLOAD:=$(call AutoLoad,29,9pnet)
@@ -1495,41 +1494,12 @@ endef
 $(eval $(call KernelPackage,inet-diag))
 
 
-define KernelPackage/mptcp
-  SUBMENU:=$(NETWORK_SUPPORT_MENU)
-  TITLE:=MultiPath TCP support
-  KCONFIG:=CONFIG_MPTCP=y
-  AUTOLOAD:=$(call AutoProbe,mptcp)
-endef
-
-define KernelPackage/mptcp/description
- MPTCP is a module made for MultiPath TCP support
-endef
-
-$(eval $(call KernelPackage,mptcp))
-
-
-define KernelPackage/mptcp_ipv6
-  SUBMENU:=$(NETWORK_SUPPORT_MENU)
-  TITLE:=MultiPath TCP IPv6 support
-  DEPENDS:=@IPV6 +kmod-mptcp
-  KCONFIG:=CONFIG_MPTCP_IPV6=y
-  AUTOLOAD:=$(call AutoProbe,mptcp_ipv6)
-endef
-
-define KernelPackage/mptcp_ipv6/description
- MPTCP_IPV6 is a module made for MultiPath TCP IPv6 support
-endef
-
-$(eval $(call KernelPackage,mptcp_ipv6))
-
-
 define KernelPackage/inet-mptcp-diag
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=INET diag support for MultiPath TCP
-  DEPENDS:=kmod-mptcp +kmod-inet-diag
-  KCONFIG:= CONFIG_INET_MPTCP_DIAG=y
-  FILES:= $(LINUX_DIR)/net/mptcp/mptcp_diag.ko
+  DEPENDS:=@KERNEL_MPTCP +kmod-inet-diag
+  KCONFIG:=CONFIG_INET_MPTCP_DIAG
+  FILES:=$(LINUX_DIR)/net/mptcp/mptcp_diag.ko
   AUTOLOAD:=$(call AutoProbe,mptcp_diag)
 endef
 

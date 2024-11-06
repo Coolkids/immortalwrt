@@ -9,12 +9,12 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=iptables
-PKG_VERSION:=1.8.8
-PKG_RELEASE:=2
+PKG_VERSION:=1.8.10
+PKG_RELEASE:=1
 
 PKG_SOURCE_URL:=https://netfilter.org/projects/iptables/files
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
-PKG_HASH:=71c75889dc710676631553eb1511da0177bbaaf1b551265b912d236c3f51859f
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
+PKG_HASH:=5cc255c189356e317d070755ce9371eb63a1b783c34498fb8c30264f3cc59c9c
 
 PKG_FIXUP:=autoreconf
 PKG_FLAGS:=nonshared
@@ -151,7 +151,7 @@ Extra iptables nftables nft binaries.
 endef
 
 define Package/iptables-mod-conntrack-extra
-$(call Package/iptables/Module, +kmod-ipt-conntrack-extra +kmod-ipt-raw)
+$(call Package/iptables/Module, +kmod-ipt-conntrack-extra)
   TITLE:=Extra connection tracking extensions
 endef
 
@@ -198,21 +198,6 @@ Includes support for:
   - bpf
 
 endef
-
-
-define Package/iptables-mod-imq
-$(call Package/iptables/Module, +kmod-ipt-imq)
-  TITLE:=IMQ support
-endef
-
-define Package/iptables-mod-imq/description
-iptables extension for IMQ support.
-
- Targets:
-  - IMQ
-
-endef
-
 
 define Package/iptables-mod-ipopt
 $(call Package/iptables/Module, +kmod-ipt-ipopt)
@@ -756,7 +741,6 @@ $(eval $(call BuildPlugin,iptables-mod-conntrack-label,$(IPT_CONNTRACK_LABEL-m))
 $(eval $(call BuildPlugin,iptables-mod-extra,$(IPT_EXTRA-m)))
 $(eval $(call BuildPlugin,iptables-mod-physdev,$(IPT_PHYSDEV-m)))
 $(eval $(call BuildPlugin,iptables-mod-filter,$(IPT_FILTER-m)))
-$(eval $(call BuildPlugin,iptables-mod-imq,$(IPT_IMQ-m)))
 $(eval $(call BuildPlugin,iptables-mod-ipopt,$(IPT_IPOPT-m)))
 $(eval $(call BuildPlugin,iptables-mod-ipsec,$(IPT_IPSEC-m)))
 $(eval $(call BuildPlugin,iptables-mod-nat-extra,$(IPT_NAT_EXTRA-m)))
@@ -778,7 +762,8 @@ $(eval $(call BuildPackage,ip6tables-zz-legacy))
 $(eval $(call BuildPlugin,ip6tables-extra,$(IPT_IPV6_EXTRA-m)))
 $(eval $(call BuildPlugin,ip6tables-mod-nat,$(IPT_NAT6-m)))
 
-###gargoyle
+
+
 define Package/iptables-mod-weburl
 $(call Package/iptables/Module, +kmod-ipt-weburl)
   TITLE:=weburl

@@ -47,12 +47,10 @@ apk = \
   IPKG_INSTROOT=$(1) \
   $(FAKEROOT) $(STAGING_DIR_HOST)/bin/apk \
 	--root $(1) \
-	--repositories-file /dev/zero \
-	--keys-dir $(TOPDIR) \
+	--keys-dir $(if $(APK_KEYS),$(APK_KEYS),$(TOPDIR)) \
 	--no-cache \
 	--no-logfile \
-	--preserve-env \
-	--repository file://$(PACKAGE_DIR_ALL)/packages.adb
+	--preserve-env
 
 TARGET_DIR_ORIG := $(TARGET_ROOTFS_DIR)/root.orig-$(BOARD)
 
@@ -86,7 +84,7 @@ define prepare_rootfs
 			IPKG_POSTINST_PATH=./usr/lib/opkg/info/*.postinst; \
 		fi; \
 		for script in $$IPKG_POSTINST_PATH; do \
-			IPKG_INSTROOT=$(1) $$(command -v bash) $$script; \
+			PATH="$(TARGET_PATH_PKG)" IPKG_INSTROOT=$(1) $$(command -v bash) $$script; \
 			ret=$$?; \
 			if [ $$ret -ne 0 ]; then \
 				echo "postinst script $$script has failed with exit code $$ret" >&2; \
