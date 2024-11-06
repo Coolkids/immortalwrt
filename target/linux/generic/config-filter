@@ -6,7 +6,6 @@
 CONFIG_CLANG_VERSION=.*
 CONFIG_FRAME_WARN=.*
 # CONFIG_GCC_VERSION is not set
-# CONFIG_HAVE_(?!(ARCH_TIMER|TCM|SMP)).* is not set
 # CONFIG_INLINE_.* is not set
 # CONFIG_LD_.* is not set
 CONFIG_LLD_VERSION=.*
