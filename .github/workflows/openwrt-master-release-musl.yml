@@ -1,4 +1,4 @@
-name: OpenWrt Releases
+name: OpenWrt musl Releases
 on:
   push:
     tags:
@@ -7,7 +7,7 @@ jobs:
 
   build_openwrt:
 
-    name: Build x86_64 OpenWrt IMQ releases firmware
+    name: Build x86_64 OpenWrt musl releases firmware
 
     runs-on: ubuntu-24.04
 
@@ -59,7 +59,7 @@ jobs:
         run: |
           rm -f ./.config*
           sed -i 's/-SNAPSHOT//g' ./include/version.mk
-          cp ./configs/x86-nginx.config ./.config
+          cp ./configs/base_musl_config ./.config
           make defconfig
 
       - name: Make download
@@ -121,11 +121,11 @@ jobs:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
           file: ${{ env.WORK_PATH }}/artifact/firmware/*
           overwrite: true
-          release_name: ${{ github.ref_name }}
+          release_name: ${{ github.ref_name }} musl version
           tag: ${{ github.ref_name }}
           file_glob: true
           body: |
-             Changes since the last release can be found at: https://github.com/${{ github.repository }}/compare/${{ steps.build.outputs.previous_tag }}...${{ steps.build.outputs.tag_name }} 
+            release ${{ github.ref_name }} musl version
 
       - name: Delete loder releases
         uses: dev-drprasad/delete-older-releases@v0.3.3
@@ -136,7 +136,7 @@ jobs:
 
       - name: Push Msg
         run: |
-          sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "Released on ${{ github.ref_name }}"
+          sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "Released on ${{ github.ref_name }} musl version"
 
 
 
