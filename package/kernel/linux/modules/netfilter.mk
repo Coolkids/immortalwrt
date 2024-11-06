@@ -1284,3 +1284,47 @@ define KernelPackage/nft-connlimit
 endef
 
 $(eval $(call KernelPackage,nft-connlimit))
+
+
+define KernelPackage/ipt-weburl
+  SUBMENU:=$(NF_MENU)
+  TITLE:=weburl
+  KCONFIG:=$(KCONFIG_XT_WEBURL)
+  FILES:=$(LINUX_DIR)/net/netfilter/*weburl*.$(LINUX_KMOD_SUFFIX)
+  AUTOLOAD:=$(call AutoLoad,45,$(notdir $(IPT_WEBURL-m)))
+	DEPENDS:= kmod-ipt-core
+endef
+$(eval $(call KernelPackage,ipt-weburl))
+
+
+define KernelPackage/ipt-webmon
+  SUBMENU:=$(NF_MENU)
+  TITLE:=webmon
+  KCONFIG:=$(KCONFIG_XT_WEBMON)
+  FILES:=$(LINUX_DIR)/net/netfilter/*webmon*.$(LINUX_KMOD_SUFFIX)
+  AUTOLOAD:=$(call AutoLoad,45,$(notdir $(IPT_WEBMON-m)))
+	DEPENDS:= kmod-ipt-core
+endef
+$(eval $(call KernelPackage,ipt-webmon))
+
+
+define KernelPackage/ipt-timerange
+  SUBMENU:=$(NF_MENU)
+  TITLE:=timerange
+  KCONFIG:=$(KCONFIG_XT_TIMERANGE)
+  FILES:=$(LINUX_DIR)/net/netfilter/*timerange*.$(LINUX_KMOD_SUFFIX)
+  AUTOLOAD:=$(call AutoLoad,45,$(notdir $(IPT_TIMERANGE-m)))
+	DEPENDS:= kmod-ipt-core
+endef
+$(eval $(call KernelPackage,ipt-timerange))
+
+
+define KernelPackage/ipt-bandwidth
+  SUBMENU:=$(NF_MENU)
+  TITLE:=bandwidth
+  KCONFIG:=$(KCONFIG_XT_BANDWIDTH)
+  FILES:=$(LINUX_DIR)/net/netfilter/*bandwidth*.$(LINUX_KMOD_SUFFIX)
+  AUTOLOAD:=$(call AutoLoad,45,$(notdir $(IPT_BANDWIDTH-m)))
+	DEPENDS:= kmod-ipt-core
+endef
+$(eval $(call KernelPackage,ipt-bandwidth))
