@@ -3,6 +3,8 @@ on:
   push:
     tags:
       - 'v*'
+    branches: 
+      - openwrt-23.05
 jobs:
 
   build_openwrt:
@@ -22,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: master
+          ref: openwrt-23.05
       
       - name: Set variables
         run: |
@@ -130,7 +132,7 @@ jobs:
       - name: Delete loder releases
         uses: dev-drprasad/delete-older-releases@v0.3.3
         with:
-          keep_latest: 5
+          keep_latest: 10
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
