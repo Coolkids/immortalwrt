@@ -1,0 +1,294 @@
+name: OpenWrt Release
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+
+  build_openwrt_release_glibc:
+    name: Build x86_64 OpenWrt glibc releases firmware
+    runs-on: ubuntu-24.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Set workspace
+        run: |
+          sudo mkdir -p -m 777 /mnt/openwrt
+          echo "WORK_PATH=/mnt/openwrt" >> $GITHUB_ENV
+          
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set variables
+        run: |
+          sudo -E timedatectl set-timezone Asia/Shanghai
+
+      - name: Configure compilation environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+          bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib \
+          g++-multilib git libgnutls28-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev \
+          libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev \
+          libncurses-dev libpython3-dev libreadline-dev libssl-dev libtool lld llvm lrzsz genisoimage msmtp \
+          nano ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply \
+          python3-docutils python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig \
+          texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd yasm
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+          df -h
+          
+      - name: Move Build Path
+        run: |
+          cp -r ./. ${{ env.WORK_PATH }}/
+          
+      - name: Update feeds
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          ./tool.sh feed
+
+      - name: Generate configuration file
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          rm -f ./.config*
+          cp ./configs/base_glibc_config ./.config
+          make defconfig
+
+      - name: Make download
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          make download -j8 || make download -j1 V=s
+          rm -rf $(find ./dl/ -size -1024c)
+          df -h
+
+      - name: Compile firmware
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          make -j$(nproc) || make -j1 V=s
+
+      - name: Clean Build Files
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          rm -rf ./staging_dir
+          rm -rf ./build_dir
+
+      - name: Prepare artifact
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          mkdir -p ./artifact/firmware
+          mkdir -p ./artifact/package
+          mkdir -p ./artifact/buildinfo
+          rm -rf $(find ./bin/targets/ -type d -name "packages")
+          cp -rf $(find ./bin/targets/ -type f -name "immortalwrt-*") ./artifact/firmware/
+          cp -rf $(find ./bin/targets/ -type f -name "sha256sums") ./artifact/firmware/
+          cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./artifact/package/
+          cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
+          
+      - name: Clean Bin Files
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          rm -rf ./bin
+
+      - name: Deliver buildinfo
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenWrt_buildinfo_glibc
+          path: ${{ env.WORK_PATH }}/artifact/buildinfo/
+
+      - name: Deliver package
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenWrt_package_glibc
+          path: ${{ env.WORK_PATH }}/artifact/package/
+
+      - name: Deliver firmware_glibc
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenWrt_firmware
+          path: ${{ env.WORK_PATH }}/artifact/firmware/
+      
+      - name: rename firmware
+        run: |
+          mkdir -p ${{ env.WORK_PATH }}/job_cache
+          mv ${{ env.WORK_PATH }}/artifact/firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz ${{ env.WORK_PATH }}/job_cache/immortalwrt-x86-64-generic-glibc-squashfs-combined-efi.img.gz
+          mv ${{ env.WORK_PATH }}/artifact/firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.qcow2 ${{ env.WORK_PATH }}/job_cache/immortalwrt-x86-64-generic-glibc-squashfs-combined-efi.qcow2
+
+      - name: Save cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.WORK_PATH }}/job_cache
+          key: glibc_firmware
+
+  build_openwrt_release_musl:
+    name: Build x86_64 OpenWrt musl releases firmware
+    runs-on: ubuntu-24.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Set workspace
+        run: |
+          sudo mkdir -p -m 777 /mnt/openwrt
+          echo "WORK_PATH=/mnt/openwrt" >> $GITHUB_ENV
+          
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set variables
+        run: |
+          sudo -E timedatectl set-timezone Asia/Shanghai
+
+      - name: Configure compilation environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+          bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib \
+          g++-multilib git libgnutls28-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev \
+          libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev \
+          libncurses-dev libpython3-dev libreadline-dev libssl-dev libtool lld llvm lrzsz genisoimage msmtp \
+          nano ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply \
+          python3-docutils python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig \
+          texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd yasm
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+          df -h
+          
+      - name: Move Build Path
+        run: |
+          cp -r ./. ${{ env.WORK_PATH }}/
+          
+      - name: Update feeds
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          ./tool.sh feed
+
+      - name: Generate configuration file
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          rm -f ./.config*
+          cp ./configs/base_musl_config ./.config
+          make defconfig
+
+      - name: Make download
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          make download -j8 || make download -j1 V=s
+          rm -rf $(find ./dl/ -size -1024c)
+          df -h
+
+      - name: Compile firmware
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          make -j$(nproc) || make -j1 V=s
+
+      - name: Clean Build Files
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          rm -rf ./staging_dir
+          rm -rf ./build_dir
+
+      - name: Prepare artifact
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          mkdir -p ./artifact/firmware
+          mkdir -p ./artifact/package
+          mkdir -p ./artifact/buildinfo
+          rm -rf $(find ./bin/targets/ -type d -name "packages")
+          cp -rf $(find ./bin/targets/ -type f -name "immortalwrt-*") ./artifact/firmware/
+          cp -rf $(find ./bin/targets/ -type f -name "sha256sums") ./artifact/firmware/
+          cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./artifact/package/
+          cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
+          
+      - name: Clean Bin Files
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          rm -rf ./bin
+
+      - name: Deliver buildinfo
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenWrt_buildinfo_musl
+          path: ${{ env.WORK_PATH }}/artifact/buildinfo/
+
+      - name: Deliver package
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenWrt_package_musl
+          path: ${{ env.WORK_PATH }}/artifact/package/
+
+      - name: Deliver firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenWrt_firmware_musl
+          path: ${{ env.WORK_PATH }}/artifact/firmware/
+
+      - name: rename firmware
+        run: |
+          mkdir -p ${{ env.WORK_PATH }}/job_cache
+          mv ${{ env.WORK_PATH }}/artifact/firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz ${{ env.WORK_PATH }}/job_cache/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.img.gz
+          mv ${{ env.WORK_PATH }}/artifact/firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.qcow2 ${{ env.WORK_PATH }}/job_cache/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.qcow2
+  
+      - name: Save cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.WORK_PATH }}/job_cache
+          key: musl_firmware
+
+  push_msg:
+    name: push weixing msg
+    needs: [build_openwrt_release_glibc, build_openwrt_release_musl]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set workspace
+        run: |
+          mkdir -p firmware
+      - name: Restore cache
+        uses: actions/cache@4
+        with:
+          path: musl_firmware
+          key: musl_firmware
+      - name: Restore cache
+        uses: actions/cache@4
+        with:
+          path: glibc_firmware
+          key: glibc_firmware
+      - name: Check SHA256
+        run: |
+          cp musl_firmware/* firmware/
+          cp glibc_firmware/* firmware/
+          cd firmware
+          for file in *; do
+            sha256sum "$file" >> ../sha256sums
+          done
+
+      - name: Upload release asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.RELEASE_TOKEN }}
+          file: firmware/*
+          overwrite: true
+          release_name: ${{ github.ref_name }}
+          tag: ${{ github.ref_name }}
+          file_glob: true
+          body: |
+            release ${{ github.ref_name }}
+  
+      - name: Delete loder releases
+        uses: dev-drprasad/delete-older-releases@v0.3.3
+        with:
+          keep_latest: 5
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+
+      - name: Push Msg
+        run: |
+          sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "Released on ${{ github.ref_name }}"
+
+
+
+
