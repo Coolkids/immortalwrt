@@ -240,8 +240,10 @@ jobs:
   push_msg:
     name: push weixing msg
     needs: [build_openwrt_release_glibc, build_openwrt_release_musl]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Set workspace
         run: |
           mkdir -p firmware
