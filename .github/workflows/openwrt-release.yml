@@ -4,9 +4,18 @@ on:
     tags:
       - 'v*'
 jobs:
+  clear_cache:
+    name: clear github job_cache
+    steps:
+      - name: clear cache
+        uses: MyAlbum/purge-cache@v2
+        with:
+          max-age: 1
+          token: ${{ secrets.RELEASE_TOKEN }}
 
   build_openwrt_release_glibc:
     name: Build x86_64 OpenWrt glibc releases firmware
+    needs: [clear_cache]
     runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
 
@@ -123,6 +132,7 @@ jobs:
 
   build_openwrt_release_musl:
     name: Build x86_64 OpenWrt musl releases firmware
+    needs: [clear_cache]
     runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
 
@@ -247,13 +257,13 @@ jobs:
       - name: Set workspace
         run: |
           mkdir -p firmware
-      - name: Restore cache
-        uses: actions/cache@4
+      - name: Restore cache musl
+        uses: actions/cache@v4
         with:
           path: musl_firmware
           key: musl_firmware
-      - name: Restore cache
-        uses: actions/cache@4
+      - name: Restore cache gcc
+        uses: actions/cache@v4
         with:
           path: glibc_firmware
           key: glibc_firmware
