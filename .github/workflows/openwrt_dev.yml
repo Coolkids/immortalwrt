@@ -1,5 +1,5 @@
 
-name: OpenWrt 24.10 Test CI
+name: OpenWrt Test CI
 
 on:
   push:
