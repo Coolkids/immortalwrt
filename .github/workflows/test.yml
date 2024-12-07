@@ -10,7 +10,6 @@ jobs:
 
   push_msg:
     name: push weixing msg
-    needs: [build_openwrt_release_glibc, build_openwrt_release_musl]
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
