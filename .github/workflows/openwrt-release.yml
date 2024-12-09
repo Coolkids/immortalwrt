@@ -4,22 +4,10 @@ on:
     tags:
       - 'v*'
 jobs:
-  clear_cache:
-    name: clear github job_cache
-    runs-on: ubuntu-24.04
-    steps:
-      - name: clear cache
-        uses: MyAlbum/purge-cache@v2
-        with:
-          max-age: 1
-          token: ${{ secrets.RELEASE_TOKEN }}
-
   build_openwrt_release_glibc:
     name: Build x86_64 OpenWrt glibc releases firmware
-    needs: [clear_cache]
     runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
-
     steps:
       - name: Set workspace
         run: |
@@ -113,30 +101,16 @@ jobs:
           name: OpenWrt_package_glibc
           path: ${{ env.WORK_PATH }}/artifact/package/
 
-      - name: Deliver firmware_glibc
+      - name: Deliver firmware
         uses: actions/upload-artifact@v4
         with:
-          name: OpenWrt_firmware
+          name: OpenWrt_firmware_glibc
           path: ${{ env.WORK_PATH }}/artifact/firmware/
       
-      - name: rename firmware
-        run: |
-          mkdir -p ${{ env.WORK_PATH }}/job_cache
-          mv ${{ env.WORK_PATH }}/artifact/firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz ${{ env.WORK_PATH }}/job_cache/immortalwrt-x86-64-generic-glibc-squashfs-combined-efi.img.gz
-          mv ${{ env.WORK_PATH }}/artifact/firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.qcow2 ${{ env.WORK_PATH }}/job_cache/immortalwrt-x86-64-generic-glibc-squashfs-combined-efi.qcow2
-
-      - name: Save cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.WORK_PATH }}/job_cache
-          key: glibc_firmware
-
   build_openwrt_release_musl:
     name: Build x86_64 OpenWrt musl releases firmware
-    needs: [clear_cache]
     runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
-
     steps:
       - name: Set workspace
         run: |
@@ -236,18 +210,6 @@ jobs:
           name: OpenWrt_firmware_musl
           path: ${{ env.WORK_PATH }}/artifact/firmware/
 
-      - name: rename firmware
-        run: |
-          mkdir -p ${{ env.WORK_PATH }}/job_cache
-          mv ${{ env.WORK_PATH }}/artifact/firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz ${{ env.WORK_PATH }}/job_cache/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.img.gz
-          mv ${{ env.WORK_PATH }}/artifact/firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.qcow2 ${{ env.WORK_PATH }}/job_cache/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.qcow2
-  
-      - name: Save cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.WORK_PATH }}/job_cache
-          key: musl_firmware
-
   push_msg:
     name: push weixing msg
     needs: [build_openwrt_release_glibc, build_openwrt_release_musl]
@@ -259,23 +221,30 @@ jobs:
         run: |
           mkdir -p firmware
       - name: Restore cache musl
-        uses: actions/cache@v4
+        uses: actions/download-artifact@v4
         with:
           path: musl_firmware
-          key: musl_firmware
-      - name: Restore cache gcc
-        uses: actions/cache@v4
+          name: OpenWrt_firmware_musl
+      - name: Restore cache glibc
+        uses: actions/download-artifact@v4
         with:
           path: glibc_firmware
-          key: glibc_firmware
+          name: OpenWrt_firmware_glibc
+      - name: rename firmware
+          run: |
+            mkdir -p job_cache
+            mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz firmware/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.img.gz
+            mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.qcow2 firmware/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.qcow2
+            mv glibc_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz firmware/immortalwrt-x86-64-generic-glibc-squashfs-combined-efi.img.gz
+            mv glibc_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.qcow2 firmware/immortalwrt-x86-64-generic-glibc-squashfs-combined-efi.qcow2
+            
       - name: Check SHA256
         run: |
-          cp musl_firmware/* firmware/
-          cp glibc_firmware/* firmware/
           cd firmware
           for file in *; do
             sha256sum "$file" >> ../sha256sums
           done
+          mv ../sha256sums .
 
       - name: Upload release asset
         uses: svenstaro/upload-release-action@v2
