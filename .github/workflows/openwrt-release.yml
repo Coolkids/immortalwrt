@@ -231,12 +231,12 @@ jobs:
           path: glibc_firmware
           name: OpenWrt_firmware_glibc
       - name: rename firmware
-          run: |
-            mkdir -p job_cache
-            mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz firmware/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.img.gz
-            mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.qcow2 firmware/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.qcow2
-            mv glibc_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz firmware/immortalwrt-x86-64-generic-glibc-squashfs-combined-efi.img.gz
-            mv glibc_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.qcow2 firmware/immortalwrt-x86-64-generic-glibc-squashfs-combined-efi.qcow2
+        run: |
+          mkdir -p job_cache
+          mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz firmware/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.img.gz
+          mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.qcow2 firmware/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.qcow2
+          mv glibc_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz firmware/immortalwrt-x86-64-generic-glibc-squashfs-combined-efi.img.gz
+          mv glibc_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.qcow2 firmware/immortalwrt-x86-64-generic-glibc-squashfs-combined-efi.qcow2
             
       - name: Check SHA256
         run: |
