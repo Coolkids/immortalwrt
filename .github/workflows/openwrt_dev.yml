@@ -71,8 +71,8 @@ jobs:
           df -h
           
       - name: Compile firmware
-        working-directory: ${{ env.WORK_PATH }}
         run: |
+          cd ${{ env.WORK_PATH }}
           make -j$(nproc) || make -j1 V=s
 
       - name: Clean Build Files
@@ -172,8 +172,8 @@ jobs:
           df -h
           
       - name: Compile firmware
-        working-directory: ${{ env.WORK_PATH }}
         run: |
+          cd ${{ env.WORK_PATH }}
           make -j$(nproc) || make -j1 V=s
 
       - name: Clean Build Files
