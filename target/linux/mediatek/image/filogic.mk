@@ -651,6 +651,23 @@ define Device/cudy_ap3000outdoor-v1
 endef
 TARGET_DEVICES += cudy_ap3000outdoor-v1
 
+define Device/cudy_ap3000-v1
+  DEVICE_VENDOR := Cudy
+  DEVICE_MODEL := AP3000
+  DEVICE_VARIANT := v1
+  DEVICE_DTS := mt7981b-cudy-ap3000-v1
+  DEVICE_DTS_DIR := ../dts
+  SUPPORTED_DEVICES += R49
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 65536k
+  KERNEL_IN_UBI := 1
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
+endef
+TARGET_DEVICES += cudy_ap3000-v1
+
 define Device/cudy_m3000-v1
   DEVICE_VENDOR := Cudy
   DEVICE_MODEL := M3000
@@ -759,6 +776,20 @@ define Device/dlink_aquila-pro-ai-m30-a1
   IMAGE/recovery.bin := sysupgrade-tar | pad-to $$(IMAGE_SIZE) | dlink-ai-recovery-header DLK6E6110001 \x6A\x28\xEE\x0B \x00\x00\x2C\x00 \x00\x00\x20\x03 \x61\x6E
 endef
 TARGET_DEVICES += dlink_aquila-pro-ai-m30-a1
+
+define Device/dlink_aquila-pro-ai-m60-a1
+  DEVICE_VENDOR := D-Link
+  DEVICE_MODEL := AQUILA PRO AI M60
+  DEVICE_VARIANT := A1
+  DEVICE_DTS := mt7986a-dlink-aquila-pro-ai-m60-a1
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-leds-gca230718 kmod-mt7915e kmod-mt7986-firmware mt7986-wo-firmware
+  IMAGES += recovery.bin
+  IMAGE_SIZE := 51200k
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  IMAGE/recovery.bin := sysupgrade-tar | pad-to $$(IMAGE_SIZE) | dlink-ai-recovery-header DLK6E8202001 \x30\x6C\x19\x0C \x00\x00\x2C\x00 \x00\x00\x20\x03 \x82\x6E
+endef
+TARGET_DEVICES += dlink_aquila-pro-ai-m60-a1
 
 define Device/edgecore_eap111
   DEVICE_VENDOR := Edgecore
@@ -1547,6 +1578,27 @@ define Device/ruijie_rg-x60-pro
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 endef
 TARGET_DEVICES += ruijie_rg-x60-pro
+
+define Device/tenbay_wr3000k
+  DEVICE_VENDOR := Tenbay
+  DEVICE_MODEL := WR3000K
+  DEVICE_DTS := mt7981b-tenbay-wr3000k
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 49152k
+  KERNEL_IN_UBI := 1
+  IMAGES += factory.bin
+  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  KERNEL = kernel-bin | lzma | \
+        fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  KERNEL_INITRAMFS = kernel-bin | lzma | \
+        fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd
+endef
+TARGET_DEVICES += tenbay_wr3000k
 
 define Device/tplink_re6000xd
   DEVICE_VENDOR := TP-Link
