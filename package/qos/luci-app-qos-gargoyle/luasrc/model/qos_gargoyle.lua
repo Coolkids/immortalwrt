@@ -26,5 +26,6 @@ function cbi_add_dpi_protocols(field)
 end
 
 function get_wan()
-	return "pppoe-wan"
+	local uci = require "luci.model.uci".cursor()
+	return uci:get_first("qos_gargoyle", "global", "wan", "pppoe-wan")
 end
