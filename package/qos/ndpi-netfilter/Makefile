@@ -9,10 +9,10 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=ndpi-netfilter
-PKG_VERSION:=2025.01.06
+PKG_VERSION:=2025.01.15
 PKG_RELEASE:=1
 
-PKG_SOURCE_COMMIT:=fb9207362f5e9478f6112cdbb7a0e263f3b14a40
+PKG_SOURCE_COMMIT:=e9f1c89a96e3b937a80a4ace381dc315f23bc32a
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_SOURCE_COMMIT).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/vel21ripn/nDPI/tar.gz/$(PKG_SOURCE_COMMIT)?
 PKG_HASH:=skip
