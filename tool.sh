@@ -57,6 +57,8 @@ rm -rf ./feeds/luci/applications/luci-app-passwall
 rm -rf ./feeds/packages/net/v2ray-geodata
 rm -rf ./feeds/packages/net/mosdns
 ./scripts/feeds install -a
+## 兼容passwall passwall2 同时安装的APK编译
+sed -i '/\/www\/luci-static\/resources\/qrcode.min.js/d' feeds/diy2/luci-app-passwall/Makefile
 ./scripts/feeds install -p diy2 -f luci-app-passwall
 ./scripts/feeds install -p custom -f v2ray-geodata
 ./scripts/feeds install -p mosdns -f mosdns
