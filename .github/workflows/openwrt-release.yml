@@ -76,12 +76,10 @@ jobs:
         working-directory: ${{ env.WORK_PATH }}
         run: |
           mkdir -p ./artifact/firmware
-          mkdir -p ./artifact/package
           mkdir -p ./artifact/buildinfo
           rm -rf $(find ./bin/targets/ -type d -name "packages")
           cp -rf $(find ./bin/targets/ -type f -name "immortalwrt-*") ./artifact/firmware/
           cp -rf $(find ./bin/targets/ -type f -name "sha256sums") ./artifact/firmware/
-          cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./artifact/package/
           cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
           
       - name: Clean Bin Files
@@ -92,19 +90,13 @@ jobs:
       - name: Deliver buildinfo
         uses: actions/upload-artifact@v4
         with:
-          name: OpenWrt_buildinfo_glibc
+          name: "OpenWrt glibc buildinfo"
           path: ${{ env.WORK_PATH }}/artifact/buildinfo/
-
-      - name: Deliver package
-        uses: actions/upload-artifact@v4
-        with:
-          name: OpenWrt_package_glibc
-          path: ${{ env.WORK_PATH }}/artifact/package/
 
       - name: Deliver firmware
         uses: actions/upload-artifact@v4
         with:
-          name: OpenWrt_firmware_glibc
+          name: "OpenWrt glibc firmware"
           path: ${{ env.WORK_PATH }}/artifact/firmware/
       
   build_openwrt_release_musl:
@@ -179,12 +171,10 @@ jobs:
         working-directory: ${{ env.WORK_PATH }}
         run: |
           mkdir -p ./artifact/firmware
-          mkdir -p ./artifact/package
           mkdir -p ./artifact/buildinfo
           rm -rf $(find ./bin/targets/ -type d -name "packages")
           cp -rf $(find ./bin/targets/ -type f -name "immortalwrt-*") ./artifact/firmware/
           cp -rf $(find ./bin/targets/ -type f -name "sha256sums") ./artifact/firmware/
-          cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./artifact/package/
           cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
           
       - name: Clean Bin Files
@@ -195,19 +185,13 @@ jobs:
       - name: Deliver buildinfo
         uses: actions/upload-artifact@v4
         with:
-          name: OpenWrt_buildinfo_musl
+          name: "OpenWrt musl buildinfo"
           path: ${{ env.WORK_PATH }}/artifact/buildinfo/
-
-      - name: Deliver package
-        uses: actions/upload-artifact@v4
-        with:
-          name: OpenWrt_package_musl
-          path: ${{ env.WORK_PATH }}/artifact/package/
 
       - name: Deliver firmware
         uses: actions/upload-artifact@v4
         with:
-          name: OpenWrt_firmware_musl
+          name: "OpenWrt musl firmware"
           path: ${{ env.WORK_PATH }}/artifact/firmware/
 
   push_msg:
@@ -224,15 +208,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: musl_firmware
-          name: OpenWrt_firmware_musl
+          name: "OpenWrt musl firmware"
       - name: Restore cache glibc
         uses: actions/download-artifact@v4
         with:
           path: glibc_firmware
-          name: OpenWrt_firmware_glibc
+          name: "OpenWrt glibc firmware"
       - name: rename firmware
         run: |
-          mkdir -p job_cache
           mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz firmware/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.img.gz
           mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.qcow2 firmware/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.qcow2
           mv glibc_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz firmware/immortalwrt-x86-64-generic-glibc-squashfs-combined-efi.img.gz
