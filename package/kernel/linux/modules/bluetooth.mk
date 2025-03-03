@@ -38,9 +38,10 @@ $(eval $(call KernelPackage,bluetooth))
 define KernelPackage/hci-uart
   SUBMENU:=$(BLUETOOTH_MENU)
   TITLE:=Bluetooth HCI UART support
-  DEPENDS:=+kmod-bluetooth
+  DEPENDS:=+kmod-bluetooth +kmod-btbcm
   KCONFIG:= \
 	CONFIG_BT_HCIUART \
+	CONFIG_BT_HCIUART_BCM=y \
 	CONFIG_BT_HCIUART_INTEL=n \
 	CONFIG_BT_HCIUART_H4 \
 	CONFIG_BT_HCIUART_NOKIA=n
@@ -59,16 +60,16 @@ $(eval $(call KernelPackage,hci-uart))
 define KernelPackage/btusb
   SUBMENU:=$(BLUETOOTH_MENU)
   TITLE:=Bluetooth HCI USB support
-  DEPENDS:=@USB_SUPPORT +kmod-usb-core +kmod-bluetooth
+  DEPENDS:=@USB_SUPPORT +kmod-usb-core +kmod-bluetooth +kmod-btbcm +kmod-btmtk
   KCONFIG:= \
 	CONFIG_BT_HCIBTUSB \
+	CONFIG_BT_HCIBTUSB_BCM=y \
 	CONFIG_BT_HCIBTUSB_MTK=y \
 	CONFIG_BT_HCIBTUSB_RTL=y
   FILES:= \
 	$(LINUX_DIR)/drivers/bluetooth/btusb.ko \
 	$(LINUX_DIR)/drivers/bluetooth/btintel.ko \
-	$(LINUX_DIR)/drivers/bluetooth/btrtl.ko \
-	$(LINUX_DIR)/drivers/bluetooth/btmtk.ko
+	$(LINUX_DIR)/drivers/bluetooth/btrtl.ko
   AUTOLOAD:=$(call AutoProbe,btusb)
 endef
 
@@ -77,6 +78,30 @@ define KernelPackage/btusb/description
 endef
 
 $(eval $(call KernelPackage,btusb))
+
+
+define KernelPackage/btbcm
+  SUBMENU:=$(BLUETOOTH_MENU)
+  TITLE:=Broadcom Bluetooth support
+  HIDDEN:=1
+  DEPENDS:=+kmod-bluetooth
+  KCONFIG:=CONFIG_BT_BCM
+  FILES:=$(LINUX_DIR)/drivers/bluetooth/btbcm.ko
+endef
+
+$(eval $(call KernelPackage,btbcm))
+
+
+define KernelPackage/btmtk
+  SUBMENU:=$(BLUETOOTH_MENU)
+  TITLE:=MTK Bluetooth support
+  HIDDEN:=1
+  DEPENDS:=+kmod-bluetooth
+  KCONFIG:=CONFIG_BT_MTK
+  FILES:=$(LINUX_DIR)/drivers/bluetooth/btmtk.ko
+endef
+
+$(eval $(call KernelPackage,btmtk))
 
 
 define KernelPackage/ath3k
@@ -112,24 +137,6 @@ define KernelPackage/bluetooth-6lowpan/description
 endef
 
 $(eval $(call KernelPackage,bluetooth-6lowpan))
-
-
-define KernelPackage/btbcm
-  SUBMENU:=$(BLUETOOTH_MENU)
-  TITLE:=Broadcom Bluetooth Kernel Module support
-  DEPENDS:=+kmod-hci-uart +kmod-btusb
-  KCONFIG:= \
-	CONFIG_BT_BCM \
-	CONFIG_BT_HCIBTUSB_BCM=y \
-	CONFIG_BT_HCIUART_BCM=y
-  FILES:=$(LINUX_DIR)/drivers/bluetooth/btbcm.ko
-endef
-
-define KernelPackage/btbcm/description
- Kernel support for Broadcom Bluetooth Module
-endef
-
-$(eval $(call KernelPackage,btbcm))
 
 
 define KernelPackage/btmrvl
