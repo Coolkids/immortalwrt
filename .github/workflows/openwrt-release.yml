@@ -220,6 +220,10 @@ jobs:
           mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.qcow2 firmware/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.qcow2
           mv glibc_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz firmware/immortalwrt-x86-64-generic-glibc-squashfs-combined-efi.img.gz
           mv glibc_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.qcow2 firmware/immortalwrt-x86-64-generic-glibc-squashfs-combined-efi.qcow2
+          mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined.img.gz firmware/immortalwrt-x86-64-generic-musl-squashfs-combined.img.gz
+          mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined.qcow2 firmware/immortalwrt-x86-64-generic-musl-squashfs-combined.qcow2
+          mv glibc_firmware/immortalwrt-x86-64-generic-squashfs-combined.img.gz firmware/immortalwrt-x86-64-generic-glibc-squashfs-combined.img.gz
+          mv glibc_firmware/immortalwrt-x86-64-generic-squashfs-combined.qcow2 firmware/immortalwrt-x86-64-generic-glibc-squashfs-combined.qcow2
             
       - name: Check SHA256
         run: |
