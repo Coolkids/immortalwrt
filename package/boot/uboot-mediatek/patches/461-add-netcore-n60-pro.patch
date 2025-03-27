@@ -1,6 +1,6 @@
 --- /dev/null
-+++ b/configs/mt7981_routerich_ax3000_defconfig
-@@ -0,0 +1,108 @@
++++ b/configs/mt7986_netcore_n60-pro_defconfig
+@@ -0,0 +1,130 @@
 +CONFIG_ARM=y
 +CONFIG_SYS_HAS_NONCACHED_MEMORY=y
 +CONFIG_POSITION_INDEPENDENT=y
@@ -8,27 +8,30 @@
 +CONFIG_TEXT_BASE=0x41e00000
 +CONFIG_SYS_MALLOC_F_LEN=0x4000
 +CONFIG_NR_DRAM_BANKS=1
-+CONFIG_DEFAULT_DEVICE_TREE="mt7981-routerich_ax3000"
++CONFIG_DEFAULT_DEVICE_TREE="mt7986a-netcore-n60-pro"
 +CONFIG_OF_LIBFDT_OVERLAY=y
-+CONFIG_TARGET_MT7981=y
-+CONFIG_PRE_CON_BUF_ADDR=0x4007ef00
++CONFIG_TARGET_MT7986=y
++CONFIG_PRE_CON_BUF_ADDR=0x4007EF00
 +CONFIG_DEBUG_UART_BASE=0x11002000
 +CONFIG_DEBUG_UART_CLOCK=40000000
 +CONFIG_SYS_LOAD_ADDR=0x46000000
++CONFIG_PCI=y
 +CONFIG_DEBUG_UART=y
++CONFIG_AHCI=y
 +CONFIG_FIT=y
 +CONFIG_BOOTDELAY=30
 +CONFIG_AUTOBOOT_KEYED=y
 +CONFIG_AUTOBOOT_MENU_SHOW=y
-+CONFIG_DEFAULT_FDT_FILE="mediatek/mt7981-routerich_ax3000.dtb"
++CONFIG_DEFAULT_FDT_FILE="mediatek/mt7986a-netcore-n60-pro.dtb"
 +CONFIG_LOGLEVEL=7
 +CONFIG_PRE_CONSOLE_BUFFER=y
 +CONFIG_LOG=y
 +CONFIG_BOARD_LATE_INIT=y
 +CONFIG_HUSH_PARSER=y
-+CONFIG_SYS_PROMPT="MT7981> "
++CONFIG_SYS_PROMPT="MT7986> "
 +CONFIG_CMD_CPU=y
 +CONFIG_CMD_LICENSE=y
++# CONFIG_CMD_BOOTEFI_BOOTMGR is not set
 +CONFIG_CMD_BOOTMENU=y
 +CONFIG_CMD_ASKENV=y
 +CONFIG_CMD_ERASEENV=y
@@ -36,9 +39,12 @@
 +CONFIG_CMD_STRINGS=y
 +CONFIG_CMD_DM=y
 +CONFIG_CMD_GPIO=y
++CONFIG_CMD_PWM=y
 +CONFIG_CMD_GPT=y
 +CONFIG_CMD_MTD=y
 +CONFIG_CMD_PART=y
++CONFIG_CMD_PCI=y
++CONFIG_CMD_USB=y
 +CONFIG_CMD_DHCP=y
 +CONFIG_CMD_TFTPSRV=y
 +CONFIG_CMD_RARP=y
@@ -54,6 +60,10 @@
 +CONFIG_CMD_UUID=y
 +CONFIG_CMD_HASH=y
 +CONFIG_CMD_SMC=y
++CONFIG_CMD_EXT4=y
++CONFIG_CMD_FAT=y
++CONFIG_CMD_FS_GENERIC=y
++CONFIG_CMD_FS_UUID=y
 +CONFIG_CMD_UBI=y
 +CONFIG_CMD_UBI_RENAME=y
 +CONFIG_OF_EMBED=y
@@ -65,7 +75,7 @@
 +CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
 +CONFIG_SYS_RELOC_GD_ENV_ADDR=y
 +CONFIG_USE_DEFAULT_ENV_FILE=y
-+CONFIG_DEFAULT_ENV_FILE="routerich_ax3000_env"
++CONFIG_DEFAULT_ENV_FILE="netcore_n60-pro_env"
 +CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
 +CONFIG_VERSION_VARIABLE=y
 +CONFIG_NET_RANDOM_ETHADDR=y
@@ -76,6 +86,9 @@
 +CONFIG_SERVERIP="192.168.1.254"
 +CONFIG_REGMAP=y
 +CONFIG_SYSCON=y
++CONFIG_SCSI_AHCI=y
++CONFIG_AHCI_PCI=y
++CONFIG_MTK_AHCI=y
 +CONFIG_BUTTON=y
 +CONFIG_BUTTON_GPIO=y
 +CONFIG_CLK=y
@@ -90,44 +103,53 @@
 +CONFIG_MTD_UBI_FASTMAP=y
 +CONFIG_PHY_FIXED=y
 +CONFIG_MEDIATEK_ETH=y
++CONFIG_PCIE_MEDIATEK=y
 +CONFIG_PHY=y
 +CONFIG_PHY_MTK_TPHY=y
 +CONFIG_PINCTRL=y
 +CONFIG_PINCONF=y
-+CONFIG_PINCTRL_MT7981=y
++CONFIG_PINCTRL_MT7622=y
++CONFIG_PINCTRL_MT7986=y
 +CONFIG_POWER_DOMAIN=y
 +CONFIG_MTK_POWER_DOMAIN=y
 +CONFIG_DM_REGULATOR=y
 +CONFIG_DM_REGULATOR_FIXED=y
 +CONFIG_DM_REGULATOR_GPIO=y
++CONFIG_DM_PWM=y
++CONFIG_PWM_MTK=y
 +CONFIG_RAM=y
++CONFIG_SCSI=y
 +CONFIG_DM_SERIAL=y
 +CONFIG_MTK_SERIAL=y
 +CONFIG_SPI=y
 +CONFIG_DM_SPI=y
 +CONFIG_MTK_SPIM=y
++CONFIG_USB=y
++CONFIG_USB_XHCI_HCD=y
++CONFIG_USB_XHCI_MTK=y
++CONFIG_USB_STORAGE=y
 +CONFIG_ZSTD=y
 +CONFIG_HEXDUMP=y
 +CONFIG_LMB_MAX_REGIONS=64
 --- /dev/null
-+++ b/arch/arm/dts/mt7981-routerich_ax3000.dts
-@@ -0,0 +1,187 @@
++++ b/arch/arm/dts/mt7986a-netcore-n60-pro.dts
+@@ -0,0 +1,200 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Copyright (c) 2022 MediaTek Inc.
++ * Copyright (c) 2021 MediaTek Inc.
 + * Author: Sam Shih <sam.shih@mediatek.com>
 + */
 +
 +/dts-v1/;
-+#include "mt7981.dtsi"
++#include "mt7986.dtsi"
 +#include <dt-bindings/gpio/gpio.h>
 +#include <dt-bindings/input/linux-event-codes.h>
 +
 +/ {
 +	#address-cells = <1>;
 +	#size-cells = <1>;
-+	model = "Routerich AX3000";
-+	compatible = "routerich,ax3000", "mediatek,mt7981";
++	model = "Netcore N60 Pro";
++	compatible = "mediatek,mt7986", "mediatek,mt7986-rfb";
 +
 +	chosen {
 +		stdout-path = &uart0;
@@ -136,71 +158,51 @@
 +
 +	memory@40000000 {
 +		device_type = "memory";
-+		reg = <0x40000000 0x10000000>;
++		reg = <0x40000000 0x20000000>;
 +	};
 +
-+	keys {
++	gpio-keys {
 +		compatible = "gpio-keys";
 +
-+		button-0 {
-+			label = "mesh";
-+			linux,code = <BTN_0>;
-+			gpios = <&gpio 1 GPIO_ACTIVE_LOW>;
-+		};
-+
-+		button-1 {
++		button-reset {
 +			label = "reset";
 +			linux,code = <KEY_RESTART>;
-+			gpios = <&gpio 1 GPIO_ACTIVE_LOW>;
-+		};
-+	};
-+
-+	leds {
-+		compatible = "gpio-leds";
-+
-+		led-0 {
-+			label = "red:wlan5g";
-+			gpios = <&gpio 5 GPIO_ACTIVE_LOW>;
-+		};
-+
-+		led-1 {
-+			label = "red:wan";
-+			gpios = <&gpio 6 GPIO_ACTIVE_HIGH>;
-+		};
-+
-+		led-2 {
-+			label = "blue:power";
-+			gpios = <&gpio 7 GPIO_ACTIVE_LOW>;
-+		};
-+
-+		led-3 {
-+			label = "blue:lan1";
 +			gpios = <&gpio 9 GPIO_ACTIVE_LOW>;
 +		};
 +
-+		led-4 {
-+			label = "blue:lan2";
++		button-mesh {
++			label = "mesh";
++			linux,code = <KEY_WPS_BUTTON>;
 +			gpios = <&gpio 10 GPIO_ACTIVE_LOW>;
 +		};
++	};
 +
-+		led-5 {
-+			label = "blue:lan3";
-+			gpios = <&gpio 11 GPIO_ACTIVE_LOW>;
++	gpio-leds {
++		compatible = "gpio-leds";
++
++		led-0 {
++			label = "blue:wlan";
++			gpios = <&gpio 1 GPIO_ACTIVE_LOW>;
 +		};
 +
-+		led-6 {
-+			label = "blue:wan";
-+			gpios = <&gpio 12 GPIO_ACTIVE_LOW>;
++		power_led: led-1 {
++			label = "blue:power";
++			gpios = <&gpio 29 GPIO_ACTIVE_LOW>;
 +		};
 +
-+		led-7 {
-+			label = "blue:wlan2g";
-+			gpios = <&gpio 34 GPIO_ACTIVE_LOW>;
++		led-2 {
++			label = "blue:status";
++			gpios = <&gpio 30 GPIO_ACTIVE_LOW>;
 +		};
 +
-+		led-8 {
++		led-3 {
 +			label = "blue:mesh";
-+			gpios = <&gpio 35 GPIO_ACTIVE_LOW>;
++			gpios = <&gpio 31 GPIO_ACTIVE_LOW>;
++		};
++
++		led-4 {
++			label = "blue:wan";
++			gpios = <&gpio 32 GPIO_ACTIVE_LOW>;
 +		};
 +	};
 +};
@@ -210,12 +212,18 @@
 +	status = "okay";
 +};
 +
++&uart1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart1_pins>;
++	status = "disabled";
++};
++
 +&eth {
 +	status = "okay";
 +	mediatek,gmac-id = <0>;
 +	phy-mode = "2500base-x";
 +	mediatek,switch = "mt7531";
-+	reset-gpios = <&gpio 39 GPIO_ACTIVE_HIGH>;
++	reset-gpios = <&gpio 5 GPIO_ACTIVE_HIGH>;
 +
 +	fixed-link {
 +		speed = <2500>;
@@ -231,17 +239,44 @@
 +		};
 +
 +		conf-pu {
-+			pins = "SPI0_CS", "SPI0_HOLD", "SPI0_WP";
++			pins = "SPI2_CS", "SPI2_HOLD", "SPI2_WP";
 +			drive-strength = <MTK_DRIVE_8mA>;
-+			bias-pull-up = <MTK_PUPD_SET_R1R0_11>;
++			bias-pull-up = <MTK_PUPD_SET_R1R0_00>;
 +		};
 +
 +		conf-pd {
-+			pins = "SPI0_CLK", "SPI0_MOSI", "SPI0_MISO";
++			pins = "SPI2_CLK", "SPI2_MOSI", "SPI2_MISO";
 +			drive-strength = <MTK_DRIVE_8mA>;
-+			bias-pull-down = <MTK_PUPD_SET_R1R0_11>;
++			bias-pull-down = <MTK_PUPD_SET_R1R0_00>;
 +		};
 +	};
++
++	spic_pins: spi1-pins-func-1 {
++		mux {
++			function = "spi";
++			groups = "spi1_2";
++		};
++	};
++
++	uart1_pins: spi1-pins-func-3 {
++		mux {
++			function = "uart";
++			groups = "uart1_2";
++		};
++	};
++
++	pwm_pins: pwm0-pins-func-1 {
++		mux {
++			function = "pwm";
++			groups = "pwm0";
++		};
++	};
++};
++
++&pwm {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pwm_pins>;
++	status = "okay";
 +};
 +
 +&spi0 {
@@ -255,12 +290,12 @@
 +	dma_ext;
 +	ipm_design;
 +	support_quad;
-+	tick_dly = <2>;
++	tick_dly = <1>;
 +	sample_sel = <0>;
 +
-+	spi_nand@0 {
++	spi_nand@1 {
 +		compatible = "spi-nand";
-+		reg = <0>;
++		reg = <1>;
 +		spi-max-frequency = <52000000>;
 +
 +		partitions {
@@ -274,12 +309,12 @@
 +			};
 +
 +			partition@100000 {
-+				label = "uboot-env-orig";
++				label = "orig-env";
 +				reg = <0x100000 0x80000>;
 +			};
 +
-+			partition@160000 {
-+				label = "Factory";
++			partition@180000 {
++				label = "factory";
 +				reg = <0x180000 0x200000>;
 +			};
 +
@@ -300,19 +335,19 @@
 +	status = "disabled";
 +};
 --- /dev/null
-+++ b/routerich_ax3000_env
-@@ -0,0 +1,58 @@
++++ b/netcore_n60-pro_env
+@@ -0,0 +1,57 @@
 +ipaddr=192.168.1.1
 +serverip=192.168.1.254
 +loadaddr=0x46000000
 +console=earlycon=uart8250,mmio32,0x11002000 console=ttyS0
-+bootcmd=run check_buttons ; if pstore check ; then run boot_recovery ; else run boot_ubi ; fi
++bootcmd=if pstore check ; then run boot_recovery ; else run boot_ubi ; fi
 +bootconf=config-1
 +bootdelay=0
-+bootfile=immortalwrt-mediatek-filogic-routerich_ax3000-ubootmod-initramfs-recovery.itb
-+bootfile_bl2=immortalwrt-mediatek-filogic-routerich_ax3000-ubootmod-preloader.bin
-+bootfile_fip=immortalwrt-mediatek-filogic-routerich_ax3000-ubootmod-bl31-uboot.fip
-+bootfile_upg=immortalwrt-mediatek-filogic-routerich_ax3000-ubootmod-squashfs-sysupgrade.itb
++bootfile=immortalwrt-mediatek-filogic-netcore_n60-pro-initramfs-recovery.itb
++bootfile_bl2=immortalwrt-mediatek-filogic-netcore_n60-pro-preloader.bin
++bootfile_fip=immortalwrt-mediatek-filogic-netcore_n60-pro-bl31-uboot.fip
++bootfile_upg=immortalwrt-mediatek-filogic-netcore_n60-pro-squashfs-sysupgrade.itb
 +bootled_pwr=blue:power
 +bootled_rec=blue:power
 +bootmenu_confirm_return=askenv - Press ENTER to return to menu ; bootmenu 60
@@ -330,19 +365,17 @@
 +bootmenu_7=[31mLoad BL2 preloader via TFTP then write to NAND.[0m=run boot_tftp_write_bl2 ; run bootmenu_confirm_return
 +bootmenu_8=Reboot.=reset
 +bootmenu_9=Reset all settings to factory defaults.=run reset_factory ; reset
-+boot_first=if button reset ; then led $bootled_rec on ; run boot_default ; fi ; bootmenu
++boot_first=if button reset ; then led $bootled_rec on ; run boot_tftp_recovery ; setenv flag_recover 1 ; run boot_default ; fi ; bootmenu
 +boot_default=if env exists flag_recover ; then else run bootcmd ; fi ; run boot_recovery ; setenv replacevol 1 ; run boot_tftp_forever
 +boot_production=led $bootled_pwr on ; run ubi_read_production && bootm $loadaddr#$bootconf ; led $bootled_pwr off
 +boot_recovery=led $bootled_rec on ; run ubi_read_recovery && bootm $loadaddr#$bootconf ; led $bootled_rec off
 +boot_ubi=run boot_production ; run boot_recovery ; run boot_tftp_forever
-+boot_tftp_forever=led $bootled_rec on ; while true ; do run boot_tftp ; sleep 1 ; done
++boot_tftp_forever=led $bootled_rec on ; while true ; do run boot_tftp_recovery ; sleep 1 ; done
 +boot_tftp_production=tftpboot $loadaddr $bootfile_upg && env exists replacevol && iminfo $loadaddr && run ubi_write_production ; if env exists noboot ; then else bootm $loadaddr#$bootconf ; fi
 +boot_tftp_recovery=tftpboot $loadaddr $bootfile && env exists replacevol && iminfo $loadaddr && run ubi_write_recovery ; if env exists noboot ; then else bootm $loadaddr#$bootconf ; fi
 +boot_tftp=tftpboot $loadaddr $bootfile && bootm $loadaddr#$bootconf
 +boot_tftp_write_fip=tftpboot $loadaddr $bootfile_fip && run mtd_write_fip && run reset_factory
 +boot_tftp_write_bl2=tftpboot $loadaddr $bootfile_bl2 && run mtd_write_bl2
-+check_buttons=if button reset ; then run boot_tftp ; fi
-+ethaddr_factory=mtd read Factory 0x40080000 0x0 0x20000 && env readmem -b ethaddr 0x40080004 0x6 ; setenv ethaddr_factory
 +part_default=production
 +part_recovery=recovery
 +reset_factory=ubi part ubi ; mw $loadaddr 0x0 0x800 ; ubi write $loadaddr ubootenv 0x800 ; ubi write $loadaddr ubootenv2 0x800
@@ -356,6 +389,7 @@
 +ubi_remove_rootfs=ubi check rootfs_data && ubi remove rootfs_data
 +ubi_write_production=ubi check fit && ubi remove fit ; run ubi_remove_rootfs ; ubi create fit $filesize dynamic && ubi write $loadaddr fit $filesize
 +ubi_write_recovery=ubi check recovery && ubi remove recovery ; run ubi_remove_rootfs ; ubi create recovery $filesize dynamic && ubi write $loadaddr recovery $filesize
++ethaddr_factory=mtd read factory 0x40080000 0x1fe000 0x1000 && env readmem -b ethaddr 0x40080f20 0x6 ; setenv ethaddr_factory
 +_init_env=setenv _init_env ; run ubi_create_env ; saveenv ; saveenv
 +_firstboot=setenv _firstboot ; run ethaddr_factory ; run _switch_to_menu ; run _init_env ; run boot_first
 +_switch_to_menu=setenv _switch_to_menu ; setenv bootdelay 3 ; setenv bootmenu_delay 3 ; setenv bootmenu_0 $bootmenu_0d ; setenv bootmenu_0d ; run _bootmenu_update_title
