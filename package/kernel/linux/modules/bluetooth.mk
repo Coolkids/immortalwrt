@@ -41,6 +41,7 @@ define KernelPackage/hci-uart
   DEPENDS:=+kmod-bluetooth +kmod-btbcm
   KCONFIG:= \
 	CONFIG_BT_HCIUART \
+	CONFIG_BT_HCIUART_AML=n \
 	CONFIG_BT_HCIUART_BCM=y \
 	CONFIG_BT_HCIUART_INTEL=n \
 	CONFIG_BT_HCIUART_H4 \
@@ -96,7 +97,7 @@ define KernelPackage/btmtk
   SUBMENU:=$(BLUETOOTH_MENU)
   TITLE:=MTK Bluetooth support
   HIDDEN:=1
-  DEPENDS:=+kmod-bluetooth
+  DEPENDS:=+kmod-bluetooth +!LINUX_6_6&&USB_SUPPORT:kmod-usb-core
   KCONFIG:=CONFIG_BT_MTK
   FILES:=$(LINUX_DIR)/drivers/bluetooth/btmtk.ko
 endef
