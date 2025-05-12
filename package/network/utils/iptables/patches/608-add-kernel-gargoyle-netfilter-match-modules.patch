@@ -1,5 +1,5 @@
 --- /dev/null	2025-05-03 05:16:32.568000000 +0800
-+++ iptables.new/extensions/libxt_weburl.c	2025-05-12 23:40:25.771318576 +0800
++++ iptables.new/extensions/libxt_weburl.c	2025-05-12 23:52:00.037024380 +0800
 @@ -0,0 +1,246 @@
 +/*  weburl --	An xtables extension to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
@@ -248,13 +248,13 @@
 +
 +
 --- /dev/null	2025-05-03 05:16:32.568000000 +0800
-+++ iptables.new/extensions/.weburl-test	2025-05-12 23:40:25.772318649 +0800
++++ iptables.new/extensions/.weburl-test	2025-05-12 23:52:00.038024453 +0800
 @@ -0,0 +1,2 @@
 +#!/bin/sh
 +[ -f $KERNEL_DIR/include/linux/netfilter/xt_weburl.h ] && echo weburl
 --- /dev/null	2025-05-03 05:16:32.568000000 +0800
-+++ iptables.new/extensions/libxt_webmon.c	2025-05-12 23:40:25.790319973 +0800
-@@ -0,0 +1,850 @@
++++ iptables.new/extensions/libxt_webmon.c	2025-05-12 23:52:00.055025690 +0800
+@@ -0,0 +1,851 @@
 +/*  webmon --	An iptables extension to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
 + *  		Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -281,6 +281,7 @@
 +#include <netdb.h>
 +#include <string.h>
 +#include <stdlib.h>
++#include <unistd.h>
 +#include <getopt.h>
 +
 +#include <arpa/inet.h>
@@ -1106,12 +1107,12 @@
 +}
 +
 --- /dev/null	2025-05-03 05:16:32.568000000 +0800
-+++ iptables.new/extensions/.webmon-test	2025-05-12 23:40:25.791320047 +0800
++++ iptables.new/extensions/.webmon-test	2025-05-12 23:52:00.056025763 +0800
 @@ -0,0 +1,2 @@
 +#!/bin/sh
 +[ -f $KERNEL_DIR/include/linux/netfilter/xt_webmon.h ] && echo webmon
 --- /dev/null	2025-05-03 05:16:32.568000000 +0800
-+++ iptables.new/extensions/libxt_timerange.c	2025-05-12 23:40:25.819322106 +0800
++++ iptables.new/extensions/libxt_timerange.c	2025-05-12 23:52:00.074027073 +0800
 @@ -0,0 +1,833 @@
 +/*  timerange --	An xtables extension to match multiple timeranges within a week
 + *  			Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -1947,12 +1948,12 @@
 +
 +}
 --- /dev/null	2025-05-03 05:16:32.568000000 +0800
-+++ iptables.new/extensions/.timerange-test	2025-05-12 23:40:25.821322254 +0800
++++ iptables.new/extensions/.timerange-test	2025-05-12 23:52:00.075027145 +0800
 @@ -0,0 +1,2 @@
 +#!/bin/sh
 +[ -f $KERNEL_DIR/include/linux/netfilter/xt_timerange.h ] && echo timerange
 --- /dev/null	2025-05-03 05:16:32.568000000 +0800
-+++ iptables.new/extensions/libxt_bandwidth.c	2025-05-12 23:40:25.842323798 +0800
++++ iptables.new/extensions/libxt_bandwidth.c	2025-05-12 23:52:00.093028456 +0800
 @@ -0,0 +1,918 @@
 +/*  bandwidth --	An xtables extension for bandwidth monitoring/control
 + *  			Can be used to efficiently monitor bandwidth and/or implement bandwidth quotas
@@ -2873,12 +2874,12 @@
 +	settimeofday(&tv, &new_tz);
 +}
 --- /dev/null	2025-05-03 05:16:32.568000000 +0800
-+++ iptables.new/extensions/.bandwidth-test	2025-05-12 23:40:25.843323872 +0800
++++ iptables.new/extensions/.bandwidth-test	2025-05-12 23:52:00.094028528 +0800
 @@ -0,0 +1,2 @@
 +#!/bin/sh
 +[ -f $KERNEL_DIR/include/linux/netfilter/xt_bandwidth.h ] && echo bandwidth
 --- /dev/null	2025-05-03 05:16:32.568000000 +0800
-+++ iptables.new/include/linux/netfilter/xt_weburl.h	2025-05-12 23:40:25.772318649 +0800
++++ iptables.new/include/linux/netfilter/xt_weburl.h	2025-05-12 23:52:00.038024453 +0800
 @@ -0,0 +1,45 @@
 +/*  weburl --	A netfilter module to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
@@ -2926,7 +2927,7 @@
 +};
 +#endif /*_XT_WEBURL_H*/
 --- /dev/null	2025-05-03 05:16:32.568000000 +0800
-+++ iptables.new/include/linux/netfilter/xt_webmon.h	2025-05-12 23:40:25.791320047 +0800
++++ iptables.new/include/linux/netfilter/xt_webmon.h	2025-05-12 23:52:00.056025763 +0800
 @@ -0,0 +1,69 @@
 +/*  webmon --	A netfilter module to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
@@ -2998,7 +2999,7 @@
 +
 +#endif /*_XT_WEBMON_H*/
 --- /dev/null	2025-05-03 05:16:32.568000000 +0800
-+++ iptables.new/include/linux/netfilter/xt_timerange.h	2025-05-12 23:40:25.821322254 +0800
++++ iptables.new/include/linux/netfilter/xt_timerange.h	2025-05-12 23:52:00.075027145 +0800
 @@ -0,0 +1,43 @@
 +/*  timerange --	An xtables extension to match multiple timeranges within a week
 + *  			Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -3044,7 +3045,7 @@
 +};
 +#endif /*_XT_TIMERANGE_H*/
 --- /dev/null	2025-05-03 05:16:32.568000000 +0800
-+++ iptables.new/include/linux/netfilter/xt_bandwidth.h	2025-05-12 23:40:25.843323872 +0800
++++ iptables.new/include/linux/netfilter/xt_bandwidth.h	2025-05-12 23:52:00.093028456 +0800
 @@ -0,0 +1,111 @@
 +/*  bandwidth --	An xtables extension for bandwidth monitoring/control
 + *  			Can be used to efficiently monitor bandwidth and/or implement bandwidth quotas
