@@ -309,7 +309,7 @@ static void parse_returned_ip_data(	void *out_data,
 	*(ip + 1) = *( (uint32_t*)(in_buffer + (*in_index) + 8) );
 	*(ip + 2) = *( (uint32_t*)(in_buffer + (*in_index) + 12) );
 	*(ip + 3) = *( (uint32_t*)(in_buffer + (*in_index) + 16) );
-    ip_bw_kernel_data_item* ip_bw_data = (ip_bw_kernel_data*)(in_buffer + *in_index);
+	ip_bw_kernel_data_item* ip_bw_data = (ip_bw_kernel_data_item*)(in_buffer + *in_index);
 	if(get_history == 0)
 	{
 		(((ip_bw*)out_data)[*out_index]).family = family;
