@@ -64,7 +64,7 @@ CONFIG_TARGET_PROFILE="DEVICE_generic"
 CONFIG_TARGET_ARCH_PACKAGES="x86_64"
 CONFIG_DEFAULT_TARGET_OPTIMIZATION="-Os -pipe"
 CONFIG_CPU_TYPE=" "
-CONFIG_LINUX_6_6=y
+CONFIG_LINUX_6_12=y
 CONFIG_DEFAULT_automount=y
 CONFIG_DEFAULT_base-files=y
 CONFIG_DEFAULT_ca-bundle=y
@@ -298,6 +298,7 @@ CONFIG_KERNEL_CGROUP_PIDS=y
 CONFIG_KERNEL_CGROUP_RDMA=y
 CONFIG_KERNEL_CGROUP_BPF=y
 CONFIG_KERNEL_CPUSETS=y
+# CONFIG_KERNEL_CPUSETS_V1 is not set
 # CONFIG_KERNEL_PROC_PID_CPUSET is not set
 CONFIG_KERNEL_CGROUP_CPUACCT=y
 CONFIG_KERNEL_RESOURCE_COUNTERS=y
@@ -306,6 +307,7 @@ CONFIG_KERNEL_MEMCG=y
 CONFIG_KERNEL_MEMCG_SWAP=y
 # CONFIG_KERNEL_MEMCG_SWAP_ENABLED is not set
 CONFIG_KERNEL_MEMCG_KMEM=y
+# CONFIG_KERNEL_MEMCG_V1 is not set
 # CONFIG_KERNEL_CGROUP_PERF is not set
 CONFIG_KERNEL_CGROUP_SCHED=y
 CONFIG_KERNEL_FAIR_GROUP_SCHED=y
@@ -462,7 +464,7 @@ CONFIG_USE_MUSL=y
 CONFIG_SSP_SUPPORT=y
 CONFIG_BINUTILS_VERSION_2_42=y
 CONFIG_BINUTILS_VERSION="2.42"
-CONFIG_GCC_VERSION="13.3.0"
+CONFIG_GCC_VERSION="14.3.0"
 CONFIG_GCC_USE_DEFAULT_VERSION=y
 CONFIG_LIBC="musl"
 CONFIG_TARGET_SUFFIX="musl"
@@ -1986,6 +1988,7 @@ CONFIG_PACKAGE_i915-firmware-dmc=y
 # CONFIG_PACKAGE_ibt-firmware is not set
 # CONFIG_PACKAGE_ice-firmware is not set
 # CONFIG_PACKAGE_intel-microcode is not set
+# CONFIG_PACKAGE_ivpu-firmware is not set
 # CONFIG_PACKAGE_iwl3945-firmware is not set
 # CONFIG_PACKAGE_iwl4965-firmware is not set
 # CONFIG_PACKAGE_iwlwifi-firmware-ax101 is not set
@@ -2210,6 +2213,7 @@ CONFIG_PACKAGE_kmod-crypto-hmac=y
 # CONFIG_PACKAGE_kmod-crypto-hw-hifn-795x is not set
 # CONFIG_PACKAGE_kmod-crypto-hw-padlock is not set
 CONFIG_PACKAGE_kmod-crypto-kpp=y
+# CONFIG_PACKAGE_kmod-crypto-lib-aescfb is not set
 CONFIG_PACKAGE_kmod-crypto-lib-chacha20=y
 CONFIG_PACKAGE_kmod-crypto-lib-chacha20poly1305=y
 CONFIG_PACKAGE_kmod-crypto-lib-curve25519=y
@@ -2251,7 +2255,6 @@ CONFIG_PACKAGE_kmod-fs-exfat=y
 # CONFIG_PACKAGE_kmod-fs-exportfs is not set
 CONFIG_PACKAGE_kmod-fs-ext4=y
 CONFIG_PACKAGE_kmod-fs-f2fs=y
-# CONFIG_PACKAGE_kmod-fs-fscache is not set
 # CONFIG_PACKAGE_kmod-fs-hfs is not set
 # CONFIG_PACKAGE_kmod-fs-hfsplus is not set
 # CONFIG_PACKAGE_kmod-fs-isofs is not set
@@ -2266,7 +2269,6 @@ CONFIG_PACKAGE_kmod-fs-f2fs=y
 # CONFIG_PACKAGE_kmod-fs-nfs-v3 is not set
 # CONFIG_PACKAGE_kmod-fs-nfs-v4 is not set
 # CONFIG_PACKAGE_kmod-fs-nfsd is not set
-# CONFIG_PACKAGE_kmod-fs-ntfs is not set
 CONFIG_PACKAGE_kmod-fs-ntfs3=y
 # CONFIG_PACKAGE_kmod-fs-reiserfs is not set
 # CONFIG_PACKAGE_kmod-fs-squashfs is not set
@@ -2556,7 +2558,6 @@ CONFIG_PACKAGE_kmod-ipt-ipv4options=y
 CONFIG_PACKAGE_kmod-ipt-nat=y
 CONFIG_PACKAGE_kmod-ipt-nat-extra=y
 # CONFIG_PACKAGE_kmod-ipt-nat6 is not set
-# CONFIG_PACKAGE_kmod-ipt-nathelper-rtsp is not set
 CONFIG_PACKAGE_kmod-ipt-ndpi=y
 # CONFIG_PACKAGE_kmod-ipt-nflog is not set
 # CONFIG_PACKAGE_kmod-ipt-nfqueue is not set
@@ -2593,6 +2594,7 @@ CONFIG_PACKAGE_kmod-nf-nat=y
 # CONFIG_PACKAGE_kmod-nf-nat6 is not set
 CONFIG_PACKAGE_kmod-nf-nathelper=y
 CONFIG_PACKAGE_kmod-nf-nathelper-extra=y
+# CONFIG_PACKAGE_kmod-nf-nathelper-rtsp is not set
 CONFIG_PACKAGE_kmod-nf-reject=y
 CONFIG_PACKAGE_kmod-nf-reject6=y
 CONFIG_PACKAGE_kmod-nf-socket=y
@@ -2670,6 +2672,8 @@ CONFIG_PACKAGE_kmod-igc=y
 CONFIG_PACKAGE_kmod-ixgbe=y
 # CONFIG_PACKAGE_kmod-ixgbevf is not set
 # CONFIG_PACKAGE_kmod-lan743x is not set
+CONFIG_PACKAGE_kmod-libeth=y
+CONFIG_PACKAGE_kmod-libie=y
 CONFIG_PACKAGE_kmod-libphy=y
 CONFIG_PACKAGE_kmod-macvlan=y
 CONFIG_PACKAGE_kmod-mdio-devres=y
@@ -3023,6 +3027,7 @@ CONFIG_PACKAGE_kmod-usb-hid=y
 # CONFIG_PACKAGE_kmod-usb-storage-uas is not set
 # CONFIG_PACKAGE_kmod-usb-uhci is not set
 # CONFIG_PACKAGE_kmod-usb-wdm is not set
+# CONFIG_PACKAGE_kmod-usb-xhci-pci-renesas is not set
 # CONFIG_PACKAGE_kmod-usb-yealink is not set
 # CONFIG_PACKAGE_kmod-usb2 is not set
 # CONFIG_PACKAGE_kmod-usb2-pci is not set
@@ -3042,6 +3047,7 @@ CONFIG_PACKAGE_kmod-usb-hid=y
 # CONFIG_PACKAGE_kmod-drm-display-helper is not set
 # CONFIG_PACKAGE_kmod-drm-gem-shmem-helper is not set
 # CONFIG_PACKAGE_kmod-drm-i915 is not set
+# CONFIG_PACKAGE_kmod-drm-ivpu is not set
 # CONFIG_PACKAGE_kmod-drm-kms-helper is not set
 # CONFIG_PACKAGE_kmod-drm-panel-mipi-dbi is not set
 # CONFIG_PACKAGE_kmod-drm-radeon is not set
@@ -3267,6 +3273,7 @@ CONFIG_PACKAGE_lua=y
 # CONFIG_PACKAGE_lua-bit32 is not set
 # CONFIG_PACKAGE_lua-cjson is not set
 # CONFIG_PACKAGE_lua-cjson-lua5.3 is not set
+# CONFIG_PACKAGE_lua-cjson-lua5.4 is not set
 # CONFIG_PACKAGE_lua-copas is not set
 # CONFIG_PACKAGE_lua-coxpcall is not set
 # CONFIG_PACKAGE_lua-cs-bouncer is not set
@@ -3667,7 +3674,6 @@ CONFIG_NODEJS_NPM_CACHE_DIR=""
 # CONFIG_PACKAGE_python3-mutagen is not set
 # CONFIG_PACKAGE_python3-ncurses is not set
 # CONFIG_PACKAGE_python3-netdisco is not set
-# CONFIG_PACKAGE_python3-netifaces is not set
 # CONFIG_PACKAGE_python3-networkx is not set
 # CONFIG_PACKAGE_python3-newt is not set
 # CONFIG_PACKAGE_python3-numpy is not set
@@ -4621,8 +4627,6 @@ CONFIG_WOLFSSL_ALT_NAMES=y
 # CONFIG_PACKAGE_libdrm-nouveau is not set
 # CONFIG_PACKAGE_libdrm-radeon is not set
 # CONFIG_PACKAGE_libepoxy is not set
-# CONFIG_PACKAGE_libglapi is not set
-CONFIG_HAVE_MESA=y
 # CONFIG_PACKAGE_libglm is not set
 # CONFIG_PACKAGE_libgraphene is not set
 # CONFIG_PACKAGE_libmesa-amd is not set
@@ -4643,6 +4647,8 @@ CONFIG_HAVE_MESA=y
 # CONFIG_PACKAGE_libvulkan-intel-hasvk is not set
 # CONFIG_PACKAGE_libvulkan-lvp is not set
 # CONFIG_PACKAGE_libvulkan-radeon is not set
+CONFIG_HAVE_MESA=y
+CONFIG_MESA_USE_LLVM=y
 # CONFIG_PACKAGE_seatd is not set
 # CONFIG_PACKAGE_vulkan-loader is not set
 # CONFIG_PACKAGE_wayland-info is not set
@@ -4697,6 +4703,7 @@ CONFIG_PACKAGE_bind-libs=y
 # CONFIG_PACKAGE_icu is not set
 # CONFIG_PACKAGE_icu-data-tools is not set
 # CONFIG_PACKAGE_icu-full-data is not set
+# CONFIG_PACKAGE_iniparser is not set
 CONFIG_PACKAGE_jansson=y
 # CONFIG_PACKAGE_json-glib is not set
 # CONFIG_PACKAGE_jsoncpp is not set
@@ -7362,6 +7369,7 @@ CONFIG_PACKAGE_partx-utils=y
 # CONFIG_PACKAGE_certtool is not set
 # CONFIG_PACKAGE_cryptsetup is not set
 # CONFIG_PACKAGE_cryptsetup-ssh is not set
+# CONFIG_PACKAGE_fscrypt is not set
 # CONFIG_PACKAGE_gnupg is not set
 # CONFIG_PACKAGE_gnupg2 is not set
 # CONFIG_PACKAGE_gnupg2-dirmngr is not set
@@ -8211,6 +8219,9 @@ CONFIG_PACKAGE_v2dat=y
 # CONFIG_PACKAGE_libwayland is not set
 # CONFIG_PACKAGE_qt5base-concurrent is not set
 # CONFIG_PACKAGE_qt5base-core is not set
+# CONFIG_BUILD_qt5base-gui_OPENGL_OPENGLES2 is not set
+CONFIG_BUILD_qt5base-gui_OPENGL_NONE=y
+# CONFIG_PACKAGE_qt5base-examples is not set
 # CONFIG_PACKAGE_qt5base-gui is not set
 # CONFIG_PACKAGE_qt5base-network is not set
 # CONFIG_PACKAGE_qt5base-plugin-bearer-generic is not set
@@ -8221,8 +8232,10 @@ CONFIG_PACKAGE_v2dat=y
 # CONFIG_PACKAGE_qt5base-plugin-input-evdevtablet is not set
 # CONFIG_PACKAGE_qt5base-plugin-input-evdevtouch is not set
 # CONFIG_PACKAGE_qt5base-plugin-input-libinput is not set
+# CONFIG_PACKAGE_qt5base-plugin-platforms-eglfs is not set
 # CONFIG_PACKAGE_qt5base-plugin-platforms-linuxfb is not set
 # CONFIG_PACKAGE_qt5base-plugin-platforms-minimal is not set
+# CONFIG_PACKAGE_qt5base-plugin-platforms-minimalegl is not set
 # CONFIG_PACKAGE_qt5base-plugin-platforms-offscreen is not set
 # CONFIG_PACKAGE_qt5base-plugin-platforms-vnc is not set
 # CONFIG_PACKAGE_qt5base-printSupport is not set
@@ -8230,33 +8243,34 @@ CONFIG_PACKAGE_v2dat=y
 # CONFIG_PACKAGE_qt5base-test is not set
 # CONFIG_PACKAGE_qt5base-widgets is not set
 # CONFIG_PACKAGE_qt5base-xml is not set
-# CONFIG_PACKAGE_qt5quick2-2d-sw-renderer-GLstubs is not set
-# CONFIG_PACKAGE_qt5quick2-controls2 is not set
-# CONFIG_PACKAGE_qt5quick2-qml is not set
-# CONFIG_PACKAGE_qt5quick2-qml-models is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qtlabs-animation is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qtlabs-folderlistmodel is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qtlabs-models is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qtlabs-settings is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qtlabs-sharedimage is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qtlabs-wavefrontmesh is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qtqml-models2 is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qtqml-statemachine is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qtqml-workerscript2 is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qtquick-layouts is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qtquick-localstorage is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qtquick-shapes is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qtquick-window2 is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qtquick2 is not set
-# CONFIG_PACKAGE_qt5quick2-qml-module-qttest is not set
-# CONFIG_PACKAGE_qt5quick2-qml-worker-script is not set
-# CONFIG_PACKAGE_qt5quick2-quick is not set
-# CONFIG_PACKAGE_qt5quick2-quick-shapes is not set
-# CONFIG_PACKAGE_qt5quick2-quick-test is not set
-# CONFIG_PACKAGE_qt5quick2-quick-widgets is not set
+# CONFIG_PACKAGE_qt5quick-controls2 is not set
+# CONFIG_PACKAGE_qt5quick-qml is not set
+# CONFIG_PACKAGE_qt5quick-qml-models is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtlabs-animation is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtlabs-folderlistmodel is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtlabs-models is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtlabs-settings is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtlabs-sharedimage is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtlabs-wavefrontmesh is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtqml-models2 is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtqml-statemachine is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtqml-workerscript2 is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtquick is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtquick-layouts is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtquick-localstorage is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtquick-shapes is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtquick-window2 is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qttest is not set
+# CONFIG_PACKAGE_qt5quick-qml-worker-script is not set
+# CONFIG_PACKAGE_qt5quick-quick is not set
+# CONFIG_PACKAGE_qt5quick-quick-shapes is not set
+# CONFIG_PACKAGE_qt5quick-quick-test is not set
+# CONFIG_PACKAGE_qt5quick-quick-widgets is not set
 # CONFIG_PACKAGE_qt5script-script is not set
 # CONFIG_PACKAGE_qt5script-scriptTools is not set
+# CONFIG_PACKAGE_qt5svg is not set
 # CONFIG_PACKAGE_qt5translations is not set
+# CONFIG_PACKAGE_qt5virtualkeyboard is not set
 # CONFIG_PACKAGE_wayland-protocols is not set
 # CONFIG_PACKAGE_wayland-scanner is not set
 # CONFIG_PACKAGE_weston is not set
