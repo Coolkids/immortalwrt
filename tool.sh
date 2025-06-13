@@ -57,6 +57,8 @@ rm -rf ./feeds/luci/applications/luci-app-passwall
 rm -rf ./feeds/packages/net/v2ray-geodata
 rm -rf ./feeds/packages/net/mosdns
 ./scripts/feeds install -a
+# Set Rust build arg llvm.download-ci-llvm to false.
+sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
 ## 兼容passwall passwall2 同时安装的APK编译
 sed -i '/\/www\/luci-static\/resources\/qrcode.min.js/d' ./feeds/passwall2/luci-app-passwall2/Makefile
 rm -rf ./feeds/passwall2/luci-app-passwall2/htdocs/luci-static/resources/qrcode.min.js
