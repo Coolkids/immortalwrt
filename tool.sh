@@ -56,9 +56,23 @@ delete_dep
 rm -rf ./feeds/luci/applications/luci-app-passwall
 rm -rf ./feeds/packages/net/v2ray-geodata
 rm -rf ./feeds/packages/net/mosdns
+
+## patch curl quic
+rm -rf ./feeds/packages/libs/nghttp2
+rm -rf ./feeds/packages/libs/nghttp3
+rm -rf ./feeds/packages/libs/ngtcp2
+cp -r $patchs/patchs/nghttp2 ./feeds/packages/libs
+cp -r $patchs/patchs/nghttp3 ./feeds/packages/libs
+cp -r $patchs/patchs/ngtcp2 ./feeds/packages/libs
+# curl - http3/quic
+rm -rf feeds/packages/net/curl
+git clone https://github.com/sbwml/feeds_packages_net_curl feeds/packages/net/curl
+
 ./scripts/feeds install -a
 # Set Rust build arg llvm.download-ci-llvm to false.
 sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
+
+
 ## 兼容passwall passwall2 同时安装的APK编译
 sed -i '/\/www\/luci-static\/resources\/qrcode.min.js/d' ./feeds/passwall2/luci-app-passwall2/Makefile
 rm -rf ./feeds/passwall2/luci-app-passwall2/htdocs/luci-static/resources/qrcode.min.js
