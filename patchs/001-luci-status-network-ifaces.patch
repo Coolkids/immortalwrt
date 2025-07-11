@@ -28,7 +28,7 @@ index f9c01bcaa4c020507290b02f4fafba0af70ac6bb..f20edc92fc776cdc5101c7d54f4e2dd1
 +          { class: "ifacebox-head center " + (ifc.isUp() ? "active" : "") },
 +          [
 +            E("img", { 
-+                      src: L.resource("icons/port_%s.png").format(ifc.isUp() ? "up"  : "down"),
++                      src: L.resource("icons/port_%s.svg").format(ifc.isUp() ? "up"  : "down"),
 +                      style: "width:16px; height:16px; margin-top:4px;margin-right:4px"
 +                }),
 +            E("strong", ifc.getI18n())

@@ -13,6 +13,27 @@ case $1 in
 esac
 }
 
+function smartdns(){
+	WORKINGDIR="`pwd`/feeds/packages/net/smartdns"
+	mkdir $WORKINGDIR -p
+	rm $WORKINGDIR/* -fr
+	wget https://github.com/pymumu/openwrt-smartdns/archive/master.zip -O $WORKINGDIR/master.zip
+	unzip $WORKINGDIR/master.zip -d $WORKINGDIR
+	mv $WORKINGDIR/openwrt-smartdns-master/* $WORKINGDIR/
+	rmdir $WORKINGDIR/openwrt-smartdns-master
+	rm $WORKINGDIR/master.zip
+
+	LUCIBRANCH="master" #更换此变量
+	WORKINGDIR="`pwd`/feeds/luci/applications/luci-app-smartdns"
+	mkdir $WORKINGDIR -p
+	rm $WORKINGDIR/* -fr
+	wget https://github.com/pymumu/luci-app-smartdns/archive/${LUCIBRANCH}.zip -O $WORKINGDIR/${LUCIBRANCH}.zip
+	unzip $WORKINGDIR/${LUCIBRANCH}.zip -d $WORKINGDIR
+	mv $WORKINGDIR/luci-app-smartdns-${LUCIBRANCH}/* $WORKINGDIR/
+	rmdir $WORKINGDIR/luci-app-smartdns-${LUCIBRANCH}
+	rm $WORKINGDIR/${LUCIBRANCH}.zip
+}
+
 function delete_dep(){
 # 定义A和B文件夹的路径
 A_DIR="./feeds/diy1"
@@ -54,8 +75,10 @@ rm -rf ./feeds/*
 ./scripts/feeds update -a
 delete_dep
 rm -rf ./feeds/luci/applications/luci-app-passwall
+rm -rf ./feeds/luci/applications/luci-app-smartdns
 rm -rf ./feeds/packages/net/v2ray-geodata
 rm -rf ./feeds/packages/net/mosdns
+rm -rf ./feeds/packages/net/smartdns
 
 ## patch curl quic
 rm -rf ./feeds/packages/libs/nghttp2
@@ -67,6 +90,7 @@ cp -r $patchs/patchs/ngtcp2 ./feeds/packages/libs
 # curl - http3/quic
 rm -rf feeds/packages/net/curl
 git clone https://github.com/sbwml/feeds_packages_net_curl feeds/packages/net/curl
+smartdns
 
 ./scripts/feeds install -a
 # Set Rust build arg llvm.download-ci-llvm to false.
@@ -83,6 +107,8 @@ install_dep
 pushd ./feeds/luci
 git apply $patchs/patchs/001-luci-status-network-ifaces.patch
 popd
+##rm -rf ./feeds/packages.tmp
+##./scripts/feeds update -i
 }
 
 
