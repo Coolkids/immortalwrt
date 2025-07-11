@@ -15,7 +15,7 @@ on:
 jobs:
 
   build_openwrt_glibc:
-    name: Build OpenWrt OpenWrt-24.10 glibc dev firmware
+    name: Build OpenWrt OpenWrt-master glibc dev firmware
     runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
     steps:
@@ -114,7 +114,7 @@ jobs:
           path: ${{ env.WORK_PATH }}/artifact/firmware/
 
   build_openwrt_musl:
-    name: Build OpenWrt OpenWrt-24.10 musl dev firmware
+    name: Build OpenWrt OpenWrt-master musl dev firmware
     runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
     steps:
@@ -124,6 +124,11 @@ jobs:
           echo "WORK_PATH=/mnt/openwrt" >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
       - name: Set variables
         run: |
