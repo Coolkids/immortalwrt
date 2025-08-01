@@ -240,38 +240,6 @@ u64 rtl839x_get_port_reg_le(int reg)
 	return v;
 }
 
-int read_phy(u32 port, u32 page, u32 reg, u32 *val)
-{
-	switch (soc_info.family) {
-	case RTL8380_FAMILY_ID:
-		return rtl838x_read_phy(port, page, reg, val);
-	case RTL8390_FAMILY_ID:
-		return rtl839x_read_phy(port, page, reg, val);
-	case RTL9300_FAMILY_ID:
-		return rtl930x_read_phy(port, page, reg, val);
-	case RTL9310_FAMILY_ID:
-		return rtl931x_read_phy(port, page, reg, val);
-	}
-
-	return -1;
-}
-
-int write_phy(u32 port, u32 page, u32 reg, u32 val)
-{
-	switch (soc_info.family) {
-	case RTL8380_FAMILY_ID:
-		return rtl838x_write_phy(port, page, reg, val);
-	case RTL8390_FAMILY_ID:
-		return rtl839x_write_phy(port, page, reg, val);
-	case RTL9300_FAMILY_ID:
-		return rtl930x_write_phy(port, page, reg, val);
-	case RTL9310_FAMILY_ID:
-		return rtl931x_write_phy(port, page, reg, val);
-	}
-
-	return -1;
-}
-
 static int rtldsa_bus_read(struct mii_bus *bus, int addr, int regnum)
 {
 	struct rtl838x_switch_priv *priv = bus->priv;
@@ -1596,7 +1564,7 @@ static int __init rtl83xx_sw_probe(struct platform_device *pdev)
 		priv->cpu_port = RTL931X_CPU_PORT;
 		priv->port_mask = 0x3f;
 		priv->port_width = 2;
-		priv->irq_mask = 0xFFFFFFFFFFFFFULL;
+		priv->irq_mask = GENMASK_ULL(priv->cpu_port - 1, 0);
 		priv->r = &rtl931x_reg;
 		priv->ds->num_ports = 57;
 		priv->fib_entries = 16384;
