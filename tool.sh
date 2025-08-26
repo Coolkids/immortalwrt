@@ -86,13 +86,6 @@ rm -rf ./feeds/packages/net/v2ray-geodata
 rm -rf ./feeds/packages/net/mosdns
 rm -rf ./feeds/packages/net/smartdns
 
-## patch curl quic
-rm -rf ./feeds/packages/libs/nghttp2
-rm -rf ./feeds/packages/libs/nghttp3
-rm -rf ./feeds/packages/libs/ngtcp2
-cp -r $patchs/patchs/nghttp2 ./feeds/packages/libs
-cp -r $patchs/patchs/nghttp3 ./feeds/packages/libs
-cp -r $patchs/patchs/ngtcp2 ./feeds/packages/libs
 # curl - http3/quic
 rm -rf feeds/packages/net/curl
 git clone https://github.com/sbwml/feeds_packages_net_curl feeds/packages/net/curl
