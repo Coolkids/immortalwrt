@@ -1,8 +1,8 @@
 diff --git forkSrcPrefix/ndpi-netfilter/ipt/libxt_ndpi.c forkDstPrefix/ndpi-netfilter/ipt/libxt_ndpi.c
-index 439c2cb767aa3dd1462c607434893da042ad0b50..25bab8970c29fcdf9f353e5af90eae35e559a066 100644
+index 20e60e05d547b7676453921f7d5747cc1d857b94..67b3ec700f88e2329715f0f159dc09e6aae8f879 100644
 --- forkSrcPrefix/ndpi-netfilter/ipt/libxt_ndpi.c
 +++ forkDstPrefix/ndpi-netfilter/ipt/libxt_ndpi.c
-@@ -654,9 +654,21 @@ static int cmp_pname(const void *p1, const void *p2) {
+@@ -629,9 +629,21 @@ static int cmp_pname(const void *p1, const void *p2) {
  	return 0;
  }
  
@@ -21,24 +21,23 @@ index 439c2cb767aa3dd1462c607434893da042ad0b50..25bab8970c29fcdf9f353e5af90eae35
          int i,c,d,l,cp;
  	char line[128];
 +	char name[32];
- 	char *pn[NDPI_NUM_BITS+1];
+ 	char *pn[NDPI_MAX_NUM_STATIC_BITMAP+1];
  
  	load_kernel_proto();
-@@ -679,6 +691,13 @@ static int ndpi_print_prot_list(int cond, char *msg) {
+@@ -654,6 +666,12 @@ static int ndpi_print_prot_list(int cond, char *msg) {
  		puts(msg);
- 	qsort(&pn[0],NDPI_NUM_BITS,sizeof(pn[0]),cmp_pname);
+ 	qsort(&pn[0],NDPI_MAX_NUM_STATIC_BITMAP,sizeof(pn[0]),cmp_pname);
  
-+    for (i = 0; i <= NDPI_NUM_BITS; i++) {
++    for (i = 0; i <= NDPI_MAX_NUM_STATIC_BITMAP; i++) {
 +	    if(!pn[i]) break;
 +	    strcpy(name, pn[i]);
 +	    printf("--%s Match for %s protocol packets.\n", pn[i], strupr(name));
 +	}
 +#if 0
-+
-         for (i = 0,c = 0,l=0; i < NDPI_NUM_BITS; i++) {
+         for (i = 0,c = 0,l=0; i < NDPI_MAX_NUM_STATIC_BITMAP; i++) {
  	    if(!pn[i]) break;
  	    l += snprintf(&line[l],sizeof(line)-1-l,"%-20s ", pn[i]);
-@@ -690,6 +709,7 @@ static int ndpi_print_prot_list(int cond, char *msg) {
+@@ -665,6 +683,7 @@ static int ndpi_print_prot_list(int cond, char *msg) {
  	    }
  	}
  	if(c > 0) printf("%s\n",line);
