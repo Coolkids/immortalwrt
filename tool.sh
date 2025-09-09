@@ -95,10 +95,6 @@ fix_bind
 # Set Rust build arg llvm.download-ci-llvm to false.
 sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
 
-
-## 兼容passwall passwall2 同时安装的APK编译
-sed -i '/\/www\/luci-static\/resources\/qrcode.min.js/d' ./feeds/passwall2/luci-app-passwall2/Makefile
-rm -rf ./feeds/passwall2/luci-app-passwall2/htdocs/luci-static/resources/qrcode.min.js
 ./scripts/feeds install -p diy2 -f luci-app-passwall
 ./scripts/feeds install -p custom -f v2ray-geodata
 ./scripts/feeds install -p mosdns -f mosdns
