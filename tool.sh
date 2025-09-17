@@ -34,12 +34,6 @@ function smartdns(){
 	rm $WORKINGDIR/${LUCIBRANCH}.zip
 }
 
-function fix_bind(){
-	patchs=`pwd`
-	rm -rf ./feeds/packages/net/bind/Makefile
-	cp -r $patchs/patchs/bind/Makefile ./feeds/packages/net/bind
-}
-
 function delete_dep(){
 # 定义A和B文件夹的路径
 A_DIR="./feeds/diy1"
@@ -90,7 +84,6 @@ rm -rf ./feeds/packages/net/smartdns
 rm -rf feeds/packages/net/curl
 git clone https://github.com/sbwml/feeds_packages_net_curl feeds/packages/net/curl
 smartdns
-fix_bind
 ./scripts/feeds install -a
 # Set Rust build arg llvm.download-ci-llvm to false.
 sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
