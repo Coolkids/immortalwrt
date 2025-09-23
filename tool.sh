@@ -87,7 +87,7 @@ smartdns
 ./scripts/feeds install -a
 
 # Set Rust build arg llvm.download-ci-llvm to false.
-#sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
+sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
 
 ./scripts/feeds install -p diy2 -f luci-app-passwall
 ./scripts/feeds install -p custom -f v2ray-geodata
