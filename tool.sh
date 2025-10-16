@@ -83,7 +83,7 @@ cp $patchs/patchs/rust/Makefile ./feeds/packages/lang/rust/Makefile
 # curl - http3/quic
 rm -rf feeds/packages/net/curl
 git clone https://github.com/sbwml/feeds_packages_net_curl feeds/packages/net/curl
-smartdns
+#smartdns  使用稳定版本
 ./scripts/feeds install -a
 
 # Set Rust build arg llvm.download-ci-llvm to false.
