@@ -83,9 +83,9 @@ cp $patchs/patchs/rust/Makefile ./feeds/packages/lang/rust/Makefile
 rm -rf feeds/packages/net/curl
 git clone https://github.com/sbwml/feeds_packages_net_curl feeds/packages/net/curl
 #smartdns  使用稳定版本
-#rm -rf ./feeds/packages/net/smartdns
-#rm -rf ./feeds/luci/applications/luci-app-smartdns
-#smartdns
+rm -rf ./feeds/packages/net/smartdns
+rm -rf ./feeds/luci/applications/luci-app-smartdns
+smartdns
 ./scripts/feeds install -a
 
 # Set Rust build arg llvm.download-ci-llvm to false.
