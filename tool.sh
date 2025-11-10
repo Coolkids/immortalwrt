@@ -94,6 +94,9 @@ sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' 
 ./scripts/feeds install -p diy2 -f luci-app-passwall
 ./scripts/feeds install -p custom -f v2ray-geodata
 ./scripts/feeds install -p mosdns -f mosdns
+#  替换dns2socks下载地址
+rm -rf ./feeds/diy1/dns2socks/Makefile
+cp ./feeds/custom/dns2socks/Makefile ./feeds/diy1/dns2socks
 install_dep
 pushd ./feeds/luci
 git apply $patchs/patchs/001-luci-status-network-ifaces.patch
