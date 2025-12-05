@@ -78,7 +78,6 @@ rm -rf ./feeds/luci/applications/luci-app-passwall
 rm -rf ./feeds/packages/net/v2ray-geodata
 rm -rf ./feeds/packages/net/mosdns
 
-cp $patchs/patchs/rust/Makefile ./feeds/packages/lang/rust/Makefile
 # curl - http3/quic
 rm -rf feeds/packages/net/curl
 git clone https://github.com/sbwml/feeds_packages_net_curl feeds/packages/net/curl
@@ -88,8 +87,9 @@ rm -rf ./feeds/luci/applications/luci-app-smartdns
 smartdns
 ./scripts/feeds install -a
 
+#cp $patchs/patchs/rust/Makefile ./feeds/packages/lang/rust/Makefile
 # Set Rust build arg llvm.download-ci-llvm to false.
-sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
+#sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
 
 ./scripts/feeds install -p diy2 -f luci-app-passwall
 ./scripts/feeds install -p custom -f v2ray-geodata
