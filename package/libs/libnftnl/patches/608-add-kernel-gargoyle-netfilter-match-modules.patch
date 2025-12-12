@@ -1,5 +1,5 @@
 --- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/src/expr/webmon.c	2025-12-09 20:29:42.034329218 +0800
++++ libnftnl.new/src/expr/webmon.c	2025-12-12 10:18:51.574293726 +0800
 @@ -0,0 +1,323 @@
 +#include <stdio.h>
 +#include <stdint.h>
@@ -325,7 +325,7 @@
 +	.output	= nftnl_expr_webmon_snprintf,
 +};
 --- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/src/expr/timerange.c	2025-12-09 20:29:43.135477180 +0800
++++ libnftnl.new/src/expr/timerange.c	2025-12-12 10:18:52.635243536 +0800
 @@ -0,0 +1,281 @@
 +#include <stdio.h>
 +#include <stdint.h>
@@ -609,7 +609,7 @@
 +#endif
 +}
 --- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/src/expr/bandwidth.c	2025-12-09 20:29:44.244081212 +0800
++++ libnftnl.new/src/expr/bandwidth.c	2025-12-12 10:18:53.700093419 +0800
 @@ -0,0 +1,539 @@
 +#include <stdio.h>
 +#include <stdint.h>
@@ -1151,7 +1151,7 @@
 +#endif
 +}
 --- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/src/expr/weburl.c	2025-12-09 20:29:40.930150642 +0800
++++ libnftnl.new/src/expr/weburl.c	2025-12-12 10:18:50.519354505 +0800
 @@ -0,0 +1,185 @@
 +#include <stdio.h>
 +#include <stdint.h>
@@ -1338,9 +1338,9 @@
 +	.build		= nftnl_expr_weburl_build,
 +	.output	= nftnl_expr_weburl_snprintf,
 +};
---- libnftnl.orig/src/Makefile.in	2025-08-06 15:55:28.473569524 +0800
-+++ libnftnl.new/src/Makefile.in	2025-12-09 20:29:44.373426062 +0800
-@@ -137,6 +137,10 @@
+--- libnftnl.orig/src/Makefile.in	2025-12-03 20:01:26.442586461 +0800
++++ libnftnl.new/src/Makefile.in	2025-12-12 10:18:53.819419246 +0800
+@@ -138,6 +138,10 @@
  	gen.lo table.lo trace.lo chain.lo object.lo rule.lo set.lo \
  	set_elem.lo str_array.lo ruleset.lo udata.lo expr.lo \
  	expr_ops.lo expr/bitwise.lo expr/byteorder.lo expr/cmp.lo \
@@ -1351,7 +1351,7 @@
  	expr/range.lo expr/connlimit.lo expr/counter.lo expr/ct.lo \
  	expr/data_reg.lo expr/dup.lo expr/exthdr.lo \
  	expr/flow_offload.lo expr/fib.lo expr/fwd.lo expr/last.lo \
-@@ -180,6 +184,10 @@
+@@ -181,6 +185,10 @@
  	./$(DEPDIR)/set.Plo ./$(DEPDIR)/set_elem.Plo \
  	./$(DEPDIR)/str_array.Plo ./$(DEPDIR)/table.Plo \
  	./$(DEPDIR)/trace.Plo ./$(DEPDIR)/udata.Plo \
@@ -1362,7 +1362,7 @@
  	./$(DEPDIR)/utils.Plo expr/$(DEPDIR)/bitwise.Plo \
  	expr/$(DEPDIR)/byteorder.Plo expr/$(DEPDIR)/cmp.Plo \
  	expr/$(DEPDIR)/connlimit.Plo expr/$(DEPDIR)/counter.Plo \
-@@ -409,6 +417,10 @@
+@@ -412,6 +420,10 @@
  
  libnftnl_la_SOURCES = utils.c		\
  		      batch.c		\
@@ -1373,7 +1373,7 @@
  		      flowtable.c	\
  		      common.c		\
  		      gen.c		\
-@@ -591,6 +603,10 @@
+@@ -592,6 +604,10 @@
  expr/synproxy.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
  expr/osf.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
  expr/xfrm.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
@@ -1383,8 +1383,8 @@
 +expr/weburl.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
  obj/$(am__dirstamp):
  	@$(MKDIR_P) obj
- 	@: > obj/$(am__dirstamp)
-@@ -677,6 +693,10 @@
+ 	@: >>obj/$(am__dirstamp)
+@@ -678,6 +694,10 @@
  @AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/tproxy.Plo@am__quote@ # am--include-marker
  @AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/tunnel.Plo@am__quote@ # am--include-marker
  @AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/xfrm.Plo@am__quote@ # am--include-marker
@@ -1395,10 +1395,10 @@
  @AMDEP_TRUE@@am__include@ @am__quote@obj/$(DEPDIR)/counter.Plo@am__quote@ # am--include-marker
  @AMDEP_TRUE@@am__include@ @am__quote@obj/$(DEPDIR)/ct_expect.Plo@am__quote@ # am--include-marker
  @AMDEP_TRUE@@am__include@ @am__quote@obj/$(DEPDIR)/ct_helper.Plo@am__quote@ # am--include-marker
-@@ -857,6 +877,10 @@
+@@ -858,6 +878,10 @@
  
  distclean: distclean-am
- 		-rm -f ./$(DEPDIR)/batch.Plo
+ 	-rm -f ./$(DEPDIR)/batch.Plo
 +	-rm -f expr/$(DEPDIR)/bandwidth.Plo
 +	-rm -f expr/$(DEPDIR)/timerange.Plo
 +	-rm -f expr/$(DEPDIR)/webmon.Plo
@@ -1406,10 +1406,10 @@
  	-rm -f ./$(DEPDIR)/chain.Plo
  	-rm -f ./$(DEPDIR)/common.Plo
  	-rm -f ./$(DEPDIR)/expr.Plo
-@@ -968,6 +992,10 @@
+@@ -969,6 +993,10 @@
  
  maintainer-clean: maintainer-clean-am
- 		-rm -f ./$(DEPDIR)/batch.Plo
+ 	-rm -f ./$(DEPDIR)/batch.Plo
 +	-rm -f expr/$(DEPDIR)/bandwidth.Plo
 +	-rm -f expr/$(DEPDIR)/timerange.Plo
 +	-rm -f expr/$(DEPDIR)/webmon.Plo
@@ -1417,8 +1417,8 @@
  	-rm -f ./$(DEPDIR)/chain.Plo
  	-rm -f ./$(DEPDIR)/common.Plo
  	-rm -f ./$(DEPDIR)/expr.Plo
---- libnftnl.orig/src/expr_ops.c	2025-12-09 20:29:39.747351552 +0800
-+++ libnftnl.new/src/expr_ops.c	2025-12-09 20:29:44.228016945 +0800
+--- libnftnl.orig/src/expr_ops.c	2025-12-12 10:18:49.420571234 +0800
++++ libnftnl.new/src/expr_ops.c	2025-12-12 10:18:53.685807766 +0800
 @@ -31,6 +31,10 @@
  extern struct expr_ops expr_ops_range;
  extern struct expr_ops expr_ops_redir;
@@ -1453,8 +1453,8 @@
 +
 +
 +
---- libnftnl.orig/src/Makefile.am	2025-12-09 20:29:39.747054281 +0800
-+++ libnftnl.new/src/Makefile.am	2025-12-09 20:29:44.387177332 +0800
+--- libnftnl.orig/src/Makefile.am	2025-12-12 10:18:49.420203529 +0800
++++ libnftnl.new/src/Makefile.am	2025-12-12 10:18:53.833349132 +0800
 @@ -7,6 +7,10 @@
  
  libnftnl_la_SOURCES = utils.c		\
@@ -1467,7 +1467,7 @@
  		      common.c		\
  		      gen.c		\
 --- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/include/linux/netfilter/timerange.h	2025-12-09 20:29:43.045647467 +0800
++++ libnftnl.new/include/linux/netfilter/timerange.h	2025-12-12 10:18:52.548401467 +0800
 @@ -0,0 +1,15 @@
 +#ifndef _TIMERANGE_H
 +#define _TIMERANGE_H
@@ -1485,7 +1485,7 @@
 +
 +#endif /* _TIMERANGE_H */
 --- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/include/linux/netfilter/webmon.h	2025-12-09 20:29:41.943292730 +0800
++++ libnftnl.new/include/linux/netfilter/webmon.h	2025-12-12 10:18:51.488479169 +0800
 @@ -0,0 +1,24 @@
 +#ifndef _WEBMON_H
 +#define _WEBMON_H
@@ -1511,9 +1511,9 @@
 +#define NFTA_WEBMON_MAX (__NFTA_WEBMON_MAX - 1)
 +
 +#endif /* _WEBMON_H */
---- libnftnl.orig/include/linux/netfilter/nf_tables.h	2025-12-09 20:29:39.746684533 +0800
-+++ libnftnl.new/include/linux/netfilter/nf_tables.h	2025-12-09 20:29:44.281017584 +0800
-@@ -1440,6 +1440,53 @@
+--- libnftnl.orig/include/linux/netfilter/nf_tables.h	2025-12-12 10:18:49.419655845 +0800
++++ libnftnl.new/include/linux/netfilter/nf_tables.h	2025-12-12 10:18:53.736809734 +0800
+@@ -1442,6 +1442,53 @@
  };
  #define NFTA_REJECT_MAX		(__NFTA_REJECT_MAX - 1)
  
@@ -1567,7 +1567,7 @@
  /**
   * enum nft_nat_types - nf_tables nat expression NAT types
   *
-@@ -2028,3 +2075,7 @@
+@@ -2032,3 +2079,7 @@
  #define NFTA_TUNNEL_MAX	(__NFTA_TUNNEL_MAX - 1)
  
  #endif /* _LINUX_NF_TABLES_H */
@@ -1576,7 +1576,7 @@
 +
 +
 --- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/include/linux/netfilter/weburl.h	2025-12-09 20:29:40.841471684 +0800
++++ libnftnl.new/include/linux/netfilter/weburl.h	2025-12-12 10:18:50.436509815 +0800
 @@ -0,0 +1,13 @@
 +#ifndef _WEBURL_H
 +#define _WEBURL_H
@@ -1592,7 +1592,7 @@
 +
 +#endif /* _WEBURL_H */
 --- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/include/linux/netfilter/bandwidth.h	2025-12-09 20:29:44.153642259 +0800
++++ libnftnl.new/include/linux/netfilter/bandwidth.h	2025-12-12 10:18:53.615048316 +0800
 @@ -0,0 +1,28 @@
 +#ifndef _BANDWIDTH_H
 +#define _BANDWIDTH_H
@@ -1622,8 +1622,8 @@
 +#define NFTA_BANDWIDTH_MAX (__NFTA_BANDWIDTH_MAX - 1)
 +
 +#endif /* _BANDWIDTH_H */
---- libnftnl.orig/include/libnftnl/expr.h	2025-12-09 20:29:39.746245223 +0800
-+++ libnftnl.new/include/libnftnl/expr.h	2025-12-09 20:29:44.138015860 +0800
+--- libnftnl.orig/include/libnftnl/expr.h	2025-12-12 10:18:49.419213837 +0800
++++ libnftnl.new/include/libnftnl/expr.h	2025-12-12 10:18:53.599804446 +0800
 @@ -48,6 +48,50 @@
  int nftnl_expr_fprintf(FILE *fp, const struct nftnl_expr *expr, uint32_t type, uint32_t flags);
  

@@ -1,6 +1,6 @@
---- nftables.orig/src/netlink_linearize.c	2025-12-09 20:29:39.597961236 +0800
-+++ nftables.new/src/netlink_linearize.c	2025-12-09 20:29:43.702010606 +0800
-@@ -1196,6 +1196,83 @@
+--- nftables.orig/src/netlink_linearize.c	2025-12-12 10:18:47.122923276 +0800
++++ nftables.new/src/netlink_linearize.c	2025-12-12 10:18:53.179580610 +0800
+@@ -1210,6 +1210,83 @@
  	nft_rule_add_expr(ctx, nle, &stmt->location);
  }
  
@@ -84,7 +84,7 @@
  static void netlink_gen_reject_stmt(struct netlink_linearize_ctx *ctx,
  				    const struct stmt *stmt)
  {
-@@ -1716,6 +1793,14 @@
+@@ -1730,6 +1807,14 @@
  		return netlink_gen_meta_stmt(ctx, stmt);
  	case STMT_LOG:
  		return netlink_gen_log_stmt(ctx, stmt);
@@ -99,9 +99,9 @@
  	case STMT_REJECT:
  		return netlink_gen_reject_stmt(ctx, stmt);
  	case STMT_NAT:
---- nftables.orig/src/evaluate.c	2025-08-28 04:44:24.476560641 +0800
-+++ nftables.new/src/evaluate.c	2025-12-09 20:29:43.548008750 +0800
-@@ -4156,6 +4156,139 @@
+--- nftables.orig/src/evaluate.c	2025-12-05 20:17:57.639743864 +0800
++++ nftables.new/src/evaluate.c	2025-12-12 10:18:53.030277382 +0800
+@@ -4175,6 +4175,139 @@
  	return stmt_evaluate_reject_family(ctx, stmt);
  }
  
@@ -241,7 +241,7 @@
  static int nat_evaluate_family(struct eval_ctx *ctx, struct stmt *stmt)
  {
  	struct proto_ctx *pctx = eval_proto_ctx(ctx);
-@@ -5052,6 +5185,14 @@
+@@ -5071,6 +5204,14 @@
  		return stmt_evaluate_log(ctx, stmt);
  	case STMT_REJECT:
  		return stmt_evaluate_reject(ctx, stmt);
@@ -256,9 +256,9 @@
  	case STMT_NAT:
  		return stmt_evaluate_nat(ctx, stmt);
  	case STMT_TPROXY:
---- nftables.orig/src/statement.c	2025-12-09 20:29:39.600961272 +0800
-+++ nftables.new/src/statement.c	2025-12-09 20:29:44.018538067 +0800
-@@ -601,6 +601,229 @@
+--- nftables.orig/src/statement.c	2025-12-12 10:18:47.124324523 +0800
++++ nftables.new/src/statement.c	2025-12-12 10:18:53.486800083 +0800
+@@ -602,6 +602,229 @@
  	return stmt;
  }
  
@@ -488,9 +488,9 @@
  static void reject_stmt_print(const struct stmt *stmt, struct output_ctx *octx)
  {
  	nft_print(octx, "reject");
---- nftables.orig/src/parser_bison.y	2025-12-09 20:29:39.598886619 +0800
-+++ nftables.new/src/parser_bison.y	2025-12-09 20:29:43.904207346 +0800
-@@ -649,6 +649,55 @@
+--- nftables.orig/src/parser_bison.y	2025-12-12 10:18:47.123483951 +0800
++++ nftables.new/src/parser_bison.y	2025-12-12 10:18:53.376795836 +0800
+@@ -674,6 +674,55 @@
  %token FULLY_RANDOM		"fully-random"
  %token PERSISTENT		"persistent"
  
@@ -546,7 +546,7 @@
  %token QUEUE			"queue"
  %token QUEUENUM			"num"
  %token BYPASS			"bypass"
-@@ -790,6 +839,17 @@
+@@ -815,6 +864,17 @@
  %type <val>			limit_burst_pkts limit_burst_bytes limit_mode limit_bytes time_unit quota_mode
  %type <stmt>			reject_stmt reject_stmt_alloc
  %destructor { stmt_free($$); }	reject_stmt reject_stmt_alloc
@@ -564,7 +564,7 @@
  %type <stmt>			nat_stmt nat_stmt_alloc masq_stmt masq_stmt_alloc fullcone_stmt fullcone_stmt_alloc redir_stmt redir_stmt_alloc
  %destructor { stmt_free($$); }	nat_stmt nat_stmt_alloc masq_stmt masq_stmt_alloc fullcone_stmt fullcone_stmt_alloc redir_stmt redir_stmt_alloc
  %type <val>			nf_nat_flags nf_nat_flag offset_opt
-@@ -1070,6 +1130,10 @@
+@@ -1095,6 +1155,10 @@
  close_scope_quota	: { scanner_pop_start_cond(nft->scanner, PARSER_SC_QUOTA); };
  close_scope_queue	: { scanner_pop_start_cond(nft->scanner, PARSER_SC_EXPR_QUEUE); };
  close_scope_reject	: { scanner_pop_start_cond(nft->scanner, PARSER_SC_STMT_REJECT); };
@@ -575,7 +575,7 @@
  close_scope_reset	: { scanner_pop_start_cond(nft->scanner, PARSER_SC_CMD_RESET); };
  close_scope_rt		: { scanner_pop_start_cond(nft->scanner, PARSER_SC_EXPR_RT); };
  close_scope_sctp	: { scanner_pop_start_cond(nft->scanner, PARSER_SC_SCTP); };
-@@ -3209,6 +3273,10 @@
+@@ -3270,6 +3334,10 @@
  			|	meta_stmt
  			|	log_stmt	close_scope_log
  			|	reject_stmt	close_scope_reject
@@ -586,7 +586,7 @@
  			|	nat_stmt	close_scope_nat
  			|	tproxy_stmt	close_scope_tproxy
  			|	queue_stmt
-@@ -3727,6 +3795,227 @@
+@@ -3788,6 +3856,227 @@
  			}
  			;
  
@@ -814,9 +814,9 @@
  nat_stmt		:	nat_stmt_alloc	nat_stmt_args
  			;
  
---- nftables.orig/src/netlink_delinearize.c	2025-12-09 20:29:39.597731012 +0800
-+++ nftables.new/src/netlink_delinearize.c	2025-12-09 20:29:43.625910509 +0800
-@@ -1190,6 +1190,77 @@
+--- nftables.orig/src/netlink_delinearize.c	2025-12-12 10:18:47.122543405 +0800
++++ nftables.new/src/netlink_delinearize.c	2025-12-12 10:18:53.104785336 +0800
+@@ -1205,6 +1205,77 @@
  	ctx->stmt = stmt;
  }
  
@@ -894,7 +894,7 @@
  static void netlink_parse_reject(struct netlink_parse_ctx *ctx,
  				 const struct location *loc,
  				 const struct nftnl_expr *expr)
-@@ -1960,6 +2031,10 @@
+@@ -1975,6 +2046,10 @@
  
  static const struct expr_handler netlink_parsers[] = {
  	{ .name = "immediate",	.parse = netlink_parse_immediate },
@@ -905,9 +905,9 @@
  	{ .name = "cmp",	.parse = netlink_parse_cmp },
  	{ .name = "lookup",	.parse = netlink_parse_lookup },
  	{ .name = "bitwise",	.parse = netlink_parse_bitwise },
---- nftables.orig/src/scanner.l	2025-12-09 20:29:39.599823256 +0800
-+++ nftables.new/src/scanner.l	2025-12-09 20:29:43.981013967 +0800
-@@ -257,6 +257,10 @@
+--- nftables.orig/src/scanner.l	2025-12-12 10:18:47.124073993 +0800
++++ nftables.new/src/scanner.l	2025-12-12 10:18:53.449798654 +0800
+@@ -258,6 +258,10 @@
  %s SCANSTATE_STMT_LOG
  %s SCANSTATE_STMT_NAT
  %s SCANSTATE_STMT_REJECT
@@ -918,7 +918,7 @@
  %s SCANSTATE_STMT_SYNPROXY
  %s SCANSTATE_STMT_TPROXY
  
-@@ -459,6 +463,63 @@
+@@ -461,6 +465,63 @@
  "hour"			{ return HOUR; }
  "day"			{ return DAY; }
  
@@ -982,9 +982,9 @@
  "reject"		{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_REJECT); return _REJECT; }
  <SCANSTATE_STMT_REJECT>{
  	"with"			{ return WITH; }
---- nftables.orig/include/parser.h	2025-08-28 04:44:24.456560202 +0800
-+++ nftables.new/include/parser.h	2025-12-09 20:29:44.095654599 +0800
-@@ -85,6 +85,10 @@
+--- nftables.orig/include/parser.h	2025-12-05 20:17:57.635743839 +0800
++++ nftables.new/include/parser.h	2025-12-12 10:18:53.559240402 +0800
+@@ -86,6 +86,10 @@
  	PARSER_SC_STMT_LOG,
  	PARSER_SC_STMT_NAT,
  	PARSER_SC_STMT_REJECT,
@@ -995,9 +995,9 @@
  	PARSER_SC_STMT_SYNPROXY,
  	PARSER_SC_STMT_TPROXY,
  
---- nftables.orig/include/linux/netfilter/nf_tables.h	2025-12-09 20:29:39.591306611 +0800
-+++ nftables.new/include/linux/netfilter/nf_tables.h	2025-12-09 20:29:44.056014871 +0800
-@@ -1430,6 +1430,55 @@
+--- nftables.orig/include/linux/netfilter/nf_tables.h	2025-12-12 10:18:47.121543363 +0800
++++ nftables.new/include/linux/netfilter/nf_tables.h	2025-12-12 10:18:53.523564676 +0800
+@@ -1432,6 +1432,55 @@
  };
  #define NFTA_REJECT_MAX		(__NFTA_REJECT_MAX - 1)
  
@@ -1053,8 +1053,8 @@
  /**
   * enum nft_nat_types - nf_tables nat expression NAT types
   *
---- nftables.orig/include/statement.h	2025-12-09 20:29:39.592595312 +0800
-+++ nftables.new/include/statement.h	2025-12-09 20:29:43.472672658 +0800
+--- nftables.orig/include/statement.h	2025-12-12 10:18:47.121924736 +0800
++++ nftables.new/include/statement.h	2025-12-12 10:18:52.953779482 +0800
 @@ -125,6 +125,54 @@
  
  extern struct stmt *reject_stmt_alloc(const struct location *loc);
