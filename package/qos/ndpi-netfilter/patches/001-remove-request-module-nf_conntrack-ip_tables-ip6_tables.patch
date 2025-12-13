@@ -1,16 +1,16 @@
 diff --git forkSrcPrefix/ndpi-netfilter/src/main.c forkDstPrefix/ndpi-netfilter/src/main.c
-index 1f3fae7aeed667eb05640f3da3e4b4093355aef9..06bb52e16d4788034a6f077a31b4ad265b8b7833 100644
+index 8aba0057de00b5dcb7132b8f99d1eb890e23a9a7..b9fbac1340ef0b490c0f4fd835a54e7b312c2842 100644
 --- forkSrcPrefix/ndpi-netfilter/src/main.c
 +++ forkDstPrefix/ndpi-netfilter/src/main.c
-@@ -3501,6 +3501,7 @@ static int __init ndpi_mt_init(void)
- 	set_ndpi_malloc(malloc_wrapper);
- 	set_ndpi_free(free_wrapper);
+@@ -3532,6 +3532,7 @@ static int __init ndpi_mt_init(void)
+ 			malloc_wrapper,
+ 			free_wrapper);
  
 +#if 0
  	if(request_module("nf_conntrack") < 0) {
  		pr_err("xt_ndpi: nf_conntrack required!\n");
  		return -EOPNOTSUPP;
-@@ -3515,6 +3516,7 @@ static int __init ndpi_mt_init(void)
+@@ -3546,6 +3547,7 @@ static int __init ndpi_mt_init(void)
  		return -EOPNOTSUPP;
  	}
  #endif
