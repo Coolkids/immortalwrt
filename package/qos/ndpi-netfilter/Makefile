@@ -27,7 +27,7 @@ define Package/iptables-mod-ndpi
   CATEGORY:=Network
   TITLE:=ndpi successor of OpenDPI
   URL:=http://www.ntop.org/products/ndpi/
-  DEPENDS:=+iptables +iptables-mod-conntrack-extra +kmod-ipt-ndpi
+  DEPENDS:=+iptables +iptables-mod-conntrack-extra +kmod-ipt-ndpi +libpcap
   MAINTAINER:=Thomas Heil <heil@terminal-consulting.de>
 endef
 
@@ -35,15 +35,19 @@ define Package/iptables-mod-ndpi/description
   nDPI is a ntop-maintained superset of the popular OpenDPI library
 endef
 
-CONFIGURE_CMD=./autogen.sh
-CONFIGURE_ARGS += --with-pic
-
 MAKE_PATH:=ndpi-netfilter
 
 MAKE_FLAGS += \
 	KERNEL_DIR="$(LINUX_DIR)" \
 	MODULES_DIR="$(TARGET_MODULES_DIR)" \
 	NDPI_PATH=$(PKG_BUILD_DIR)/ndpi-netfilter
+
+CONFIGURE_ARGS += -with-pic
+
+define Build/Configure
+	( cd $(PKG_BUILD_DIR); $(SHELL) autogen.sh; )
+	$(call Build/Configure/Default)
+endef
 
 define Build/Compile
 	make $(MAKE_FLAGS) -C $(PKG_BUILD_DIR)/ndpi-netfilter
