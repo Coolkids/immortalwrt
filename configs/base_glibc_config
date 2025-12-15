@@ -217,6 +217,7 @@ CONFIG_DISPLAY_SUPPORT=y
 # CONFIG_BUILD_PATENTED is not set
 # CONFIG_BUILD_NLS is not set
 CONFIG_SHADOW_PASSWORDS=y
+# CONFIG_INCLUDE_CONFIG is not set
 # CONFIG_REPRODUCIBLE_DEBUG_INFO is not set
 # CONFIG_COLLECT_KERNEL_DEBUG is not set
 
@@ -408,8 +409,8 @@ CONFIG_IPV6=y
 # Stripping options
 #
 # CONFIG_NO_STRIP is not set
-# CONFIG_USE_STRIP is not set
-CONFIG_USE_SSTRIP=y
+CONFIG_USE_STRIP=y
+CONFIG_STRIP_ARGS="--strip-all"
 # CONFIG_USE_MKLIBS is not set
 
 #
@@ -441,39 +442,86 @@ CONFIG_PKG_DT_RELR=y
 CONFIG_USE_SECCOMP=y
 # end of Global build settings
 
-# CONFIG_DEVEL is not set
+CONFIG_DEVEL=y
+# CONFIG_BROKEN is not set
 CONFIG_BINARY_FOLDER=""
 CONFIG_DOWNLOAD_TOOL_CUSTOM=""
 CONFIG_DOWNLOAD_FOLDER=""
 CONFIG_LOCALMIRROR=""
 CONFIG_AUTOREBUILD=y
+# CONFIG_AUTOREMOVE is not set
+# CONFIG_BUILD_ALL_HOST_TOOLS is not set
+# CONFIG_OPTIMIZE_HOST_TOOLS is not set
 CONFIG_BUILD_SUFFIX=""
 CONFIG_TARGET_ROOTFS_DIR=""
+# CONFIG_CCACHE is not set
 CONFIG_CCACHE_DIR=""
 CONFIG_KERNEL_CFLAGS=""
 CONFIG_EXTERNAL_KERNEL_TREE=""
 CONFIG_KERNEL_GIT_CLONE_URI=""
+# CONFIG_BUILD_LOG is not set
 CONFIG_BUILD_LOG_DIR=""
+# CONFIG_SRC_TREE_OVERRIDE is not set
 CONFIG_EXTRA_OPTIMIZATION="-fno-caller-saves -fno-plt"
+# CONFIG_TARGET_OPTIONS is not set
 CONFIG_TARGET_OPTIMIZATION="-Os -pipe"
+# CONFIG_BPF_TOOLCHAIN_NONE is not set
+# CONFIG_BPF_TOOLCHAIN_HOST is not set
+CONFIG_BPF_TOOLCHAIN_BUILD_LLVM=y
+# CONFIG_EXTERNAL_TOOLCHAIN is not set
+CONFIG_NEED_TOOLCHAIN=y
+CONFIG_TOOLCHAINOPTS=y
+# CONFIG_EXTRA_TARGET_ARCH is not set
+
+#
+# Binary tools
+#
+# CONFIG_BINUTILS_USE_VERSION_2_42 is not set
+# CONFIG_BINUTILS_USE_VERSION_2_43 is not set
+CONFIG_BINUTILS_USE_VERSION_2_44=y
+# CONFIG_BINUTILS_USE_VERSION_2_45 is not set
 CONFIG_EXTRA_BINUTILS_CONFIG_OPTIONS=""
+# CONFIG_DWARVES is not set
+
+#
+# Compiler
+#
+# CONFIG_GCC_USE_VERSION_12 is not set
+# CONFIG_GCC_USE_VERSION_13 is not set
+CONFIG_GCC_USE_VERSION_14=y
+# CONFIG_GCC_USE_VERSION_15 is not set
+# CONFIG_GCC_USE_GRAPHITE is not set
 CONFIG_EXTRA_GCC_CONFIG_OPTIONS=""
+# CONFIG_GCC_DEFAULT_PIE is not set
+# CONFIG_GCC_DEFAULT_SSP is not set
+# CONFIG_SJLJ_EXCEPTIONS is not set
+# CONFIG_INSTALL_GFORTRAN is not set
+# CONFIG_INSTALL_GCCGO is not set
 CONFIG_NASM=y
-CONFIG_MUSL_DISABLE_CRYPT_SIZE_HACK=y
-CONFIG_GDB=y
-# CONFIG_GDB_PYTHON is not set
+
+#
+# C Library
+#
+CONFIG_LIBC_USE_GLIBC=y
+# CONFIG_LIBC_USE_MUSL is not set
+
+#
+# Debuggers
+#
+# CONFIG_GDB is not set
 CONFIG_HAS_BPF_TOOLCHAIN=y
 # CONFIG_HAS_PREBUILT_LLVM_TOOLCHAIN is not set
-CONFIG_USE_MUSL=y
+CONFIG_USE_GLIBC=y
 CONFIG_SSP_SUPPORT=y
 CONFIG_BINUTILS_VERSION_2_44=y
 CONFIG_BINUTILS_VERSION="2.44"
 CONFIG_GCC_VERSION="14.3.0"
 CONFIG_GCC_USE_DEFAULT_VERSION=y
-CONFIG_LIBC="musl"
-CONFIG_TARGET_SUFFIX="musl"
+CONFIG_LIBC="glibc"
+CONFIG_TARGET_SUFFIX="gnu"
 # CONFIG_IB is not set
 # CONFIG_SDK is not set
+# CONFIG_SDK_LLVM_BPF is not set
 # CONFIG_MAKE_TOOLCHAIN is not set
 # CONFIG_IMAGEOPT is not set
 CONFIG_EXTRA_IMAGE_NAME=""
@@ -1625,6 +1673,7 @@ CONFIG_PACKAGE_dropbear=y
 #
 # Generic options
 #
+# CONFIG_DROPBEAR_STATIC_BUILD is not set
 CONFIG_DROPBEAR_LEGACY_COMPAT=y
 CONFIG_DROPBEAR_SMALL_CODE=y
 CONFIG_DROPBEAR_DEBUG_TRACE=0
@@ -1636,10 +1685,10 @@ CONFIG_DROPBEAR_DEBUG_TRACE=0
 #
 # CONFIG_DROPBEAR_DO_HOST_LOOKUP is not set
 CONFIG_DROPBEAR_SVR_PUBKEY_OPTIONS=y
-
-#
-# * note: lastlog/login()/utmp/wtmp are unavailable with musl libc
-#
+# CONFIG_DROPBEAR_LASTLOG is not set
+# CONFIG_DROPBEAR_LOGINFUNC is not set
+# CONFIG_DROPBEAR_WTMP is not set
+# CONFIG_DROPBEAR_UTMP is not set
 
 #
 # Features
@@ -1748,14 +1797,19 @@ CONFIG_PACKAGE_fwtool=y
 CONFIG_PACKAGE_getrandom=y
 # CONFIG_PACKAGE_iucode-tool is not set
 CONFIG_PACKAGE_jsonfilter=y
+# CONFIG_PACKAGE_libasan is not set
 CONFIG_PACKAGE_libatomic=y
 CONFIG_PACKAGE_libc=y
 CONFIG_PACKAGE_libgcc=y
 # CONFIG_PACKAGE_libgomp is not set
+# CONFIG_PACKAGE_liblsan is not set
 CONFIG_PACKAGE_libpthread=y
 # CONFIG_PACKAGE_libquadmath is not set
 CONFIG_PACKAGE_librt=y
 # CONFIG_PACKAGE_libstdcpp is not set
+# CONFIG_PACKAGE_libthread-db is not set
+# CONFIG_PACKAGE_libtsan is not set
+# CONFIG_PACKAGE_libubsan is not set
 CONFIG_PACKAGE_logd=y
 CONFIG_PACKAGE_mtd=y
 CONFIG_PACKAGE_netifd=y
@@ -2908,8 +2962,14 @@ CONFIG_PACKAGE_kmod-netlink-diag=y
 # CONFIG_PACKAGE_kmod-nsh is not set
 # CONFIG_PACKAGE_kmod-openvswitch is not set
 # CONFIG_PACKAGE_kmod-openvswitch-geneve is not set
+# CONFIG_PACKAGE_kmod-openvswitch-geneve-intree is not set
 # CONFIG_PACKAGE_kmod-openvswitch-gre is not set
+# CONFIG_PACKAGE_kmod-openvswitch-gre-intree is not set
+# CONFIG_PACKAGE_kmod-openvswitch-intree is not set
+# CONFIG_PACKAGE_kmod-openvswitch-lisp-intree is not set
+# CONFIG_PACKAGE_kmod-openvswitch-stt-intree is not set
 # CONFIG_PACKAGE_kmod-openvswitch-vxlan is not set
+# CONFIG_PACKAGE_kmod-openvswitch-vxlan-intree is not set
 # CONFIG_PACKAGE_kmod-ovpn-dco-v2 is not set
 # CONFIG_PACKAGE_kmod-packet-diag is not set
 # CONFIG_PACKAGE_kmod-pf-ring is not set
@@ -3142,6 +3202,7 @@ CONFIG_PACKAGE_kmod-usb-hid=y
 # CONFIG_PACKAGE_kmod-usb-storage is not set
 # CONFIG_PACKAGE_kmod-usb-storage-extras is not set
 # CONFIG_PACKAGE_kmod-usb-storage-uas is not set
+# CONFIG_PACKAGE_kmod-usb-test is not set
 # CONFIG_PACKAGE_kmod-usb-uhci is not set
 # CONFIG_PACKAGE_kmod-usb-wdm is not set
 # CONFIG_PACKAGE_kmod-usb-xhci-pci-renesas is not set
@@ -3662,7 +3723,189 @@ CONFIG_NODEJS_NPM_CACHE_DIR=""
 #
 # Perl
 #
-# CONFIG_PACKAGE_perl is not set
+CONFIG_PACKAGE_perl=y
+
+#
+# Configuration
+#
+CONFIG_PERL_THREADS=y
+# CONFIG_PERL_TESTS is not set
+CONFIG_PERL_NOCOMMENT=y
+# end of Configuration
+
+# CONFIG_PACKAGE_perl-ack is not set
+# CONFIG_PACKAGE_perl-authen-sasl is not set
+# CONFIG_PACKAGE_perl-authen-sasl-xs is not set
+# CONFIG_PACKAGE_perl-cgi is not set
+# CONFIG_PACKAGE_perl-class-inspector is not set
+# CONFIG_PACKAGE_perl-clone is not set
+# CONFIG_PACKAGE_perl-compress-bzip2 is not set
+# CONFIG_PACKAGE_perl-dbi is not set
+# CONFIG_PACKAGE_perl-device-serialport is not set
+# CONFIG_PACKAGE_perl-device-usb is not set
+# CONFIG_PACKAGE_perl-encode-locale is not set
+# CONFIG_PACKAGE_perl-file-listing is not set
+# CONFIG_PACKAGE_perl-file-next is not set
+# CONFIG_PACKAGE_perl-file-rsyncp is not set
+# CONFIG_PACKAGE_perl-file-sharedir is not set
+# CONFIG_PACKAGE_perl-file-sharedir-install is not set
+# CONFIG_PACKAGE_perl-future is not set
+# CONFIG_PACKAGE_perl-future-asyncawait is not set
+# CONFIG_PACKAGE_perl-html-form is not set
+# CONFIG_PACKAGE_perl-html-parser is not set
+# CONFIG_PACKAGE_perl-html-tagset is not set
+# CONFIG_PACKAGE_perl-html-tree is not set
+# CONFIG_PACKAGE_perl-http-cookies is not set
+# CONFIG_PACKAGE_perl-http-daemon is not set
+# CONFIG_PACKAGE_perl-http-date is not set
+# CONFIG_PACKAGE_perl-http-message is not set
+# CONFIG_PACKAGE_perl-http-negotiate is not set
+# CONFIG_PACKAGE_perl-http-server-simple is not set
+# CONFIG_PACKAGE_perl-inline is not set
+# CONFIG_PACKAGE_perl-inline-c is not set
+# CONFIG_PACKAGE_perl-io-async is not set
+# CONFIG_PACKAGE_perl-io-async-ssl is not set
+# CONFIG_PACKAGE_perl-io-html is not set
+# CONFIG_PACKAGE_perl-io-socket-ssl is not set
+# CONFIG_PACKAGE_perl-lockfile-simple is not set
+# CONFIG_PACKAGE_perl-lwp-mediatypes is not set
+# CONFIG_PACKAGE_perl-lwp-protocol-https is not set
+# CONFIG_PACKAGE_perl-metrics-any is not set
+# CONFIG_PACKAGE_perl-net-async-http is not set
+# CONFIG_PACKAGE_perl-net-cidr-lite is not set
+# CONFIG_PACKAGE_perl-net-dns is not set
+# CONFIG_PACKAGE_perl-net-dns-sec is not set
+# CONFIG_PACKAGE_perl-net-http is not set
+# CONFIG_PACKAGE_perl-net-ssleay is not set
+# CONFIG_PACKAGE_perl-net-telnet is not set
+# CONFIG_PACKAGE_perl-netaddr-ip is not set
+# CONFIG_PACKAGE_perl-parse-recdescent is not set
+# CONFIG_PACKAGE_perl-parse-yapp is not set
+# CONFIG_PACKAGE_perl-struct-dumb is not set
+# CONFIG_PACKAGE_perl-sub-uplevel is not set
+# CONFIG_PACKAGE_perl-test-harness is not set
+# CONFIG_PACKAGE_perl-test-warn is not set
+# CONFIG_PACKAGE_perl-text-csv_xs is not set
+# CONFIG_PACKAGE_perl-time-moment is not set
+# CONFIG_PACKAGE_perl-try-tiny is not set
+# CONFIG_PACKAGE_perl-uri is not set
+# CONFIG_PACKAGE_perl-www is not set
+# CONFIG_PACKAGE_perl-www-curl is not set
+# CONFIG_PACKAGE_perl-www-mechanize is not set
+# CONFIG_PACKAGE_perl-www-robotrules is not set
+# CONFIG_PACKAGE_perl-xml-parser is not set
+# CONFIG_PACKAGE_perl-xs-parse-keyword is not set
+# CONFIG_PACKAGE_perl-xs-parse-sublike is not set
+# CONFIG_PACKAGE_perlbase-anydbm-file is not set
+# CONFIG_PACKAGE_perlbase-app is not set
+# CONFIG_PACKAGE_perlbase-archive is not set
+# CONFIG_PACKAGE_perlbase-attribute is not set
+# CONFIG_PACKAGE_perlbase-attributes is not set
+# CONFIG_PACKAGE_perlbase-autodie is not set
+# CONFIG_PACKAGE_perlbase-autoloader is not set
+# CONFIG_PACKAGE_perlbase-autosplit is not set
+# CONFIG_PACKAGE_perlbase-autouse is not set
+# CONFIG_PACKAGE_perlbase-b is not set
+# CONFIG_PACKAGE_perlbase-base is not set
+# CONFIG_PACKAGE_perlbase-benchmark is not set
+# CONFIG_PACKAGE_perlbase-bigint is not set
+# CONFIG_PACKAGE_perlbase-bignum is not set
+# CONFIG_PACKAGE_perlbase-blib is not set
+# CONFIG_PACKAGE_perlbase-bytes is not set
+# CONFIG_PACKAGE_perlbase-charnames is not set
+# CONFIG_PACKAGE_perlbase-class is not set
+# CONFIG_PACKAGE_perlbase-compress is not set
+# CONFIG_PACKAGE_perlbase-config is not set
+# CONFIG_PACKAGE_perlbase-cpan is not set
+# CONFIG_PACKAGE_perlbase-cwd is not set
+# CONFIG_PACKAGE_perlbase-data is not set
+# CONFIG_PACKAGE_perlbase-db is not set
+# CONFIG_PACKAGE_perlbase-db-file is not set
+# CONFIG_PACKAGE_perlbase-dbm-filter is not set
+# CONFIG_PACKAGE_perlbase-devel is not set
+# CONFIG_PACKAGE_perlbase-diagnostics is not set
+# CONFIG_PACKAGE_perlbase-digest is not set
+# CONFIG_PACKAGE_perlbase-dirhandle is not set
+# CONFIG_PACKAGE_perlbase-dumpvalue is not set
+# CONFIG_PACKAGE_perlbase-dumpvar is not set
+# CONFIG_PACKAGE_perlbase-dynaloader is not set
+# CONFIG_PACKAGE_perlbase-encode is not set
+# CONFIG_PACKAGE_perlbase-encoding is not set
+# CONFIG_PACKAGE_perlbase-english is not set
+# CONFIG_PACKAGE_perlbase-env is not set
+# CONFIG_PACKAGE_perlbase-errno is not set
+# CONFIG_PACKAGE_perlbase-essential is not set
+# CONFIG_PACKAGE_perlbase-experimental is not set
+# CONFIG_PACKAGE_perlbase-extutils is not set
+# CONFIG_PACKAGE_perlbase-fatal is not set
+# CONFIG_PACKAGE_perlbase-fcntl is not set
+# CONFIG_PACKAGE_perlbase-feature is not set
+# CONFIG_PACKAGE_perlbase-fields is not set
+# CONFIG_PACKAGE_perlbase-file is not set
+# CONFIG_PACKAGE_perlbase-filecache is not set
+# CONFIG_PACKAGE_perlbase-filehandle is not set
+# CONFIG_PACKAGE_perlbase-filetest is not set
+# CONFIG_PACKAGE_perlbase-filter is not set
+# CONFIG_PACKAGE_perlbase-findbin is not set
+# CONFIG_PACKAGE_perlbase-gdbm-file is not set
+# CONFIG_PACKAGE_perlbase-getopt is not set
+# CONFIG_PACKAGE_perlbase-hash is not set
+# CONFIG_PACKAGE_perlbase-http-tiny is not set
+# CONFIG_PACKAGE_perlbase-i18n is not set
+# CONFIG_PACKAGE_perlbase-if is not set
+# CONFIG_PACKAGE_perlbase-integer is not set
+# CONFIG_PACKAGE_perlbase-io is not set
+# CONFIG_PACKAGE_perlbase-ipc is not set
+# CONFIG_PACKAGE_perlbase-json-pp is not set
+# CONFIG_PACKAGE_perlbase-less is not set
+# CONFIG_PACKAGE_perlbase-list is not set
+# CONFIG_PACKAGE_perlbase-locale is not set
+# CONFIG_PACKAGE_perlbase-math is not set
+# CONFIG_PACKAGE_perlbase-memoize is not set
+# CONFIG_PACKAGE_perlbase-meta-notation is not set
+# CONFIG_PACKAGE_perlbase-mime is not set
+# CONFIG_PACKAGE_perlbase-module is not set
+# CONFIG_PACKAGE_perlbase-mro is not set
+# CONFIG_PACKAGE_perlbase-net is not set
+# CONFIG_PACKAGE_perlbase-next is not set
+# CONFIG_PACKAGE_perlbase-o is not set
+# CONFIG_PACKAGE_perlbase-opcode is not set
+# CONFIG_PACKAGE_perlbase-open is not set
+# CONFIG_PACKAGE_perlbase-ops is not set
+# CONFIG_PACKAGE_perlbase-ostype is not set
+# CONFIG_PACKAGE_perlbase-params is not set
+# CONFIG_PACKAGE_perlbase-perl5db is not set
+# CONFIG_PACKAGE_perlbase-perlio is not set
+# CONFIG_PACKAGE_perlbase-pod is not set
+# CONFIG_PACKAGE_perlbase-posix is not set
+# CONFIG_PACKAGE_perlbase-re is not set
+# CONFIG_PACKAGE_perlbase-safe is not set
+# CONFIG_PACKAGE_perlbase-scalar is not set
+# CONFIG_PACKAGE_perlbase-sdbm-file is not set
+# CONFIG_PACKAGE_perlbase-search is not set
+# CONFIG_PACKAGE_perlbase-selectsaver is not set
+# CONFIG_PACKAGE_perlbase-selfloader is not set
+# CONFIG_PACKAGE_perlbase-sigtrap is not set
+# CONFIG_PACKAGE_perlbase-socket is not set
+# CONFIG_PACKAGE_perlbase-sort is not set
+# CONFIG_PACKAGE_perlbase-storable is not set
+# CONFIG_PACKAGE_perlbase-symbol is not set
+# CONFIG_PACKAGE_perlbase-sys is not set
+# CONFIG_PACKAGE_perlbase-tap is not set
+# CONFIG_PACKAGE_perlbase-term is not set
+# CONFIG_PACKAGE_perlbase-test is not set
+# CONFIG_PACKAGE_perlbase-text is not set
+# CONFIG_PACKAGE_perlbase-thread is not set
+# CONFIG_PACKAGE_perlbase-threads is not set
+# CONFIG_PACKAGE_perlbase-tie is not set
+# CONFIG_PACKAGE_perlbase-time is not set
+# CONFIG_PACKAGE_perlbase-unicode is not set
+# CONFIG_PACKAGE_perlbase-unicore is not set
+# CONFIG_PACKAGE_perlbase-universal is not set
+# CONFIG_PACKAGE_perlbase-user is not set
+# CONFIG_PACKAGE_perlbase-utf8 is not set
+# CONFIG_PACKAGE_perlbase-version is not set
+# CONFIG_PACKAGE_perlbase-xsloader is not set
 # end of Perl
 
 #
@@ -3819,6 +4062,7 @@ CONFIG_NODEJS_NPM_CACHE_DIR=""
 # CONFIG_PACKAGE_python3-openssl is not set
 # CONFIG_PACKAGE_python3-orjson is not set
 # CONFIG_PACKAGE_python3-outcome is not set
+# CONFIG_PACKAGE_python3-packages is not set
 # CONFIG_PACKAGE_python3-packaging is not set
 # CONFIG_PACKAGE_python3-paho-mqtt is not set
 # CONFIG_PACKAGE_python3-paramiko is not set
@@ -4661,6 +4905,7 @@ CONFIG_OPENSSL_ENGINE_BUILTIN=y
 CONFIG_OPENSSL_ENGINE_BUILTIN_AFALG=y
 CONFIG_OPENSSL_ENGINE_BUILTIN_DEVCRYPTO=y
 # CONFIG_OPENSSL_ENGINE_BUILTIN_PADLOCK is not set
+# CONFIG_OPENSSL_WITH_ASYNC is not set
 CONFIG_PACKAGE_libopenssl-conf=y
 # CONFIG_PACKAGE_libopenssl-gost_engine is not set
 # CONFIG_PACKAGE_libopenssl-legacy is not set
@@ -4838,7 +5083,7 @@ CONFIG_PACKAGE_knot-libs=y
 # CONFIG_PACKAGE_libblkid is not set
 CONFIG_PACKAGE_libblobmsg-json=y
 CONFIG_PACKAGE_libbpf=y
-# CONFIG_PACKAGE_libbsd is not set
+CONFIG_PACKAGE_libbsd=y
 CONFIG_PACKAGE_libcap=y
 # CONFIG_PACKAGE_libcap-bin is not set
 CONFIG_PACKAGE_libcap-ng=y
@@ -4855,6 +5100,7 @@ CONFIG_PACKAGE_libcap-ng=y
 # CONFIG_PACKAGE_libcomerr is not set
 # CONFIG_PACKAGE_libconfig is not set
 # CONFIG_PACKAGE_libcron is not set
+CONFIG_PACKAGE_libcrypt-compat=y
 # CONFIG_PACKAGE_libcryptopp is not set
 # CONFIG_PACKAGE_libctf is not set
 CONFIG_PACKAGE_libcurl=y
@@ -5208,7 +5454,6 @@ CONFIG_PACKAGE_libuci-lua=y
 # CONFIG_PACKAGE_libuci2 is not set
 # CONFIG_PACKAGE_libuclient is not set
 CONFIG_PACKAGE_libucode=y
-# CONFIG_PACKAGE_libucontext is not set
 CONFIG_PACKAGE_libudebug=y
 # CONFIG_PACKAGE_libudev-zero is not set
 # CONFIG_PACKAGE_libudns is not set
@@ -5947,6 +6192,7 @@ CONFIG_PACKAGE_luci-i18n-wechatpush-zh-cn=y
 # CONFIG_PACKAGE_opendkim is not set
 # CONFIG_PACKAGE_opendkim-tools is not set
 # CONFIG_PACKAGE_postfix is not set
+# CONFIG_PACKAGE_spamassassin is not set
 # CONFIG_PACKAGE_spamc is not set
 # CONFIG_PACKAGE_spamc-ssl is not set
 # end of Mail
@@ -6536,6 +6782,7 @@ CONFIG_PACKAGE_tc-full=y
 # CONFIG_PACKAGE_autossh is not set
 # CONFIG_PACKAGE_csshnpd is not set
 # CONFIG_PACKAGE_mosh-client is not set
+# CONFIG_PACKAGE_mosh-full is not set
 # CONFIG_PACKAGE_mosh-server is not set
 CONFIG_PACKAGE_openssh-client=y
 CONFIG_PACKAGE_openssh-client-utils=y
@@ -6718,8 +6965,10 @@ CONFIG_PACKAGE_wireguard-tools=y
 # Version Control Systems
 #
 # CONFIG_PACKAGE_git is not set
+# CONFIG_PACKAGE_git-gitweb is not set
 # CONFIG_PACKAGE_git-http is not set
 # CONFIG_PACKAGE_git-lfs is not set
+# CONFIG_PACKAGE_gitolite is not set
 # CONFIG_PACKAGE_subversion-client is not set
 # CONFIG_PACKAGE_subversion-libs is not set
 # CONFIG_PACKAGE_subversion-server is not set
@@ -8013,9 +8262,12 @@ CONFIG_PACKAGE_jshn=y
 # CONFIG_PACKAGE_kmod is not set
 # CONFIG_PACKAGE_last is not set
 # CONFIG_PACKAGE_lcd4linux-custom is not set
+# CONFIG_PACKAGE_lcd4linux-full is not set
 # CONFIG_PACKAGE_lcdproc-clients is not set
 # CONFIG_PACKAGE_lcdproc-drivers is not set
 # CONFIG_PACKAGE_lcdproc-server is not set
+# CONFIG_PACKAGE_ldconfig is not set
+# CONFIG_PACKAGE_ldd is not set
 # CONFIG_PACKAGE_less is not set
 # CONFIG_PACKAGE_libflashrom is not set
 CONFIG_PACKAGE_libjson-script=y

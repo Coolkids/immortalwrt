@@ -13,10 +13,20 @@ on:
   #  types: [published]
 
 jobs:
-  build_openwrt_musl:
-    name: Build OpenWrt OpenWrt-master musl dev firmware
+  build:
+    name: Build x86_64 OpenWrt snapshot firmware
     runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
+    strategy:
+      matrix:
+        include:
+          - name: openwrt-musl-snapshot
+            config: base_musl_config
+            target: musl
+          - name: openwrt-glibc-snapshot
+            config: base_glibc_config
+            target: glibc
+
     steps:
       - name: Set workspace
         run: |
@@ -63,7 +73,7 @@ jobs:
         working-directory: ${{ env.WORK_PATH }}
         run: |
           rm -f ./.config*
-          cp ./configs/base_musl_config ./.config
+          cp ./configs/${{ matrix.config }} ./.config
           make defconfig
 
       - name: Make download
@@ -102,20 +112,18 @@ jobs:
       - name: Deliver buildinfo
         uses: actions/upload-artifact@v4
         with:
-          name: "OpenWrt musl buildinfo"
+          name: ${{ matrix.name }}-buildinfo
           path: ${{ env.WORK_PATH }}/artifact/buildinfo/
-
 
       - name: Deliver firmware
         uses: actions/upload-artifact@v4
         with:
-          name: "OpenWrt musl firmware"
+          name: ${{ matrix.name }}
           path: ${{ env.WORK_PATH }}/artifact/firmware/
-
 
   push_msg:
     name: push weixing msg
-    needs: [build_openwrt_musl]
+    needs: build
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout

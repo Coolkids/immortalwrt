@@ -4,10 +4,20 @@ on:
     tags:
       - 'v*'
 jobs:
-  build_openwrt_release_musl:
-    name: Build x86_64 OpenWrt musl releases firmware
+  build:
+    name: Build x86_64 OpenWrt releases firmware
     runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
+    strategy:
+      matrix:
+        include:
+          - name: openwrt-musl-releases
+            config: base_musl_config
+            target: musl
+          - name: openwrt-glibc-releases
+            config: base_glibc_config
+            target: glibc
+
     steps:
       - name: Set workspace
         run: |
@@ -56,7 +66,8 @@ jobs:
         working-directory: ${{ env.WORK_PATH }}
         run: |
           rm -f ./.config*
-          cp ./configs/base_musl_config ./.config
+          sed -i 's|VERSION_NUMBER:=$(if $(VERSION_NUMBER),$(VERSION_NUMBER),$(shell date +%y.%m)-SNAPSHOT)|VERSION_NUMBER:=$(if $(VERSION_NUMBER),$(VERSION_NUMBER),$(shell date +%Y.%m.%d))|' include/version.mk
+          cp ./configs/${{ matrix.config }} ./.config
           make defconfig
 
       - name: Make download
@@ -95,36 +106,38 @@ jobs:
       - name: Deliver buildinfo
         uses: actions/upload-artifact@v4
         with:
-          name: "OpenWrt musl buildinfo"
+          name: ${{ matrix.name }}-buildinfo
           path: ${{ env.WORK_PATH }}/artifact/buildinfo/
 
       - name: Deliver firmware
         uses: actions/upload-artifact@v4
         with:
-          name: "OpenWrt musl firmware"
+          name: ${{ matrix.name }}
           path: ${{ env.WORK_PATH }}/artifact/firmware/
 
   push_msg:
     name: push weixing msg
-    needs: [build_openwrt_release_musl]
+    needs: build
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set workspace
         run: |
           mkdir -p firmware
-      - name: Restore cache musl
+
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: musl_firmware
-          name: "OpenWrt musl firmware"
+          path: artifacts
+
       - name: rename firmware
         run: |
-          mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz firmware/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.img.gz
-          mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined-efi.qcow2 firmware/immortalwrt-x86-64-generic-musl-squashfs-combined-efi.qcow2
-          mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined.img.gz firmware/immortalwrt-x86-64-generic-musl-squashfs-combined.img.gz
-          mv musl_firmware/immortalwrt-x86-64-generic-squashfs-combined.qcow2 firmware/immortalwrt-x86-64-generic-musl-squashfs-combined.qcow2
+          mv artifacts/openwrt-musl-releases/immortalwrt-x86-64-generic-erofs-combined.img.gz firmware/immortalwrt-x86_64-musl-erofs-combined-${{ github.ref_name }}.img.gz
+          mv artifacts/openwrt-musl-releases/immortalwrt-x86-64-generic-erofs-combined.qcow2 firmware/immortalwrt-x86_64-musl-erofs-combined-${{ github.ref_name }}.qcow2
+          mv artifacts/openwrt-glibc-releases/immortalwrt-x86-64-generic-erofs-combined.img.gz firmware/immortalwrt-x86_64-glibc-erofs-combined-${{ github.ref_name }}.img.gz
+          mv artifacts/openwrt-glibc-releases/immortalwrt-x86-64-generic-erofs-combined.qcow2 firmware/immortalwrt-x86_64-glibc-erofs-combined-${{ github.ref_name }}.qcow2
             
       - name: Check SHA256
         run: |
