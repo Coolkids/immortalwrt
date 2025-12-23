@@ -3718,6 +3718,11 @@ CONFIG_NODEJS_NPM_CACHE_DIR=""
 # PHP8
 #
 # CONFIG_PACKAGE_php8 is not set
+CONFIG_PHP8_LIBXML=y
+CONFIG_PHP8_DOM=y
+CONFIG_PHP8_GETTEXT=y
+CONFIG_PHP8_INTL=y
+# CONFIG_PHP8_FULLICUDATA is not set
 # end of PHP8
 
 #
@@ -4206,7 +4211,6 @@ CONFIG_PACKAGE_ucode-mod-uci=y
 CONFIG_PACKAGE_ucode-mod-uloop=y
 # end of ucode
 
-# CONFIG_PACKAGE_chicken-scheme-full is not set
 # CONFIG_PACKAGE_chicken-scheme-interpreter is not set
 # CONFIG_PACKAGE_quickjs is not set
 # CONFIG_PACKAGE_slsh is not set
@@ -5537,7 +5541,6 @@ CONFIG_PACKAGE_rpcd-mod-rrdns=y
 CONFIG_PACKAGE_terminfo=y
 # CONFIG_PACKAGE_tinycdb is not set
 # CONFIG_PACKAGE_totem-pl-parser is not set
-# CONFIG_PACKAGE_uw-imap is not set
 # CONFIG_PACKAGE_vectorscan is not set
 # CONFIG_PACKAGE_wpebackend-fdo is not set
 # CONFIG_PACKAGE_wpewebkit-driver is not set
@@ -5816,8 +5819,8 @@ CONFIG_PACKAGE_luci-app-qos-gargoyle=y
 # CONFIG_PACKAGE_luci-app-samba4 is not set
 # CONFIG_PACKAGE_luci-app-scutclient is not set
 # CONFIG_PACKAGE_luci-app-ser2net is not set
-# CONFIG_PACKAGE_luci-app-smartdns is not set
-# CONFIG_PACKAGE_luci-app-smartdns_INCLUDE_WebUI is not set
+CONFIG_PACKAGE_luci-app-smartdns=y
+CONFIG_PACKAGE_luci-app-smartdns_INCLUDE_WebUI=y
 # CONFIG_PACKAGE_luci-app-sms-tool-js is not set
 # CONFIG_PACKAGE_luci-app-snmpd is not set
 # CONFIG_PACKAGE_luci-app-softether is not set
@@ -6085,6 +6088,42 @@ CONFIG_PACKAGE_luci-i18n-passwall-zh-cn=y
 CONFIG_PACKAGE_luci-i18n-passwall2-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-passwall2-zh-tw is not set
 CONFIG_PACKAGE_luci-i18n-qos-gargoyle-zh-cn=y
+# CONFIG_PACKAGE_luci-i18n-smartdns-ar is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-bg is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-bn is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-ca is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-cs is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-da is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-de is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-el is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-es is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-fi is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-fr is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-ga is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-he is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-hi is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-hu is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-it is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-ja is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-ko is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-lt is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-mr is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-ms is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-nl is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-no is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-pl is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-pt is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-pt-br is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-ro is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-ru is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-sk is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-sv is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-ta is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-tr is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-uk is not set
+# CONFIG_PACKAGE_luci-i18n-smartdns-vi is not set
+CONFIG_PACKAGE_luci-i18n-smartdns-zh-cn=y
+# CONFIG_PACKAGE_luci-i18n-smartdns-zh-tw is not set
 # CONFIG_PACKAGE_luci-i18n-statistics-ar is not set
 # CONFIG_PACKAGE_luci-i18n-statistics-bg is not set
 # CONFIG_PACKAGE_luci-i18n-statistics-bn is not set
@@ -6599,8 +6638,8 @@ CONFIG_PACKAGE_knot-host=y
 # CONFIG_PACKAGE_pdns-tools is not set
 # CONFIG_PACKAGE_sing-geoip is not set
 # CONFIG_PACKAGE_sing-geosite is not set
-# CONFIG_PACKAGE_smartdns is not set
-# CONFIG_PACKAGE_smartdns-ui is not set
+CONFIG_PACKAGE_smartdns=y
+CONFIG_PACKAGE_smartdns-ui=y
 # CONFIG_PACKAGE_stubby is not set
 # CONFIG_PACKAGE_tor-hs is not set
 # CONFIG_PACKAGE_torsocks is not set
@@ -7348,7 +7387,6 @@ CONFIG_PACKAGE_odhcp6c=y
 CONFIG_PACKAGE_odhcpd-ipv6only=y
 # CONFIG_PACKAGE_ola is not set
 # CONFIG_PACKAGE_omcproxy is not set
-# CONFIG_PACKAGE_oor is not set
 # CONFIG_PACKAGE_open-iscsi is not set
 # CONFIG_PACKAGE_openelp is not set
 # CONFIG_PACKAGE_openlist is not set
@@ -7423,7 +7461,6 @@ CONFIG_PACKAGE_simple-obfs-client=y
 # CONFIG_PACKAGE_socat is not set
 # CONFIG_PACKAGE_softflowd is not set
 # CONFIG_PACKAGE_soloscli is not set
-# CONFIG_PACKAGE_speedtest-cli is not set
 # CONFIG_PACKAGE_speedtest-go is not set
 # CONFIG_PACKAGE_speedtest-netperf is not set
 # CONFIG_PACKAGE_speedtestcpp is not set
@@ -7647,8 +7684,6 @@ CONFIG_PACKAGE_rrdtool1=y
 # CONFIG_PACKAGE_nano-full is not set
 # CONFIG_PACKAGE_nano-plus is not set
 CONFIG_PACKAGE_vim=y
-# CONFIG_PACKAGE_vim-full is not set
-# CONFIG_PACKAGE_vim-fuller is not set
 # CONFIG_PACKAGE_vim-help is not set
 # CONFIG_PACKAGE_vim-runtime is not set
 # CONFIG_PACKAGE_zile is not set
@@ -8315,7 +8350,6 @@ CONFIG_PACKAGE_lm-sensors=y
 # CONFIG_PACKAGE_nerdctl is not set
 # CONFIG_PACKAGE_netopeer2-cli is not set
 # CONFIG_PACKAGE_netopeer2-server is not set
-# CONFIG_PACKAGE_netwhere is not set
 # CONFIG_PACKAGE_nnn is not set
 # CONFIG_PACKAGE_nsenter is not set
 # CONFIG_PACKAGE_nss-utils is not set
@@ -8383,6 +8417,7 @@ CONFIG_PACKAGE_qrencode=y
 # CONFIG_PACKAGE_rev is not set
 # CONFIG_PACKAGE_rhash is not set
 # CONFIG_PACKAGE_ripgrep is not set
+# CONFIG_PACKAGE_rlwrap is not set
 # CONFIG_PACKAGE_rng-tools is not set
 # CONFIG_PACKAGE_rtl-ais is not set
 # CONFIG_PACKAGE_rtl-sdr is not set
