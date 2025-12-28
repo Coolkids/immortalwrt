@@ -1,5 +1,5 @@
 
-name: OpenWrt Lite Snapshot CI
+name: OpenWrt Snapshot CI
 
 on:
   push:
@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-    name: Build x86_64 OpenWrt lite snapshot firmware
+    name: Build x86_64 OpenWrt snapshot firmware
     runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
     strategy:
@@ -26,7 +26,13 @@ jobs:
           - name: openwrt-glibc-lite-snapshot
             config: base_glibc_config
             target: glibc
-
+          - name: openwrt-musl-full-snapshot
+            config: full_musl_config
+            target: musl
+          - name: openwrt-glibc-full-snapshot
+            config: full_glibc_config
+            target: glibc
+            
     steps:
       - name: Set workspace
         run: |
