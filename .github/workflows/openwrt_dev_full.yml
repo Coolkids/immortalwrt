@@ -1,5 +1,5 @@
 
-name: OpenWrt Test CI
+name: OpenWrt Full Snapshot CI
 
 on:
   push:
@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-    name: Build x86_64 OpenWrt snapshot firmware
+    name: Build x86_64 OpenWrt full snapshot firmware
     runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
     strategy:
