@@ -15,6 +15,9 @@ esac
 
 function feed(){
 patchs=`pwd`
+if [ -d "./tmp" ]; then
+    rm -rf ./tmp
+fi
 rm -rf ./feeds/*
 ./scripts/feeds update -a
 ##禁用luci_app_attendedsysupgrade

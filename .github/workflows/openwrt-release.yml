@@ -11,11 +11,17 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: openwrt-musl-releases
+          - name: openwrt-musl-lite-releases
             config: base_musl_config
             target: musl
-          - name: openwrt-glibc-releases
+          - name: openwrt-glibc-lite-releases
             config: base_glibc_config
+            target: glibc
+          - name: openwrt-musl-full-releases
+            config: full_musl_config
+            target: musl
+          - name: openwrt-glibc-full-releases
+            config: full_glibc_config
             target: glibc
 
     steps:
@@ -134,10 +140,14 @@ jobs:
 
       - name: rename firmware
         run: |
-          mv artifacts/openwrt-musl-releases/immortalwrt-x86-64-generic-erofs-combined.img.gz firmware/immortalwrt-x86_64-musl-erofs-combined-${{ github.ref_name }}.img.gz
-          mv artifacts/openwrt-musl-releases/immortalwrt-x86-64-generic-erofs-combined.qcow2 firmware/immortalwrt-x86_64-musl-erofs-combined-${{ github.ref_name }}.qcow2
-          mv artifacts/openwrt-glibc-releases/immortalwrt-x86-64-generic-erofs-combined.img.gz firmware/immortalwrt-x86_64-glibc-erofs-combined-${{ github.ref_name }}.img.gz
-          mv artifacts/openwrt-glibc-releases/immortalwrt-x86-64-generic-erofs-combined.qcow2 firmware/immortalwrt-x86_64-glibc-erofs-combined-${{ github.ref_name }}.qcow2
+          mv artifacts/openwrt-musl-lite-releases/immortalwrt-x86-64-generic-erofs-combined.img.gz firmware/immortalwrt-x86_64-musl-lite-erofs-combined-${{ github.ref_name }}.img.gz
+          mv artifacts/openwrt-musl-lite-releases/immortalwrt-x86-64-generic-erofs-combined.qcow2 firmware/immortalwrt-x86_64-musl-lite-erofs-combined-${{ github.ref_name }}.qcow2
+          mv artifacts/openwrt-glibc-lite-releases/immortalwrt-x86-64-generic-erofs-combined.img.gz firmware/immortalwrt-x86_64-glibc-lite-erofs-combined-${{ github.ref_name }}.img.gz
+          mv artifacts/openwrt-glibc-lite-releases/immortalwrt-x86-64-generic-erofs-combined.qcow2 firmware/immortalwrt-x86_64-glibc-lite-erofs-combined-${{ github.ref_name }}.qcow2
+          mv artifacts/openwrt-musl-full-releases/immortalwrt-x86-64-generic-erofs-combined.img.gz firmware/immortalwrt-x86_64-musl-full-erofs-combined-${{ github.ref_name }}.img.gz
+          mv artifacts/openwrt-musl-full-releases/immortalwrt-x86-64-generic-erofs-combined.qcow2 firmware/immortalwrt-x86_64-musl-full-erofs-combined-${{ github.ref_name }}.qcow2
+          mv artifacts/openwrt-glibc-full-releases/immortalwrt-x86-64-generic-erofs-combined.img.gz firmware/immortalwrt-x86_64-glibc-full-erofs-combined-${{ github.ref_name }}.img.gz
+          mv artifacts/openwrt-glibc-full-releases/immortalwrt-x86-64-generic-erofs-combined.qcow2 firmware/immortalwrt-x86_64-glibc-full-erofs-combined-${{ github.ref_name }}.qcow2
             
       - name: Check SHA256
         run: |

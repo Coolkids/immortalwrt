@@ -20,11 +20,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: openwrt-musl-lite-snapshot
-            config: base_musl_config
+          - name: openwrt-musl-full-snapshot
+            config: full_musl_config
             target: musl
-          - name: openwrt-glibc-lite-snapshot
-            config: base_glibc_config
+          - name: openwrt-glibc-full-snapshot
+            config: full_glibc_config
             target: glibc
 
     steps:
