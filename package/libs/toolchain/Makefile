@@ -781,9 +781,8 @@ else
 
 endif
 
-$(eval $(call BuildPackage,libgcc))
-# libc depends on knowing libgcc's ABI, so it needs to be evaluated first
 $(eval $(call BuildPackage,libc))
+$(eval $(call BuildPackage,libgcc))
 $(eval $(call BuildPackage,libatomic))
 $(eval $(call BuildPackage,libquadmath))
 $(eval $(call BuildPackage,libstdcpp))
