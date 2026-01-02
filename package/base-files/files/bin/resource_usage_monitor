@@ -1,0 +1,153 @@
+#!/bin/bash
+
+# 设置采样次数和间隔
+samples=6  # 每分钟进行 6 次采样
+interval=10  # 每次采样间隔 10 秒
+
+# 初始化变量为0
+median_cpu_usage=0
+median_mem_usage_mb=0
+median_mem_usage_percent=0
+mem_total=0
+mem_available=0
+
+# 初始化数组来存储采样的 CPU 使用率和内存使用数据
+cpu_usages=()
+mem_usages_mb=()
+mem_usage_percentages=()
+
+for i in $(seq 1 $samples); do
+    # 获取当前时间的 CPU 使用统计
+    cpu_stats_now=($(head -n 1 /proc/stat 2>/dev/null))
+    if [ $? -ne 0 ] || [ ${#cpu_stats_now[@]} -eq 0 ]; then
+        echo "Warning: 无法获取CPU统计信息" >&2
+        cpu_usages+=(0)
+        sleep $interval
+        continue
+    fi
+    
+    sleep $interval  # 等待间隔
+    
+    cpu_stats_then=($(head -n 1 /proc/stat 2>/dev/null))
+    if [ $? -ne 0 ] || [ ${#cpu_stats_then[@]} -eq 0 ]; then
+        echo "Warning: 无法获取CPU统计信息" >&2
+        cpu_usages+=(0)
+        # 继续内存采集
+    else
+        # 计算总时间和空闲时间的差异
+        idle_now=${cpu_stats_now[4]}
+        idle_then=${cpu_stats_then[4]}
+        total_now=0
+        total_then=0
+
+        for value in "${cpu_stats_now[@]:1}"; do
+            total_now=$((total_now + value))
+        done
+        for value in "${cpu_stats_then[@]:1}"; do
+            total_then=$((total_then + value))
+        done
+
+        # 计算总差异时间和空闲差异时间
+        total_diff=$((total_then - total_now))
+        idle_diff=$((idle_then - idle_now))
+
+        # 计算 CPU 使用率，保留 1 位小数
+        if (( total_diff > 0 )); then
+            cpu_usage=$(awk "BEGIN {printf \"%.1f\", (100 * ($total_diff - $idle_diff) / $total_diff)}")
+        else
+            cpu_usage=0.0
+        fi
+
+        # 将每次采样结果添加到 CPU 使用率数组
+        cpu_usages+=($cpu_usage)
+    fi
+
+    # 获取内存信息
+    mem_total=$(grep MemTotal /proc/meminfo 2>/dev/null | awk '{print $2}')  # 单位为 KB
+    mem_available=$(grep MemAvailable /proc/meminfo 2>/dev/null | awk '{print $2}')  # 单位为 KB
+    
+    # 检查是否成功获取内存信息
+    if [ -z "$mem_total" ] || [ -z "$mem_available" ]; then
+        echo "Warning: 无法获取内存信息" >&2
+        mem_usages_mb+=(0)
+        mem_usage_percentages+=(0)
+        continue
+    fi
+
+    # 计算内存使用量和使用百分比
+    mem_used=$((mem_total - mem_available))  # 已使用内存 (KB)
+    if [ $mem_used -lt 0 ]; then
+        mem_used=0
+    fi
+    
+    mem_used_mb=$(awk "BEGIN {printf \"%.1f\", $mem_used / 1024}")  # 转换为 MB
+    mem_usage_percent=$(awk "BEGIN {printf \"%.1f\", ($mem_used / $mem_total) * 100}")  # 使用百分比，保留1位小数
+
+    # 将内存采样结果添加到数组
+    mem_usages_mb+=($mem_used_mb)
+    mem_usage_percentages+=($mem_usage_percent)
+done
+
+# 如果没有任何采样数据，使用默认值
+if [ ${#cpu_usages[@]} -eq 0 ]; then
+    cpu_usages=(0)
+fi
+if [ ${#mem_usages_mb[@]} -eq 0 ]; then
+    mem_usages_mb=(0)
+fi
+if [ ${#mem_usage_percentages[@]} -eq 0 ]; then
+    mem_usage_percentages=(0)
+fi
+
+# 计算 CPU 使用率的中位数
+sorted_cpu_usages=($(printf "%s\n" "${cpu_usages[@]}" | sort -n))
+middle_index=$(( ${#sorted_cpu_usages[@]} / 2 ))
+if (( ${#sorted_cpu_usages[@]} % 2 == 0 )) && (( ${#sorted_cpu_usages[@]} > 1 )); then
+    idx1=$((middle_index - 1))
+    idx2=$middle_index
+    median_cpu_usage=$(awk "BEGIN {printf \"%.1f\", (${sorted_cpu_usages[idx1]} + ${sorted_cpu_usages[idx2]}) / 2}")
+elif (( ${#sorted_cpu_usages[@]} > 0 )); then
+    median_cpu_usage=${sorted_cpu_usages[middle_index]}
+else
+    median_cpu_usage=0.0
+fi
+
+# 计算内存使用量 (MB) 的中位数
+sorted_mem_usages_mb=($(printf "%s\n" "${mem_usages_mb[@]}" | sort -n))
+middle_index_mem=$(( ${#sorted_mem_usages_mb[@]} / 2 ))
+if (( ${#sorted_mem_usages_mb[@]} % 2 == 0 )) && (( ${#sorted_mem_usages_mb[@]} > 1 )); then
+    idx1=$((middle_index_mem - 1))
+    idx2=$middle_index_mem
+    median_mem_usage_mb=$(awk "BEGIN {printf \"%.1f\", (${sorted_mem_usages_mb[idx1]} + ${sorted_mem_usages_mb[idx2]}) / 2}")
+elif (( ${#sorted_mem_usages_mb[@]} > 0 )); then
+    median_mem_usage_mb=${sorted_mem_usages_mb[middle_index_mem]}
+else
+    median_mem_usage_mb=0.0
+fi
+
+# 计算内存使用百分比的中位数
+sorted_mem_usage_percentages=($(printf "%s\n" "${mem_usage_percentages[@]}" | sort -n))
+middle_index_percent=$(( ${#sorted_mem_usage_percentages[@]} / 2 ))
+if (( ${#sorted_mem_usage_percentages[@]} % 2 == 0 )) && (( ${#sorted_mem_usage_percentages[@]} > 1 )); then
+    idx1=$((middle_index_percent - 1))
+    idx2=$middle_index_percent
+    median_mem_usage_percent=$(awk "BEGIN {printf \"%.1f\", (${sorted_mem_usage_percentages[idx1]} + ${sorted_mem_usage_percentages[idx2]}) / 2}")
+elif (( ${#sorted_mem_usage_percentages[@]} > 0 )); then
+    median_mem_usage_percent=${sorted_mem_usage_percentages[middle_index_percent]}
+else
+    median_mem_usage_percent=0.0
+fi
+
+# 将结果保存到文件，仅保存数值
+{
+    echo "$median_cpu_usage"
+    echo "$median_mem_usage_mb"
+    echo "$median_mem_usage_percent"
+} > /tmp/resource_usage.txt 2>/dev/null || {
+    echo "0.0"
+    echo "0.0"
+    echo "0.0"
+} > /tmp/resource_usage.txt
+
+# 如果需要JSON格式，可以取消下面的注释
+# echo "{\"cpu_usage\": $median_cpu_usage, \"mem_usage_mb\": $median_mem_usage_mb, \"mem_usage_percent\": $median_mem_usage_percent}" > /tmp/resource_usage.json

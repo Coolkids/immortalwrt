@@ -1,0 +1,49 @@
+#!/bin/sh
+
+# 一次性读取所有资源指标
+read_metrics() {
+    # 读取在线人数
+    local on_line_num=0
+    if [ -f /proc/net/arp ]; then
+        on_line_num=$(cat /proc/net/arp | grep 'br-lan' | grep '0x2' | wc -l)
+        echo "$on_line_num" | grep -qE '^[0-9]+$' || on_line_num=0
+    fi
+    
+    # 读取CPU和内存使用情况
+    local cpu_usage="0.0"
+    local mem_use="0.0"
+    local mem_use_per="0.0"
+    
+    if [ -f /tmp/resource_usage.txt ] && [ -s /tmp/resource_usage.txt ]; then
+        {
+            read -r cpu_usage
+            read -r mem_use
+            read -r mem_use_per
+        } < /tmp/resource_usage.txt
+        
+        # 验证数字格式
+        echo "$cpu_usage" | grep -qE '^[0-9]+(\.[0-9]+)?$' || cpu_usage="0.0"
+        echo "$mem_use" | grep -qE '^[0-9]+(\.[0-9]+)?$' || mem_use="0.0"
+        echo "$mem_use_per" | grep -qE '^[0-9]+(\.[0-9]+)?$' || mem_use_per="0.0"
+    fi
+    
+    # 输出所有指标
+    echo "$on_line_num"
+    echo "$cpu_usage"
+    echo "$mem_use"
+    echo "$mem_use_per"
+}
+
+# 一次性读取所有指标
+IFS=$'\n' read -r -d '' on_line_num cpu_usage mem_use mem_use_per < <(read_metrics && printf '\0')
+
+# 构建JSON
+json='{
+"on_line_num":'${on_line_num%.*}',
+"cpu":'${cpu_usage}',
+"mem_use":'${mem_use}',
+"mem_use_per":'${mem_use_per}'
+}'
+
+# 输出JSON
+echo "${json}"
