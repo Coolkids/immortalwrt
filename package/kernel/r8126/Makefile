@@ -21,29 +21,16 @@ define KernelPackage/r8126
   DEPENDS:=@PCI_SUPPORT +kmod-libphy
   FILES:=$(PKG_BUILD_DIR)/src/r8126.ko
   AUTOLOAD:=$(call AutoProbe,r8126,1)
-  PROVIDES:=@kmod-r8169-any
-  VARIANT:=regular
+  PROVIDES:=@kmod-r8169-any @kmod-r8126-rss
 endef
-
-define KernelPackage/r8126-rss
-$(call KernelPackage/r8126)
-  CONFLICTS:=kmod-r8126
-  TITLE+= (RSS)
-  VARIANT:=rss
-endef
-
-ifeq ($(BUILD_VARIANT),rss)
-  PKG_MAKE_FLAGS += \
-    ENABLE_MULTIPLE_TX_QUEUE=y \
-    ENABLE_RSS_SUPPORT=y
-endif
 
 define Build/Compile
 	+$(KERNEL_MAKE) $(PKG_JOBS) \
-		$(PKG_MAKE_FLAGS) \
 		M="$(PKG_BUILD_DIR)/src" \
+		CONFIG_ASPM=n \
+		ENABLE_MULTIPLE_TX_QUEUE=y \
+		ENABLE_RSS_SUPPORT=y \
 		modules
 endef
 
 $(eval $(call KernelPackage,r8126))
-$(eval $(call KernelPackage,r8126-rss))

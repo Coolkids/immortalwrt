@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=r8168
 PKG_VERSION:=8.055.00
-PKG_RELEASE:=4
+PKG_RELEASE:=5
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=https://github.com/openwrt/rtl8168/releases/download/$(PKG_VERSION)
@@ -21,29 +21,13 @@ define KernelPackage/r8168
   DEPENDS:=@PCI_SUPPORT +kmod-libphy
   FILES:=$(PKG_BUILD_DIR)/src/r8168.ko
   AUTOLOAD:=$(call AutoProbe,r8168,1)
-  PROVIDES:=@kmod-r8169-any
-  VARIANT:=regular
+  PROVIDES:=@kmod-r8169-any @kmod-r8168-rss
 endef
-
-define KernelPackage/r8168-rss
-$(call KernelPackage/r8168)
-  CONFLICTS:=kmod-r8168
-  TITLE+= (RSS)
-  VARIANT:=rss
-endef
-
-ifeq ($(BUILD_VARIANT),rss)
-  PKG_MAKE_FLAGS += \
-    ENABLE_MULTIPLE_TX_QUEUE=y \
-    ENABLE_RSS_SUPPORT=y
-endif
 
 define Build/Compile
 	+$(KERNEL_MAKE) $(PKG_JOBS) \
-		$(PKG_MAKE_FLAGS) \
 		M="$(PKG_BUILD_DIR)/src" \
 		modules
 endef
 
 $(eval $(call KernelPackage,r8168))
-$(eval $(call KernelPackage,r8168-rss))

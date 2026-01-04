@@ -21,30 +21,16 @@ define KernelPackage/r8125
   DEPENDS:=@PCI_SUPPORT +kmod-libphy
   FILES:=$(PKG_BUILD_DIR)/src/r8125.ko
   AUTOLOAD:=$(call AutoProbe,r8125,1)
-  PROVIDES:=@kmod-r8169-any
-  VARIANT:=regular
-  PKG_MAKE_FLAGS += CONFIG_ASPM=n
+  PROVIDES:=@kmod-r8169-any @kmod-r8125-rss
 endef
-
-define KernelPackage/r8125-rss
-$(call KernelPackage/r8125)
-  CONFLICTS:=kmod-r8125
-  TITLE+= (RSS)
-  VARIANT:=rss
-endef
-
-ifeq ($(BUILD_VARIANT),rss)
-  PKG_MAKE_FLAGS += \
-    ENABLE_MULTIPLE_TX_QUEUE=y \
-    ENABLE_RSS_SUPPORT=y
-endif
 
 define Build/Compile
 	+$(KERNEL_MAKE) $(PKG_JOBS) \
-		$(PKG_MAKE_FLAGS) \
 		M="$(PKG_BUILD_DIR)/src" \
+		CONFIG_ASPM=n \
+		ENABLE_MULTIPLE_TX_QUEUE=y \
+		ENABLE_RSS_SUPPORT=y \
 		modules
 endef
 
 $(eval $(call KernelPackage,r8125))
-$(eval $(call KernelPackage,r8125-rss))
