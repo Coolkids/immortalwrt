@@ -129,7 +129,6 @@ define Package/ebtables-nft
 $(call Package/iptables/Default)
   DEPENDS:=+kmod-nft-bridge +xtables-nft +kmod-ebtables
   TITLE:=Bridge firewall administration tool nft
-  PROVIDES:=ebtables
   ALTERNATIVES:=\
     300:/usr/sbin/ebtables:xtables-nft-multi \
     300:/usr/sbin/ebtables-restore:xtables-nft-multi \
@@ -143,7 +142,6 @@ define Package/iptables-nft
 $(call Package/iptables/Default)
   TITLE:=IP firewall administration tool nft
   DEPENDS:=+kmod-ipt-core +xtables-nft
-  PROVIDES:=iptables
   ALTERNATIVES:=\
     300:/usr/sbin/iptables:xtables-nft-multi \
     300:/usr/sbin/iptables-restore:xtables-nft-multi \
@@ -488,7 +486,6 @@ define Package/ip6tables-nft
 $(call Package/iptables/Default)
   DEPENDS:=@IPV6 +kmod-ip6tables +xtables-nft
   TITLE:=IP firewall administration tool nft
-  PROVIDES:=ip6tables
   ALTERNATIVES:=\
     300:/usr/sbin/ip6tables:xtables-nft-multi \
     300:/usr/sbin/ip6tables-restore:xtables-nft-multi \
