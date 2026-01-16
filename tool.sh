@@ -7,6 +7,14 @@ case $1 in
 	feed
 	echo "update feed finish"
 	;;
+"restore")
+	echo "restore $2 config"
+	restore_config $2
+	;;
+"save")
+	echo "save $2 config"
+	save_config $2
+	;;
 *)
 	echo "param invalid"
 	;;
@@ -38,9 +46,13 @@ git clone https://github.com/sbwml/feeds_packages_net_curl feeds/packages/net/cu
 ./scripts/feeds install -p diy2 -f luci-app-passwall
 ./scripts/feeds install -p custom -f v2ray-geodata
 ./scripts/feeds install -p mosdns -f mosdns
-
-
 }
 
+function restore_config(){
+cp ./configs/$1 .config
+}
+function save_config(){
+cp .config ./configs/$1
+}
 
-main $1
+main $1 $2
