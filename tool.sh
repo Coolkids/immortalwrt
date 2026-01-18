@@ -36,16 +36,18 @@ popd
 rm -rf ./feeds/luci/applications/luci-app-passwall
 rm -rf ./feeds/packages/net/v2ray-geodata
 rm -rf ./feeds/packages/net/mosdns
-rm -rf ./feeds/diy1/naiveproxy
 
 # curl - http3/quic
 rm -rf feeds/packages/net/curl
 git clone https://github.com/sbwml/feeds_packages_net_curl feeds/packages/net/curl
 
+sed -i '/^else ifeq (\$(ARCH),x86_64)$/a\
+	PKG_SOURCE:=bandix-$(RUST_BANDIX_VERSION)-x86_64-unknown-linux-musl.tar.gz' "./feeds/custom/openwrt-bandix/openwrt-bandix/Makefile"
+
 ./scripts/feeds install -a
-./scripts/feeds install -p diy2 -f luci-app-passwall
+./scripts/feeds install -p custom -f luci-app-passwall
 ./scripts/feeds install -p custom -f v2ray-geodata
-./scripts/feeds install -p mosdns -f mosdns
+./scripts/feeds install -p custom -f mosdns
 }
 
 function restore_config(){
