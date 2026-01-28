@@ -16,7 +16,7 @@ on:
 jobs:
   build:
     name: Build x86_64 OpenWrt Firmware
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: github.event.repository.owner.id == github.event.sender.id
     strategy:
       fail-fast: false
@@ -92,10 +92,7 @@ jobs:
       - name: Compile firmware
         run: |
           cd ${{ env.WORK_PATH }}
-          make -j$(nproc) || make package/feeds/packages/rust/compile V=s || make -j1 V=s
-          if ! find ./bin/targets/ -type f -name "immortalwrt-*" | grep -q .; then
-            make -j$(nproc) || make -j1 V=s
-          fi
+          make -j$(nproc) || make -j1 V=s
 
       - name: Clean Build Files
         working-directory: ${{ env.WORK_PATH }}
@@ -133,7 +130,7 @@ jobs:
   push_snapshot_msg:
     name: push weixing msg
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: (!startsWith(github.ref, 'refs/tags/v'))
     steps:
       - name: Checkout
@@ -142,11 +139,10 @@ jobs:
         run: |
           sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "Snapshot on ${{ github.ref_name }}"
 
-
   release_build:
     name: Release x86_64 OpenWrt Firmware
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - name: Checkout
