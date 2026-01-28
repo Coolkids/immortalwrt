@@ -16,7 +16,7 @@ on:
 jobs:
   build:
     name: Build x86_64 OpenWrt Firmware
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     strategy:
       fail-fast: false
@@ -41,12 +41,12 @@ jobs:
           sudo mkdir -p -m 777 /mnt/openwrt
           echo "WORK_PATH=/mnt/openwrt" >> $GITHUB_ENV
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: '22'
+          node-version: '24'
 
       - name: Set variables
         run: |
@@ -55,19 +55,16 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo -E apt-get -qq update
-          sudo -E apt-get -qq install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
-          bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib \
-          g++-multilib git libgnutls28-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev \
-          libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev \
-          libncurses-dev libpython3-dev libreadline-dev libssl-dev libtool lld llvm lrzsz genisoimage msmtp \
-          nano ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply \
-          python3-docutils python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig \
-          texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd yasm
-          sudo -E apt-get -qq autoremove --purge
-          sudo -E apt-get -qq clean
+          sudo -E apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+            bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib \
+            g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev \
+            libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev libpython3-dev \
+            libreadline-dev libssl-dev libtool libyaml-dev libz-dev lld llvm lrzsz mkisofs msmtp nano \
+            ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-docutils \
+            python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs \
+            upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd yasm
           df -h
-          
+   
       - name: Move Build Path
         run: |
           cp -r ./. ${{ env.WORK_PATH }}/
@@ -94,10 +91,6 @@ jobs:
       - name: Compile firmware
         run: |
           cd ${{ env.WORK_PATH }}
-          make tools/compile -j$(nproc) || make tools/compile -j1 V=s
-          make toolchain/compile -j$(nproc) || make toolchain/compile -j1 V=s
-          make target/linux/compile -j$(nproc) || make target/linux/compile -j1 V=s
-          make package/feeds/packages/rust/compile -j$(nproc) || make package/feeds/packages/rust/compile -j1 V=s
           make -j$(nproc) || make -j1 V=s
 
       - name: Clean Build Files
@@ -122,13 +115,13 @@ jobs:
           rm -rf ./bin
 
       - name: Deliver buildinfo
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.name }}-buildinfo
           path: ${{ env.WORK_PATH }}/artifact/buildinfo/
 
       - name: Deliver firmware
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.name }}
           path: ${{ env.WORK_PATH }}/artifact/firmware/
@@ -136,11 +129,11 @@ jobs:
   push_snapshot_msg:
     name: push weixing msg
     needs: build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     if: (!startsWith(github.ref, 'refs/tags/v'))
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Push Msg
         run: |
           sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "Snapshot on ${{ github.ref_name }}"
@@ -149,18 +142,18 @@ jobs:
   release_build:
     name: Release x86_64 OpenWrt Firmware
     needs: build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set workspace
         run: |
           mkdir -p firmware
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: artifacts
 
