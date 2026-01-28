@@ -1,9 +1,9 @@
-src-git packages https://github.com/immortalwrt/packages.git
-src-git luci https://github.com/immortalwrt/luci.git
-src-git routing https://github.com/openwrt/routing.git
-src-git telephony https://github.com/openwrt/telephony.git
-src-git video https://github.com/openwrt/video.git
+src-git packages https://github.com/immortalwrt/packages.git^06eb18fd2705ad05043b726492841e9e2df8e854
+src-git luci https://github.com/immortalwrt/luci.git^9bf025f4c50d028f4a095587c4d272975d3167b5
+src-git routing https://github.com/openwrt/routing.git^bdf571c0ea5b9b029707787e0f89be7bbd3d75e3
+src-git telephony https://github.com/openwrt/telephony.git^c5652e69f293620548b2276f5a8983f7c1589e48
+src-git video https://github.com/openwrt/video.git^094bf58da6682f895255a35a84349a79dab4bf95
 #src-git targets https://github.com/openwrt/targets.git
 #src-git oldpackages http://git.openwrt.org/packages.git
 #src-link custom /usr/src/openwrt/custom-feed
-src-git custom https://github.com/Coolkids/custom-packages.git
+src-git custom https://github.com/Coolkids/custom-packages.git^b1af3041bab48740b6fde3a4aef877701bcbaf26
