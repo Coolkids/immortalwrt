@@ -14,7 +14,7 @@ PKG_SOURCE_PROTO:=git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=6a0b8e366520a09722aef6c17ec1b103e82f3c28
 PKG_MIRROR_HASH:=5bd5efe0b037cada9b2dfdfa75bbc83f087751dd14d7dd8af974b8a37467ec68
-PKG_SOURCE_URL:=git://sourceware.org/git/glibc.git
+PKG_SOURCE_URL:=https://mirrors.tuna.tsinghua.edu.cn/git/glibc.git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.zst
 PKG_CPE_ID:=cpe:/a:gnu:glibc
 
