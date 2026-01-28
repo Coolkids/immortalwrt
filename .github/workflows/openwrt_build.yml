@@ -92,7 +92,10 @@ jobs:
       - name: Compile firmware
         run: |
           cd ${{ env.WORK_PATH }}
-          make -j$(nproc) || make -j1 V=s
+          make -j$(nproc) || make package/feeds/packages/rust/compile -j$(nproc) || make -j1 V=s
+          if ! find ./bin/targets/ -type f -name "immortalwrt-*" | grep -q .; then
+            make -j$(nproc) || make -j1 V=s
+          fi
 
       - name: Clean Build Files
         working-directory: ${{ env.WORK_PATH }}
