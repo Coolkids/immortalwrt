@@ -43,10 +43,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      # - name: Setup Node.js
-      #   uses: actions/setup-node@v5
-      #   with:
-      #     node-version: '24'
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
 
       - name: Set variables
         run: |
@@ -65,14 +65,6 @@ jobs:
             ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-docutils \
             python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs \
             upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd yasm
-          curl -o- https://fnm.vercel.app/install | bash
-          FNM_PATH="/home/runner/.local/share/fnm"
-          export PATH="$FNM_PATH:$PATH"
-          eval "`fnm env`"
-          fnm install 24
-          npm -v
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
-          export PATH="$HOME/.cargo/bin:$PATH"
           df -h
    
       - name: Move Build Path
@@ -101,7 +93,12 @@ jobs:
       - name: Compile firmware
         run: |
           cd ${{ env.WORK_PATH }}
-          make -j$(($(nproc) + 1)) || make -j1 V=s
+          if [[ "${{ matrix.target }}" == "glibc" ]]; then
+              echo "减线程编译"
+              make -j$(($(nproc) - 1)) || make -j1 V=s
+          else
+              make -j$(nproc) || make -j1 V=s
+          fi
 
       - name: Clean Build Files
         working-directory: ${{ env.WORK_PATH }}
@@ -146,6 +143,7 @@ jobs:
         uses: actions/checkout@v5
       - name: Push Msg
         run: |
+          sudo -E timedatectl set-timezone Asia/Shanghai
           sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "Snapshot on ${{ github.ref_name }}"
 
   release_build:
@@ -206,6 +204,7 @@ jobs:
 
       - name: Push Msg
         run: |
+          sudo -E timedatectl set-timezone Asia/Shanghai
           sh .github/push.sh ${{ secrets.CORPID }} ${{ secrets.CORPSECRET }} ${{ secrets.AGENTID }} "x86_64" "Released on ${{ github.ref_name }}"
 
 
