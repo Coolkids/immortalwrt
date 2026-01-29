@@ -82,24 +82,17 @@ jobs:
           rm -f ./.config*
           cp ./configs/${{ matrix.config }} ./.config
           make defconfig
-          npm -v
 
       - name: Make download
         working-directory: ${{ env.WORK_PATH }}
         run: |
           make download -j8 || make download -j1 V=s
           df -h
-          free -h
           
       - name: Compile firmware
         run: |
           cd ${{ env.WORK_PATH }}
-          if [[ "${{ matrix.target }}" == "glibc" ]]; then
-              echo "$(($(nproc) - 1))线程编译"
-              make -j2 || make -j1 V=s
-          else
-              make -j$(nproc) || make -j1 V=s
-          fi
+          make -j$(nproc) || make -j2 || make -j1 || make -j1 V=s
 
       - name: Clean Build Files
         working-directory: ${{ env.WORK_PATH }}
