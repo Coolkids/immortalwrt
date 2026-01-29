@@ -16,7 +16,7 @@ on:
 jobs:
   build:
     name: Build x86_64 OpenWrt Firmware
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
     strategy:
       fail-fast: false
@@ -86,13 +86,12 @@ jobs:
         working-directory: ${{ env.WORK_PATH }}
         run: |
           make download -j8 || make download -j1 V=s
-          rm -rf $(find ./dl/ -size -1024c)
           df -h
           
       - name: Compile firmware
         run: |
           cd ${{ env.WORK_PATH }}
-          make -j$(nproc) || make -j1 V=s
+          make -j$(($(nproc) + 1)) || make -j1 V=s
 
       - name: Clean Build Files
         working-directory: ${{ env.WORK_PATH }}
