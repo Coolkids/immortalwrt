@@ -92,7 +92,7 @@ jobs:
       - name: Compile firmware
         run: |
           cd ${{ env.WORK_PATH }}
-          make -j$(nproc) || make -j2 || make -j1 || make -j1 V=s
+          make -j$(($(nproc) + 1)) || make -j$(nproc)  || make -j$(($(nproc) - 1)) || make -j1 || make -j1 V=s
 
       - name: Clean Build Files
         working-directory: ${{ env.WORK_PATH }}
