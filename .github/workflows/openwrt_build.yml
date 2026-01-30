@@ -56,7 +56,7 @@ jobs:
             gawk gcc-multilib genisoimage gettext git gnutls-dev gperf gzip haveged help2man intltool irqbalance jq lib32gcc-s1 \
             libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev \
             libncurses5-dev libncursesw5-dev libnsl-dev libpython3-dev libreadline-dev libssl-dev libtool libyaml-dev libz-dev \
-            lld llvm lrzsz msmtp nano ninja-build ntpdate p7zip p7zip-full patch pigz pkgconf python3 python3-cryptography python3-docutils \
+            lld llvm lrzsz mkisofs msmtp nano ninja-build ntpdate p7zip p7zip-full patch pigz pkgconf python3 python3-cryptography python3-docutils \
             python3-pip python3-ply python3-pyelftools python3-requests python3-setuptools qemu-utils quilt re2c rsync scons sharutils \
             squashfs-tools subversion swig tar texinfo uglifyjs unzip upx-ucl vim wget xmlto xsltproc xxd xz-utils yasm \
             zip zlib1g-dev zstd
@@ -78,11 +78,19 @@ jobs:
           echo "gcc version:$(gcc --version)"
           echo "g++ version:$(g++ --version)"
 
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Install rustup and Rust toolchain
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+          export PATH="$HOME/.cargo/bin:$PATH"
+          rustup component add clippy rustfmt
+          echo "rustc version:$(rustc --version)"
+          echo "cargo version:$(cargo --version)"
+
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: '24'
+
       - name: Change Build Path
         run: |
           sudo rsync -a "$GITHUB_WORKSPACE/openwrt/" ${{ env.WORK_PATH }}/
