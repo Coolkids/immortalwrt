@@ -42,8 +42,9 @@ jobs:
           echo "WORK_PATH=/mnt/openwrt" >> $GITHUB_ENV
           sudo -E timedatectl set-timezone Asia/Shanghai
       - name: Checkout
-        uses: actions/checkout@v5
-        path: openwrt
+        uses: actions/checkout@v6
+        with:
+          path: openwrt
           
       - name: Configure compilation environment
         env:
@@ -164,8 +165,6 @@ jobs:
     runs-on: ubuntu-24.04
     if: (!startsWith(github.ref, 'refs/tags/v'))
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
       - name: Push Msg
         run: |
           sudo -E timedatectl set-timezone Asia/Shanghai
@@ -177,9 +176,6 @@ jobs:
     runs-on: ubuntu-24.04
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
       - name: Set workspace
         run: |
           mkdir -p firmware
