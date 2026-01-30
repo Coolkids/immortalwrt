@@ -65,13 +65,8 @@ jobs:
       - name: Install GCC 14 and set default
         run: |
           sudo apt-get install -y gcc-14 g++-14 g++-14-multilib gcc-14-multilib
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 \
-            --slave /usr/bin/g++ g++ /usr/bin/g++-14 \
-            --slave /usr/bin/cc cc /usr/bin/gcc-14 \
-            --slave /usr/bin/c++ c++ /usr/bin/g++-14
-          sudo update-alternatives --set gcc /usr/bin/gcc-14
-          echo "CC=/usr/bin/gcc-14" >> $GITHUB_ENV
-          echo "CXX=/usr/bin/g++-14" >> $GITHUB_ENV
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 60
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 60
           echo "gcc version:$(gcc --version)"
           echo "g++ version:$(g++ --version)"
 
