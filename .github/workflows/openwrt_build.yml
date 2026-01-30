@@ -109,13 +109,9 @@ jobs:
         run: |
           cd ${{ env.WORK_PATH }}
           if [[ "${{ matrix.target }}" == "glibc" ]]; then
-              make -j$(($(nproc) + 1)) || make package/feeds/packages/rust/compile V=s
-              if ! find ./bin/targets/ -type f -name "immortalwrt-*" | grep -q .; then
-                make -j$(($(nproc) + 1)) || make -j$(nproc)  || make -j$(($(nproc) - 1)) || make -j2 || make -j1 || make -j1 V=s
-              fi
-          else
-              make -j$(($(nproc) + 1)) || make -j$(nproc)  || make -j$(($(nproc) - 1)) || make -j2 || make -j1 || make -j1 V=s
-          fi       
+            sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
+          fi
+          make -j$(nproc)  || make -j1 V=s      
 
       - name: Clean Build Files
         working-directory: ${{ env.WORK_PATH }}
