@@ -62,20 +62,20 @@ jobs:
             re2c rsync scons sharutils squashfs-tools subversion swig tar texinfo uglifyjs unzip upx-ucl vim wget \
             xmlto xsltproc xxd xz-utils yasm zip zlib1g-dev zstd
           df -h
-      - name: Install GCC 15 and set default
+      - name: Install GCC 14 and set default
         run: |
           sudo apt-get update
           sudo apt-get install -y software-properties-common ca-certificates gnupg
           sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
           sudo apt-get update
-          sudo apt-get install -y gcc-15 g++-15
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-15 100 \
-            --slave /usr/bin/g++ g++ /usr/bin/g++-15 \
-            --slave /usr/bin/cc cc /usr/bin/gcc-15 \
-            --slave /usr/bin/c++ c++ /usr/bin/g++-15
-          sudo update-alternatives --set gcc /usr/bin/gcc-15
-          echo "CC=/usr/bin/gcc-15" >> $GITHUB_ENV
-          echo "CXX=/usr/bin/g++-15" >> $GITHUB_ENV
+          sudo apt-get install -y gcc-14 g++-14
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 \
+            --slave /usr/bin/g++ g++ /usr/bin/g++-14 \
+            --slave /usr/bin/cc cc /usr/bin/gcc-14 \
+            --slave /usr/bin/c++ c++ /usr/bin/g++-14
+          sudo update-alternatives --set gcc /usr/bin/gcc-14
+          echo "CC=/usr/bin/gcc-14" >> $GITHUB_ENV
+          echo "CXX=/usr/bin/g++-14" >> $GITHUB_ENV
           echo "gcc version:$(gcc --version)"
           echo "g++ version:$(g++ --version)"
 
