@@ -61,26 +61,6 @@ jobs:
             python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs \
             upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd yasm
           df -h
-      - name: Install GCC 14 and set default
-        run: |
-          sudo apt-get install -y gcc-14 g++-14 g++-14-multilib gcc-14-multilib
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 60
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 60
-          echo "gcc version:$(gcc --version)"
-          echo "g++ version:$(g++ --version)"
-
-      - name: Install rustup and Rust toolchain
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
-          export PATH="$HOME/.cargo/bin:$PATH"
-          rustup component add clippy rustfmt
-          echo "rustc version:$(rustc --version)"
-          echo "cargo version:$(cargo --version)"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: '24'
 
       - name: Change Build Path
         run: |
@@ -101,13 +81,13 @@ jobs:
       - name: Make download
         working-directory: ${{ env.WORK_PATH }}
         run: |
-          make download -j8 || make download -j1 V=s
+          make download -j16 || make download -j1 V=s
           df -h
           
       - name: Compile firmware
         run: |
           cd ${{ env.WORK_PATH }}
-          make -j$(nproc)  || make -j1 V=s      
+          make -j$(($(nproc) + 1))  || make -j1 V=s      
 
       - name: Clean Build Files
         working-directory: ${{ env.WORK_PATH }}
