@@ -108,9 +108,6 @@ jobs:
       - name: Compile firmware
         run: |
           cd ${{ env.WORK_PATH }}
-          if [[ "${{ matrix.target }}" == "glibc" ]]; then
-            sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
-          fi
           make -j$(nproc)  || make -j1 V=s      
 
       - name: Clean Build Files
