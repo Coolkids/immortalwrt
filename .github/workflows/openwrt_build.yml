@@ -155,15 +155,45 @@ jobs:
           path: artifacts
 
       - name: rename firmware
-        run: |
-          mv artifacts/openwrt-musl-lite/immortalwrt-x86-64-generic-erofs-combined.img.gz firmware/immortalwrt-x86_64-musl-lite-erofs-combined-${{ github.ref_name }}.img.gz
-          mv artifacts/openwrt-musl-lite/immortalwrt-x86-64-generic-erofs-combined.qcow2 firmware/immortalwrt-x86_64-musl-lite-erofs-combined-${{ github.ref_name }}.qcow2
-          mv artifacts/openwrt-glibc-lite/immortalwrt-x86-64-generic-erofs-combined.img.gz firmware/immortalwrt-x86_64-glibc-lite-erofs-combined-${{ github.ref_name }}.img.gz
-          mv artifacts/openwrt-glibc-lite/immortalwrt-x86-64-generic-erofs-combined.qcow2 firmware/immortalwrt-x86_64-glibc-lite-erofs-combined-${{ github.ref_name }}.qcow2
-          mv artifacts/openwrt-musl-full/immortalwrt-x86-64-generic-erofs-combined.img.gz firmware/immortalwrt-x86_64-musl-full-erofs-combined-${{ github.ref_name }}.img.gz
-          mv artifacts/openwrt-musl-full/immortalwrt-x86-64-generic-erofs-combined.qcow2 firmware/immortalwrt-x86_64-musl-full-erofs-combined-${{ github.ref_name }}.qcow2
-          mv artifacts/openwrt-glibc-full/immortalwrt-x86-64-generic-erofs-combined.img.gz firmware/immortalwrt-x86_64-glibc-full-erofs-combined-${{ github.ref_name }}.img.gz
-          mv artifacts/openwrt-glibc-full/immortalwrt-x86-64-generic-erofs-combined.qcow2 firmware/immortalwrt-x86_64-glibc-full-erofs-combined-${{ github.ref_name }}.qcow2
+        run: |          
+          cd artifacts
+          set -euo pipefail
+
+          REF_NAME="${{ github.ref_name }}"
+          for dir in openwrt-*; do
+            [ -d "$dir" ] || continue
+
+            # 从目录名解析 musl/glibc + lite/full
+            if [[ "$dir" =~ openwrt-(musl|glibc)-(lite|full) ]]; then
+              libc="${BASH_REMATCH[1]}"
+              size="${BASH_REMATCH[2]}"
+            else
+              echo "Skip unknown dir: $dir"
+              continue
+            fi
+
+            for f in "$dir"/immortalwrt-x86-64-generic-*; do
+              [ -f "$f" ] || continue
+
+              name="$(basename "$f")"
+
+              # 提取 erofs / squashfs
+              if [[ "$name" =~ -(erofs|squashfs)-combined ]]; then
+                fs="${BASH_REMATCH[1]}"
+              else
+                echo "Skip unknown fs: $name"
+                continue
+              fi
+
+              # 提取文件后缀（img.gz / qcow2 / vmdk）
+              ext="${name#*combined.}"
+
+              new_name="immortalwrt-x86_64-${libc}-${size}-${fs}-combined-${REF_NAME}.${ext}"
+
+              echo "Rename: $name -> $new_name"
+              mv "$f" "../firmware/$new_name"
+            done
+          done
 
       - name: Check SHA256
         run: |
