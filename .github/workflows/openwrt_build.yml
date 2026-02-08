@@ -46,7 +46,7 @@ jobs:
         run: |
           sudo mkdir -p -m 777 /mnt/openwrt
           echo "WORK_PATH=/mnt/openwrt" >> $GITHUB_ENV
-          echo "ENABLE_LTO=${{ inputs.ENABLE_LTO }}" >> $GITHUB_ENV
+          echo "ENABLE_LTO=${{ inputs.ENABLE_LTO || 'true' }}" >> $GITHUB_ENV
           sudo -E timedatectl set-timezone Asia/Shanghai
       - name: Checkout
         uses: actions/checkout@v6
