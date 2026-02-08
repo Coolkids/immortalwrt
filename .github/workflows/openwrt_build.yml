@@ -12,6 +12,12 @@ on:
   #release:
   #  types: [published]
   workflow_dispatch:
+    inputs:
+      ENABLE_LTO:
+        description: 'enable Link time optimization'
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   build:
@@ -40,6 +46,7 @@ jobs:
         run: |
           sudo mkdir -p -m 777 /mnt/openwrt
           echo "WORK_PATH=/mnt/openwrt" >> $GITHUB_ENV
+          echo "ENABLE_LTO=${{ inputs.ENABLE_LTO }}" >> $GITHUB_ENV
           sudo -E timedatectl set-timezone Asia/Shanghai
       - name: Checkout
         uses: actions/checkout@v6
@@ -51,7 +58,6 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt update -y
-          sudo apt full-upgrade -y
           sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
             bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib \
             g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev \
@@ -77,13 +83,18 @@ jobs:
           rm -f ./.config*
           cp ./configs/${{ matrix.config }} ./.config
           make defconfig
-
-      - name: Make download
+          df -h
+      
+      - name: Disable GCC Link time optimization
         working-directory: ${{ env.WORK_PATH }}
         run: |
-          make download -j16 || make download -j1 V=s
-          df -h
-          
+          if [ "${{ inputs.ENABLE_LTO }}" = "false" ]; then
+            sed -i 's/^CONFIG_USE_LTO=y$/# CONFIG_USE_LTO is not set/' .config
+            echo "Disable Link time optimization"
+          else
+            echo "Enable Link time optimization"
+          fi
+
       - name: Compile firmware
         run: |
           cd ${{ env.WORK_PATH }}
