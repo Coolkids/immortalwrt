@@ -37,6 +37,7 @@ rm -rf ./feeds/luci/applications/luci-app-passwall
 rm -rf ./feeds/packages/net/v2ray-geodata
 rm -rf ./feeds/packages/net/mosdns
 rm -rf ./feeds/luci/applications/luci-app-unblockneteasemusic
+rm -rf ./feeds/luci/themes/luci-theme-argon
 
 # curl - http3/quic
 rm -rf feeds/packages/net/curl
@@ -49,6 +50,7 @@ sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' 
 ./scripts/feeds install -p custom -f luci-app-passwall
 ./scripts/feeds install -p custom -f v2ray-geodata
 ./scripts/feeds install -p custom -f mosdns
+./scripts/feeds install -p custom -f luci-theme-argon
 }
 
 function restore_config(){
