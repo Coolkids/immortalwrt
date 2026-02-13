@@ -45,7 +45,7 @@ git clone https://github.com/sbwml/feeds_packages_net_curl feeds/packages/net/cu
 
 sed -i '/^else ifeq (\$(ARCH),x86_64)$/a\
 	PKG_SOURCE:=bandix-$(RUST_BANDIX_VERSION)-x86_64-unknown-linux-musl.tar.gz' "./feeds/custom/openwrt-bandix/openwrt-bandix/Makefile"
-
+sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
 ./scripts/feeds install -a
 ./scripts/feeds install -p custom -f luci-app-passwall
 ./scripts/feeds install -p custom -f v2ray-geodata
