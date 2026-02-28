@@ -7,6 +7,9 @@ case $1 in
 	feed
 	echo "update feed finish"
 	;;
+"build")
+	build
+	;;
 "restore")
 	echo "restore $2 config"
 	restore_config $2
@@ -56,8 +59,14 @@ sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' 
 function restore_config(){
 cp ./configs/$1 .config
 }
+
 function save_config(){
 cp .config ./configs/$1
 }
 
+function build(){
+	make defconfig
+	make download -j8
+	time make -j$(($(nproc) + 1))  || make -j1 V=s
+}
 main $1 $2
