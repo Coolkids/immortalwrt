@@ -22,14 +22,13 @@ on:
         default: true
         type: boolean
 
-env:
-  IS_RELEASE: false
-
 jobs:
   build:
     name: Build x86_64 OpenWrt Firmware
     runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
+    outputs:
+      is_release: ${{ steps.detect_tag.outputs.is_release }}
     strategy:
       fail-fast: false
       matrix:
@@ -91,17 +90,12 @@ jobs:
           else
             TAG=$(git tag --points-at ${{ github.event.workflow_run.head_sha }} | head -n1)
           fi
-
-          echo "TAG=$TAG" >> $GITHUB_ENV
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "Detected TAG: $TAG"
-      
-      - name: Set release flag
-        working-directory: ${{ env.WORK_PATH }}
-        run: |
           if [[ "$TAG" == v* ]]; then
-            echo "IS_RELEASE=true" >> $GITHUB_ENV
-          fi    
+            echo "is_release=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_release=false" >> $GITHUB_OUTPUT
+          fi        
 
       - name: Update feeds
         working-directory: ${{ env.WORK_PATH }}
@@ -169,7 +163,7 @@ jobs:
     name: push weixing msg
     needs: build
     runs-on: ubuntu-24.04
-    if: env.IS_RELEASE == 'false'
+    if: needs.build.outputs.is_release == 'false'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -183,7 +177,7 @@ jobs:
     name: Release x86_64 OpenWrt Firmware
     needs: build
     runs-on: ubuntu-24.04
-    if: env.IS_RELEASE == 'true'
+    if: needs.build.outputs.is_release == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
