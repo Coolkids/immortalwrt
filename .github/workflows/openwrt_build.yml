@@ -22,6 +22,9 @@ on:
         default: true
         type: boolean
 
+env:
+  IS_RELEASE: false
+
 jobs:
   build:
     name: Build x86_64 OpenWrt Firmware
@@ -79,6 +82,27 @@ jobs:
         run: |
           sudo rsync -a "$GITHUB_WORKSPACE/openwrt/" ${{ env.WORK_PATH }}/
           
+      - name: Detect version tag
+        id: detect_tag
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+          else
+            TAG=$(git tag --points-at ${{ github.event.workflow_run.head_sha }} | head -n1)
+          fi
+
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Detected TAG: $TAG"
+      
+      - name: Set release flag
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          if [[ "$TAG" == v* ]]; then
+            echo "IS_RELEASE=true" >> $GITHUB_ENV
+          fi    
+
       - name: Update feeds
         working-directory: ${{ env.WORK_PATH }}
         run: |
@@ -145,7 +169,7 @@ jobs:
     name: push weixing msg
     needs: build
     runs-on: ubuntu-24.04
-    if: (!startsWith(github.ref, 'refs/tags/v'))
+    if: env.IS_RELEASE == 'false'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -159,7 +183,7 @@ jobs:
     name: Release x86_64 OpenWrt Firmware
     needs: build
     runs-on: ubuntu-24.04
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: env.IS_RELEASE == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
