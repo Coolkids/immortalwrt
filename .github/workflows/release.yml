@@ -1,0 +1,61 @@
+name: Auto Release CI
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    # 每周二触发（后面脚本判断是否第二周）
+    - cron: "0 5 15 * *"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      ########################################
+      # 执行锁定脚本
+      ########################################
+      - name: Run release script
+        run: |
+          ./release-lock.sh
+
+      ########################################
+      # 提交 release
+      ########################################
+      - name: Commit release
+        run: |
+          VERSION=$(cat .release_version)
+
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git add feeds.conf.default include/version.mk
+
+          git commit -m "release ${VERSION}" || echo "Nothing to commit"
+
+          git tag "${VERSION}"
+
+          git push origin HEAD
+          git push origin "${VERSION}"
+
+      ########################################
+      # 还原修改
+      ########################################
+      - name: Revert changes
+        run: |
+          git reset --hard HEAD~1
+
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git commit --allow-empty -am "[skip ci] revert release changes"
+
+          git push origin HEAD
