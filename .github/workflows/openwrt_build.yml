@@ -68,7 +68,7 @@ jobs:
         run: |
           EVENT="${{ github.event_name }}"
 
-          if [[ "$EVENT" == "workflow_call" ]]; then
+          if [[ "$EVENT" == "workflow_call" || "$EVENT" == "workflow_dispatch" ]]; then
             REF="${{ inputs.ref }}"
             TAG="${{ inputs.tag }}"
           elif [[ "$EVENT" == "push" && "${GITHUB_REF}" == refs/tags/* ]]; then
