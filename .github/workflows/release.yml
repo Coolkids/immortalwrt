@@ -58,6 +58,8 @@ jobs:
     needs: release
     runs-on: ubuntu-latest
     steps:
+      - name: Delay 60s
+        run: sleep 60
       - name: Checkout
         uses: actions/checkout@v6
         with:
@@ -65,8 +67,10 @@ jobs:
         
       - name: Revert changes
         run: |
+          git fetch origin
+          git reset --hard origin/master
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git revert HEAD --no-edit
+          git revert ${{ needs.release.outputs.sha }} --no-edit
           git commit --amend -m "[skip ci] revert release changes"
           git push origin HEAD
