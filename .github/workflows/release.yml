@@ -55,10 +55,10 @@ jobs:
           echo "tag=$VERSION" >> $GITHUB_OUTPUT
           echo "sha=$SHA" >> $GITHUB_OUTPUT
       - name: Call build
-        uses: ./.github/workflows/openwrt_build.yml
+        uses: Coolkids/immortalwrt/.github/workflows/openwrt_build.yml@master
         with:
           ref: ${{ steps.rel.outputs.sha }}
-          tag: ${{ steps.rel.outputs.tag }}  
+          tag: ${{ steps.rel.outputs.tag }}
       ########################################
       # 还原修改
       ########################################
