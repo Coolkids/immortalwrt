@@ -11,9 +11,14 @@ on:
   #   - cron: 0 20 * * *
   #release:
   #  types: [published]
-  workflow_run:
-    workflows: ["Auto Release CI"]
-    types: [completed]
+  workflow_call:
+    inputs:
+      ref:
+        required: false
+        type: string
+      tag:
+        required: false
+        type: string
   workflow_dispatch:
     inputs:
       ENABLE_LTO:
@@ -28,7 +33,7 @@ jobs:
     runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
     outputs:
-      is_release: ${{ steps.detect_tag.outputs.is_release }}
+      is_release: ${{ steps.ctx.outputs.is_release }}
     strategy:
       fail-fast: false
       matrix:
@@ -57,9 +62,42 @@ jobs:
             echo "ENABLE_LTO=${{ inputs.ENABLE_LTO }}" >> $GITHUB_ENV
           fi
           sudo -E timedatectl set-timezone Asia/Shanghai
+
+      - name: Resolve build context
+        id: ctx
+        run: |
+          EVENT="${{ github.event_name }}"
+
+          if [[ "$EVENT" == "workflow_call" ]]; then
+            REF="${{ inputs.ref }}"
+            TAG="${{ inputs.tag }}"
+          elif [[ "$EVENT" == "push" && "${GITHUB_REF}" == refs/tags/* ]]; then
+            REF="${GITHUB_SHA}"
+            TAG="${GITHUB_REF#refs/tags/}"
+          else
+            REF="${GITHUB_SHA}"
+            TAG=""
+          fi
+
+          echo "ref=$REF" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+          if [[ "$TAG" == v* ]]; then
+            echo "is_release=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_release=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Show build type
+        run: |
+          echo "REF: ${{ steps.ctx.outputs.ref }}"
+          echo "TAG: ${{ steps.ctx.outputs.tag }}"
+          echo "Release: ${{ steps.ctx.outputs.is_release }}"
+
       - name: Checkout
         uses: actions/checkout@v6
         with:
+          ref: ${{ steps.ctx.outputs.ref }}
           path: openwrt
           
       - name: Configure compilation environment
@@ -79,23 +117,7 @@ jobs:
 
       - name: Change Build Path
         run: |
-          sudo rsync -a "$GITHUB_WORKSPACE/openwrt/" ${{ env.WORK_PATH }}/
-          
-      - name: Detect version tag
-        id: detect_tag
-        working-directory: ${{ env.WORK_PATH }}
-        run: |
-          if [[ "${{ github.event_name }}" == "push" ]]; then
-            TAG="${GITHUB_REF#refs/tags/}"
-          else
-            TAG=$(git tag --points-at ${{ github.event.workflow_run.head_sha }} | head -n1)
-          fi
-          echo "Detected TAG: $TAG"
-          if [[ "$TAG" == v* ]]; then
-            echo "is_release=true" >> $GITHUB_OUTPUT
-          else
-            echo "is_release=false" >> $GITHUB_OUTPUT
-          fi        
+          sudo rsync -a "$GITHUB_WORKSPACE/openwrt/" ${{ env.WORK_PATH }}/        
 
       - name: Update feeds
         working-directory: ${{ env.WORK_PATH }}

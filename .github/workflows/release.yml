@@ -46,6 +46,19 @@ jobs:
           git push origin HEAD
           git push origin "${VERSION}"
 
+      - name: Get release info
+        id: rel
+        run: |
+          VERSION=$(cat .release_version)
+          SHA=$(git rev-parse HEAD)
+
+          echo "tag=$VERSION" >> $GITHUB_OUTPUT
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+      - name: Call build
+        uses: ./.github/workflows/openwrt_build.yml
+        with:
+          ref: ${{ steps.rel.outputs.sha }}
+          tag: ${{ steps.rel.outputs.tag }}  
       ########################################
       # 还原修改
       ########################################
