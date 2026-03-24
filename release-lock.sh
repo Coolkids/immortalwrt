@@ -43,11 +43,10 @@ mv "$tmp_file" "$FEEDS_FILE"
 # 2. 修改 version.mk
 ########################################
 
-# 替换整行（关键）
+# 替换整行
 sed -i -E \
-"s#^VERSION_NUMBER:=.*#VERSION_NUMBER:=\$(if \$(VERSION_NUMBER),\$(VERSION_NUMBER),${VERSION_NUMBER})#" \
+"s#^VERSION_NUMBER:=.*SNAPSHOT.*#VERSION_NUMBER:=\$(if \$(VERSION_NUMBER),\$(VERSION_NUMBER),${VERSION_NUMBER})#" \
 "$VERSION_FILE"
-
 echo "[INFO] version.mk updated"
 
 ########################################
