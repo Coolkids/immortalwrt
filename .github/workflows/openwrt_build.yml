@@ -11,6 +11,9 @@ on:
   #   - cron: 0 20 * * *
   #release:
   #  types: [published]
+  workflow_run:
+    workflows: ["Auto Release CI"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       ENABLE_LTO:
