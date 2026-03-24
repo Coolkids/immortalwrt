@@ -51,11 +51,8 @@ jobs:
       ########################################
       - name: Revert changes
         run: |
-          git reset --hard HEAD~1
-
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-
-          git commit --allow-empty -am "[skip ci] revert release changes"
-
+          git revert HEAD --no-edit
+          git commit --amend -m "[skip ci] revert release changes"
           git push origin HEAD
