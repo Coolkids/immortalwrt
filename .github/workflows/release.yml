@@ -2,7 +2,6 @@ name: Auto Release CI
 
 on:
   workflow_dispatch:
-
   schedule:
     # 每周二触发（后面脚本判断是否第二周）
     - cron: "0 5 15 * *"
@@ -13,23 +12,17 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-
+    outputs:
+      sha: ${{ steps.rel.outputs.sha }}
+      tag: ${{ steps.rel.outputs.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
-      ########################################
-      # 执行锁定脚本
-      ########################################
       - name: Run release script
         run: |
           ./release-lock.sh
 
-      ########################################
-      # 提交 release
-      ########################################
       - name: Commit release
         run: |
           VERSION=$(cat .release_version)
@@ -54,14 +47,17 @@ jobs:
 
           echo "tag=$VERSION" >> $GITHUB_OUTPUT
           echo "sha=$SHA" >> $GITHUB_OUTPUT
-      - name: Call build
-        uses: Coolkids/immortalwrt/.github/workflows/openwrt_build.yml@master
-        with:
-          ref: ${{ steps.rel.outputs.sha }}
-          tag: ${{ steps.rel.outputs.tag }}
-      ########################################
-      # 还原修改
-      ########################################
+  build:
+    needs: release
+    uses: Coolkids/immortalwrt/.github/workflows/openwrt_build.yml@master
+    with:
+      ref: ${{ needs.release.outputs.sha }}
+      tag: ${{ needs.release.outputs.tag }}
+
+  revert:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
       - name: Revert changes
         run: |
           git config user.name "github-actions"

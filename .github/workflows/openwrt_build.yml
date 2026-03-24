@@ -184,7 +184,7 @@ jobs:
   push_snapshot_msg:
     name: push weixing msg
     needs: build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     if: needs.build.outputs.is_release == 'false'
     steps:
       - name: Checkout
@@ -198,7 +198,7 @@ jobs:
   release_build:
     name: Release x86_64 OpenWrt Firmware
     needs: build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     if: needs.build.outputs.is_release == 'true'
     steps:
       - name: Checkout
