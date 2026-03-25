@@ -1,0 +1,30 @@
+
+name: Push OpenWrt Build Message CI
+
+on:
+  workflow_call:
+    secrets:
+      corpid:
+        required: true
+      corpsecret:
+        required: true
+      agentid:
+        required: true
+    inputs:
+      msg:
+        required: true
+        type: string 
+
+
+jobs:
+  push_msg:
+    name: push weixing msg
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Push Msg
+        run: |
+          sudo -E timedatectl set-timezone Asia/Shanghai
+          sh .github/push.sh ${{ secrets.corpid }} ${{ secrets.corpsecret }} ${{ secrets.agentid }} "x86_64" "${{ inputs.msg }}"

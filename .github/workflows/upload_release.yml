@@ -1,0 +1,100 @@
+
+name: Upload OpenWrt Release CI
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+    secrets:
+      release_token:
+        required: true
+
+jobs:
+  upload_release:
+    name: Upload OpenWrt Release Firmware
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set workspace
+        run: |
+          mkdir -p firmware
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v7
+        with:
+          path: artifacts
+
+      - name: Rename Firmware
+        run: |          
+          cd artifacts
+          set -euo pipefail
+
+          REF_NAME="${{ inputs.tag }}"
+          for dir in openwrt-*; do
+            [ -d "$dir" ] || continue
+
+            # 从目录名解析 musl/glibc + lite/full
+            if [[ "$dir" =~ openwrt-(musl|glibc)-(lite|full) ]]; then
+              libc="${BASH_REMATCH[1]}"
+              size="${BASH_REMATCH[2]}"
+            else
+              echo "Skip unknown dir: $dir"
+              continue
+            fi
+
+            for f in "$dir"/immortalwrt-x86-64-generic-*; do
+              [ -f "$f" ] || continue
+
+              name="$(basename "$f")"
+
+              # 提取 erofs / squashfs
+              if [[ "$name" =~ -(erofs|squashfs)-combined ]]; then
+                fs="${BASH_REMATCH[1]}"
+              else
+                echo "Skip unknown fs: $name"
+                continue
+              fi
+
+              # 提取文件后缀（img.gz / qcow2 / vmdk）
+              ext="${name#*combined.}"
+
+              new_name="immortalwrt-x86_64-${libc}-${size}-${fs}-combined-${REF_NAME}.${ext}"
+
+              echo "Rename: $name -> $new_name"
+              mv "$f" "../firmware/$new_name"
+            done
+          done
+
+      - name: Check SHA256
+        run: |
+          cd firmware
+          for file in *; do
+            sha256sum "$file" >> ../sha256sums
+          done
+          mv ../sha256sums .
+
+      - name: Upload release asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.release_token }}
+          file: firmware/*
+          overwrite: true
+          release_name: ${{ inputs.tag }}
+          tag: ${{ inputs.tag }}
+          file_glob: true
+          body: |
+            release ${{ inputs.tag }}
+  
+      - name: Delete loder releases
+        uses: dev-drprasad/delete-older-releases@v0.3.3
+        with:
+          keep_latest: 5
+        env:
+          GITHUB_TOKEN: ${{ secrets.release_token }}
+
+
+

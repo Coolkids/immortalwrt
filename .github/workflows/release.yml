@@ -49,10 +49,28 @@ jobs:
           echo "sha=$SHA" >> $GITHUB_OUTPUT
   build:
     needs: release
-    uses: Coolkids/immortalwrt/.github/workflows/openwrt_build.yml@master
+    uses: Coolkids/immortalwrt/.github/workflows/build.yml@master
     with:
       ref: ${{ needs.release.outputs.sha }}
       tag: ${{ needs.release.outputs.tag }}
+
+  upload_release:
+    needs: [release, build]
+    uses: Coolkids/immortalwrt/.github/workflows/upload_release.yml@master
+    with:
+      tag: ${{ needs.release.outputs.tag }}
+    secrets:
+      release_token: ${{ secrets.RELEASE_TOKEN }}
+
+  push_msg:
+    needs: [release, build, upload_release]
+    uses: Coolkids/immortalwrt/.github/workflows/msg.yml@master
+    secrets:
+      corpid: ${{ secrets.CORPID }}
+      corpsecret: ${{ secrets.CORPSECRET }}
+      agentid: ${{ secrets.AGENTID }}
+    with:
+      msg: "Released on ${{ needs.release.outputs.tag }}"
 
   revert:
     needs: release

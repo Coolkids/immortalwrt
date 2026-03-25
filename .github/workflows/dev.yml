@@ -1,0 +1,83 @@
+
+name: OpenWrt Auto Build CI
+
+on:
+  push:
+    branches: 
+      - master
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+
+jobs:
+  prebuild:
+    name: Resolve build context
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+    outputs:
+      sha: ${{ steps.ctx.outputs.ref }}
+      tag: ${{ steps.ctx.outputs.tag }}
+      is_release: ${{ steps.ctx.outputs.is_release }}"
+    steps:
+      - name: Set workspace
+        run: |
+          sudo -E timedatectl set-timezone Asia/Shanghai
+
+      - name: Resolve build context
+        id: ctx
+        run: |
+          REF="${GITHUB_SHA}"
+          TAG="${GITHUB_REF#refs/tags/}"
+          echo "ref=$REF" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+          if [[ "$TAG" == v* ]]; then
+            echo "is_release=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_release=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Show build type
+        run: |
+          echo "REF: ${{ steps.ctx.outputs.ref }}"
+          echo "TAG: ${{ steps.ctx.outputs.tag }}"
+          echo "Release: ${{ steps.ctx.outputs.is_release }}"
+
+  build:
+    needs: prebuild
+    uses: Coolkids/immortalwrt/.github/workflows/build.yml@master
+    with:
+      ref: ${{ needs.prebuild.outputs.sha }}
+      tag: ${{ needs.prebuild.outputs.tag }}
+
+  upload_release:
+    needs: [prebuild, build]
+    if: needs.prebuild.outputs.is_release == 'true'
+    uses: Coolkids/immortalwrt/.github/workflows/upload_release.yml@master
+    with:
+      tag: ${{ needs.prebuild.outputs.tag }}
+    secrets:
+      release_token: ${{ secrets.RELEASE_TOKEN }}
+
+  push_release_msg:
+    needs: [prebuild, build, upload_release]
+    if: needs.prebuild.outputs.is_release == 'true'
+    uses: Coolkids/immortalwrt/.github/workflows/msg.yml@master
+    secrets:
+      corpid: ${{ secrets.CORPID }}
+      corpsecret: ${{ secrets.CORPSECRET }}
+      agentid: ${{ secrets.AGENTID }}
+    with:
+      msg: "Released on ${{ needs.prebuild.outputs.tag }}"
+    
+  push_snapshot_msg:
+    needs: [prebuild, build]
+    if: needs.prebuild.outputs.is_release == 'false'
+    uses: Coolkids/immortalwrt/.github/workflows/msg.yml@master
+    secrets:
+      corpid: ${{ secrets.CORPID }}
+      corpsecret: ${{ secrets.CORPSECRET }}
+      agentid: ${{ secrets.AGENTID }}
+    with:
+      msg: "Snapshot on ${{ needs.prebuild.outputs.tag }}"
