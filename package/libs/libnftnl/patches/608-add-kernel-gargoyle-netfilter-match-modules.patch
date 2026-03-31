@@ -1,5 +1,84 @@
---- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/src/expr/webmon.c	2025-12-12 10:18:51.574293726 +0800
+--- libnftnl.orig/src/Makefile.in	2025-12-03 20:01:26.442586461 +0800
++++ libnftnl.new/src/Makefile.in	2026-03-29 17:00:55.749765520 +0800
+@@ -138,6 +138,10 @@
+ 	gen.lo table.lo trace.lo chain.lo object.lo rule.lo set.lo \
+ 	set_elem.lo str_array.lo ruleset.lo udata.lo expr.lo \
+ 	expr_ops.lo expr/bitwise.lo expr/byteorder.lo expr/cmp.lo \
++	expr/bandwidth.lo \\
++	expr/timerange.lo \\
++	expr/webmon.lo \\
++	expr/weburl.lo \\
+ 	expr/range.lo expr/connlimit.lo expr/counter.lo expr/ct.lo \
+ 	expr/data_reg.lo expr/dup.lo expr/exthdr.lo \
+ 	expr/flow_offload.lo expr/fib.lo expr/fwd.lo expr/last.lo \
+@@ -181,6 +185,10 @@
+ 	./$(DEPDIR)/set.Plo ./$(DEPDIR)/set_elem.Plo \
+ 	./$(DEPDIR)/str_array.Plo ./$(DEPDIR)/table.Plo \
+ 	./$(DEPDIR)/trace.Plo ./$(DEPDIR)/udata.Plo \
++	expr/$(DEPDIR)/bandwidth.Plo \\
++	expr/$(DEPDIR)/timerange.Plo \\
++	expr/$(DEPDIR)/webmon.Plo \\
++	expr/$(DEPDIR)/weburl.Plo \\
+ 	./$(DEPDIR)/utils.Plo expr/$(DEPDIR)/bitwise.Plo \
+ 	expr/$(DEPDIR)/byteorder.Plo expr/$(DEPDIR)/cmp.Plo \
+ 	expr/$(DEPDIR)/connlimit.Plo expr/$(DEPDIR)/counter.Plo \
+@@ -412,6 +420,10 @@
+ 
+ libnftnl_la_SOURCES = utils.c		\
+ 		      batch.c		\
++	      expr/bandwidth.c \\
++	      expr/timerange.c \\
++	      expr/webmon.c \\
++	      expr/weburl.c \\
+ 		      flowtable.c	\
+ 		      common.c		\
+ 		      gen.c		\
+@@ -592,6 +604,10 @@
+ expr/synproxy.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
+ expr/osf.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
+ expr/xfrm.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
++expr/bandwidth.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
++expr/timerange.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
++expr/webmon.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
++expr/weburl.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
+ obj/$(am__dirstamp):
+ 	@$(MKDIR_P) obj
+ 	@: >>obj/$(am__dirstamp)
+@@ -678,6 +694,10 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/tproxy.Plo@am__quote@ # am--include-marker
+ @AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/tunnel.Plo@am__quote@ # am--include-marker
+ @AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/xfrm.Plo@am__quote@ # am--include-marker
++@AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/bandwidth.Plo@am__quote@ # am--include-marker
++@AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/timerange.Plo@am__quote@ # am--include-marker
++@AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/webmon.Plo@am__quote@ # am--include-marker
++@AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/weburl.Plo@am__quote@ # am--include-marker
+ @AMDEP_TRUE@@am__include@ @am__quote@obj/$(DEPDIR)/counter.Plo@am__quote@ # am--include-marker
+ @AMDEP_TRUE@@am__include@ @am__quote@obj/$(DEPDIR)/ct_expect.Plo@am__quote@ # am--include-marker
+ @AMDEP_TRUE@@am__include@ @am__quote@obj/$(DEPDIR)/ct_helper.Plo@am__quote@ # am--include-marker
+@@ -858,6 +878,10 @@
+ 
+ distclean: distclean-am
+ 	-rm -f ./$(DEPDIR)/batch.Plo
++	-rm -f expr/$(DEPDIR)/bandwidth.Plo
++	-rm -f expr/$(DEPDIR)/timerange.Plo
++	-rm -f expr/$(DEPDIR)/webmon.Plo
++	-rm -f expr/$(DEPDIR)/weburl.Plo
+ 	-rm -f ./$(DEPDIR)/chain.Plo
+ 	-rm -f ./$(DEPDIR)/common.Plo
+ 	-rm -f ./$(DEPDIR)/expr.Plo
+@@ -969,6 +993,10 @@
+ 
+ maintainer-clean: maintainer-clean-am
+ 	-rm -f ./$(DEPDIR)/batch.Plo
++	-rm -f expr/$(DEPDIR)/bandwidth.Plo
++	-rm -f expr/$(DEPDIR)/timerange.Plo
++	-rm -f expr/$(DEPDIR)/webmon.Plo
++	-rm -f expr/$(DEPDIR)/weburl.Plo
+ 	-rm -f ./$(DEPDIR)/chain.Plo
+ 	-rm -f ./$(DEPDIR)/common.Plo
+ 	-rm -f ./$(DEPDIR)/expr.Plo
+--- /dev/null	2026-03-29 16:32:29.595302769 +0800
++++ libnftnl.new/src/expr/webmon.c	2026-03-29 17:00:54.077738258 +0800
 @@ -0,0 +1,323 @@
 +#include <stdio.h>
 +#include <stdint.h>
@@ -324,8 +403,196 @@
 +	.build		= nftnl_expr_webmon_build,
 +	.output	= nftnl_expr_webmon_snprintf,
 +};
---- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/src/expr/timerange.c	2025-12-12 10:18:52.635243536 +0800
+--- /dev/null	2026-03-29 16:32:29.595302769 +0800
++++ libnftnl.new/src/expr/weburl.c	2026-03-29 17:00:53.286321745 +0800
+@@ -0,0 +1,185 @@
++#include <stdio.h>
++#include <stdint.h>
++#include <string.h>
++#include <arpa/inet.h>
++#include <errno.h>
++#include <linux/netfilter/nf_tables.h>
++#include <linux/netfilter/weburl.h>
++
++#include <time.h>
++#include <sys/time.h>
++
++#include "internal.h"
++#include <libmnl/libmnl.h>
++#include <libnftnl/expr.h>
++#include <libnftnl/rule.h>
++
++struct nftnl_expr_weburl {
++	uint32_t		flags;
++	const char		*match;
++};
++
++static int nftnl_expr_weburl_set(struct nftnl_expr *e, uint16_t type,
++				 const void *data, uint32_t data_len)
++{
++	struct nftnl_expr_weburl *weburl = nftnl_expr_data(e);
++	switch(type){
++	case NFTNL_EXPR_WEBURL_FLAGS:
++		memcpy(&weburl->flags, data, data_len);
++		break;
++	case NFTNL_EXPR_WEBURL_MATCH:
++		weburl->match = strdup(data);
++		if (!weburl->match)
++			return -1;
++		break;
++	}
++	return 0;
++}
++
++static const void *
++nftnl_expr_weburl_get(const struct nftnl_expr *e, uint16_t type,
++		      uint32_t *data_len)
++{
++	struct nftnl_expr_weburl *weburl = nftnl_expr_data(e);
++
++	switch(type) {
++	case NFTNL_EXPR_WEBURL_FLAGS:
++		*data_len = sizeof(uint32_t);
++		return &weburl->flags;
++	case NFTNL_EXPR_WEBURL_MATCH:
++		*data_len = strlen(weburl->match)+1;
++		return weburl->match;
++	}
++	return NULL;
++}
++
++static int nftnl_expr_weburl_cb(const struct nlattr *attr, void *data)
++{
++	const struct nlattr **tb = data;
++	int type = mnl_attr_get_type(attr);
++
++	if (mnl_attr_type_valid(attr, NFTA_WEBURL_MAX) < 0)
++		return MNL_CB_OK;
++
++	switch(type) {
++	case NFTNL_EXPR_WEBURL_FLAGS:
++		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
++			abi_breakage();
++		break;
++	case NFTNL_EXPR_WEBURL_MATCH:
++		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
++			abi_breakage();
++		break;
++	}
++
++	tb[type] = attr;
++	return MNL_CB_OK;
++}
++
++static void
++nftnl_expr_weburl_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
++{
++	struct nftnl_expr_weburl *weburl = nftnl_expr_data(e);
++
++	if (e->flags & (1 << NFTNL_EXPR_WEBURL_FLAGS))
++		mnl_attr_put_u32(nlh, NFTNL_EXPR_WEBURL_FLAGS, htonl(weburl->flags));
++	if (e->flags & (1 << NFTNL_EXPR_WEBURL_MATCH))
++		mnl_attr_put_strz(nlh, NFTNL_EXPR_WEBURL_MATCH, weburl->match);
++}
++
++static int
++nftnl_expr_weburl_parse(struct nftnl_expr *e, struct nlattr *attr)
++{
++	struct nftnl_expr_weburl *weburl = nftnl_expr_data(e);
++	struct nlattr *tb[NFTA_WEBURL_MAX+1] = {};
++
++	if (mnl_attr_parse_nested(attr, nftnl_expr_weburl_cb, tb) < 0)
++		return -1;
++
++	if (tb[NFTNL_EXPR_WEBURL_FLAGS]) {
++		weburl->flags = ntohl(mnl_attr_get_u32(tb[NFTNL_EXPR_WEBURL_FLAGS]));
++		e->flags |= (1 << NFTNL_EXPR_WEBURL_FLAGS);
++	}
++	if (tb[NFTNL_EXPR_WEBURL_MATCH]) {
++		if (weburl->match)
++			xfree(weburl->match);
++
++		weburl->match = strdup(mnl_attr_get_str(tb[NFTNL_EXPR_WEBURL_MATCH]));
++		if (!weburl->match)
++			return -1;
++		e->flags |= (1 << NFTNL_EXPR_WEBURL_MATCH);
++	}
++
++	return 0;
++}
++
++static int
++nftnl_expr_weburl_snprintf(char *buf, size_t len,
++			   uint32_t flags, const struct nftnl_expr *e)
++{
++	struct nftnl_expr_weburl *weburl = nftnl_expr_data(e);
++	int ret, offset = 0, remain = len;
++
++	if (e->flags & (1 << NFTNL_EXPR_WEBURL_FLAGS)) {
++		bool inv = weburl->flags & NFT_WEBURL_F_INV;
++		if (e->flags & (1 << NFTNL_EXPR_WEBURL_FLAGS)) {
++			if(weburl->flags & NFT_WEBURL_F_MP_DOMAINONLY)
++			{
++				ret = snprintf(buf + offset, remain, "domain-only ");
++				SNPRINTF_BUFFER_SIZE(ret, remain, offset);
++			}
++			else if(weburl->flags & NFT_WEBURL_F_MP_PATHONLY)
++			{
++				ret = snprintf(buf + offset, remain, "path-only ");
++				SNPRINTF_BUFFER_SIZE(ret, remain, offset);
++			}
++		}
++
++		if(weburl->flags & NFT_WEBURL_F_MT_CONTAINS)
++		{
++			ret = snprintf(buf + offset, remain, "contains ");
++			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
++		}
++		else if(weburl->flags & NFT_WEBURL_F_MT_CONTAINSREGEX)
++		{
++			ret = snprintf(buf + offset, remain, "contains-regex ");
++			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
++		}
++		else if(weburl->flags & NFT_WEBURL_F_MT_MATCHESEXACTLY)
++		{
++			ret = snprintf(buf + offset, remain, "matches-exactly ");
++			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
++		}
++
++		if(inv)
++		{
++			ret = snprintf(buf + offset, remain, "!= ");
++			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
++		}
++	}
++	if (e->flags & (1 << NFTNL_EXPR_WEBURL_MATCH)) {
++		ret = snprintf(buf + offset, remain, "%s", weburl->match);
++		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
++	}
++
++	return offset;
++}
++
++static void nftnl_expr_weburl_free(const struct nftnl_expr *e)
++{
++	struct nftnl_expr_weburl *weburl = nftnl_expr_data(e);
++
++	xfree(weburl->match);
++}
++
++struct expr_ops expr_ops_weburl = {
++	.name		= "weburl",
++	.alloc_len	= sizeof(struct nftnl_expr_weburl),
++	.nftnl_max_attr	= NFTA_WEBURL_MAX,
++	.free		= nftnl_expr_weburl_free,
++	.set		= nftnl_expr_weburl_set,
++	.get		= nftnl_expr_weburl_get,
++	.parse		= nftnl_expr_weburl_parse,
++	.build		= nftnl_expr_weburl_build,
++	.output	= nftnl_expr_weburl_snprintf,
++};
+--- /dev/null	2026-03-29 16:32:29.595302769 +0800
++++ libnftnl.new/src/expr/timerange.c	2026-03-29 17:00:54.882753719 +0800
 @@ -0,0 +1,281 @@
 +#include <stdio.h>
 +#include <stdint.h>
@@ -608,8 +875,8 @@
 +	settimeofday(NULL, &new_tz);
 +#endif
 +}
---- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/src/expr/bandwidth.c	2025-12-12 10:18:53.700093419 +0800
+--- /dev/null	2026-03-29 16:32:29.595302769 +0800
++++ libnftnl.new/src/expr/bandwidth.c	2026-03-29 17:00:55.662764101 +0800
 @@ -0,0 +1,539 @@
 +#include <stdio.h>
 +#include <stdint.h>
@@ -1150,275 +1417,8 @@
 +	settimeofday(NULL, &new_tz);
 +#endif
 +}
---- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/src/expr/weburl.c	2025-12-12 10:18:50.519354505 +0800
-@@ -0,0 +1,185 @@
-+#include <stdio.h>
-+#include <stdint.h>
-+#include <string.h>
-+#include <arpa/inet.h>
-+#include <errno.h>
-+#include <linux/netfilter/nf_tables.h>
-+#include <linux/netfilter/weburl.h>
-+
-+#include <time.h>
-+#include <sys/time.h>
-+
-+#include "internal.h"
-+#include <libmnl/libmnl.h>
-+#include <libnftnl/expr.h>
-+#include <libnftnl/rule.h>
-+
-+struct nftnl_expr_weburl {
-+	uint32_t		flags;
-+	const char		*match;
-+};
-+
-+static int nftnl_expr_weburl_set(struct nftnl_expr *e, uint16_t type,
-+				 const void *data, uint32_t data_len)
-+{
-+	struct nftnl_expr_weburl *weburl = nftnl_expr_data(e);
-+	switch(type){
-+	case NFTNL_EXPR_WEBURL_FLAGS:
-+		memcpy(&weburl->flags, data, data_len);
-+		break;
-+	case NFTNL_EXPR_WEBURL_MATCH:
-+		weburl->match = strdup(data);
-+		if (!weburl->match)
-+			return -1;
-+		break;
-+	}
-+	return 0;
-+}
-+
-+static const void *
-+nftnl_expr_weburl_get(const struct nftnl_expr *e, uint16_t type,
-+		      uint32_t *data_len)
-+{
-+	struct nftnl_expr_weburl *weburl = nftnl_expr_data(e);
-+
-+	switch(type) {
-+	case NFTNL_EXPR_WEBURL_FLAGS:
-+		*data_len = sizeof(uint32_t);
-+		return &weburl->flags;
-+	case NFTNL_EXPR_WEBURL_MATCH:
-+		*data_len = strlen(weburl->match)+1;
-+		return weburl->match;
-+	}
-+	return NULL;
-+}
-+
-+static int nftnl_expr_weburl_cb(const struct nlattr *attr, void *data)
-+{
-+	const struct nlattr **tb = data;
-+	int type = mnl_attr_get_type(attr);
-+
-+	if (mnl_attr_type_valid(attr, NFTA_WEBURL_MAX) < 0)
-+		return MNL_CB_OK;
-+
-+	switch(type) {
-+	case NFTNL_EXPR_WEBURL_FLAGS:
-+		if (mnl_attr_validate(attr, MNL_TYPE_U32) < 0)
-+			abi_breakage();
-+		break;
-+	case NFTNL_EXPR_WEBURL_MATCH:
-+		if (mnl_attr_validate(attr, MNL_TYPE_STRING) < 0)
-+			abi_breakage();
-+		break;
-+	}
-+
-+	tb[type] = attr;
-+	return MNL_CB_OK;
-+}
-+
-+static void
-+nftnl_expr_weburl_build(struct nlmsghdr *nlh, const struct nftnl_expr *e)
-+{
-+	struct nftnl_expr_weburl *weburl = nftnl_expr_data(e);
-+
-+	if (e->flags & (1 << NFTNL_EXPR_WEBURL_FLAGS))
-+		mnl_attr_put_u32(nlh, NFTNL_EXPR_WEBURL_FLAGS, htonl(weburl->flags));
-+	if (e->flags & (1 << NFTNL_EXPR_WEBURL_MATCH))
-+		mnl_attr_put_strz(nlh, NFTNL_EXPR_WEBURL_MATCH, weburl->match);
-+}
-+
-+static int
-+nftnl_expr_weburl_parse(struct nftnl_expr *e, struct nlattr *attr)
-+{
-+	struct nftnl_expr_weburl *weburl = nftnl_expr_data(e);
-+	struct nlattr *tb[NFTA_WEBURL_MAX+1] = {};
-+
-+	if (mnl_attr_parse_nested(attr, nftnl_expr_weburl_cb, tb) < 0)
-+		return -1;
-+
-+	if (tb[NFTNL_EXPR_WEBURL_FLAGS]) {
-+		weburl->flags = ntohl(mnl_attr_get_u32(tb[NFTNL_EXPR_WEBURL_FLAGS]));
-+		e->flags |= (1 << NFTNL_EXPR_WEBURL_FLAGS);
-+	}
-+	if (tb[NFTNL_EXPR_WEBURL_MATCH]) {
-+		if (weburl->match)
-+			xfree(weburl->match);
-+
-+		weburl->match = strdup(mnl_attr_get_str(tb[NFTNL_EXPR_WEBURL_MATCH]));
-+		if (!weburl->match)
-+			return -1;
-+		e->flags |= (1 << NFTNL_EXPR_WEBURL_MATCH);
-+	}
-+
-+	return 0;
-+}
-+
-+static int
-+nftnl_expr_weburl_snprintf(char *buf, size_t len,
-+			   uint32_t flags, const struct nftnl_expr *e)
-+{
-+	struct nftnl_expr_weburl *weburl = nftnl_expr_data(e);
-+	int ret, offset = 0, remain = len;
-+
-+	if (e->flags & (1 << NFTNL_EXPR_WEBURL_FLAGS)) {
-+		bool inv = weburl->flags & NFT_WEBURL_F_INV;
-+		if (e->flags & (1 << NFTNL_EXPR_WEBURL_FLAGS)) {
-+			if(weburl->flags & NFT_WEBURL_F_MP_DOMAINONLY)
-+			{
-+				ret = snprintf(buf + offset, remain, "domain-only ");
-+				SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-+			}
-+			else if(weburl->flags & NFT_WEBURL_F_MP_PATHONLY)
-+			{
-+				ret = snprintf(buf + offset, remain, "path-only ");
-+				SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-+			}
-+		}
-+
-+		if(weburl->flags & NFT_WEBURL_F_MT_CONTAINS)
-+		{
-+			ret = snprintf(buf + offset, remain, "contains ");
-+			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-+		}
-+		else if(weburl->flags & NFT_WEBURL_F_MT_CONTAINSREGEX)
-+		{
-+			ret = snprintf(buf + offset, remain, "contains-regex ");
-+			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-+		}
-+		else if(weburl->flags & NFT_WEBURL_F_MT_MATCHESEXACTLY)
-+		{
-+			ret = snprintf(buf + offset, remain, "matches-exactly ");
-+			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-+		}
-+
-+		if(inv)
-+		{
-+			ret = snprintf(buf + offset, remain, "!= ");
-+			SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-+		}
-+	}
-+	if (e->flags & (1 << NFTNL_EXPR_WEBURL_MATCH)) {
-+		ret = snprintf(buf + offset, remain, "%s", weburl->match);
-+		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
-+	}
-+
-+	return offset;
-+}
-+
-+static void nftnl_expr_weburl_free(const struct nftnl_expr *e)
-+{
-+	struct nftnl_expr_weburl *weburl = nftnl_expr_data(e);
-+
-+	xfree(weburl->match);
-+}
-+
-+struct expr_ops expr_ops_weburl = {
-+	.name		= "weburl",
-+	.alloc_len	= sizeof(struct nftnl_expr_weburl),
-+	.nftnl_max_attr	= NFTA_WEBURL_MAX,
-+	.free		= nftnl_expr_weburl_free,
-+	.set		= nftnl_expr_weburl_set,
-+	.get		= nftnl_expr_weburl_get,
-+	.parse		= nftnl_expr_weburl_parse,
-+	.build		= nftnl_expr_weburl_build,
-+	.output	= nftnl_expr_weburl_snprintf,
-+};
---- libnftnl.orig/src/Makefile.in	2025-12-03 20:01:26.442586461 +0800
-+++ libnftnl.new/src/Makefile.in	2025-12-12 10:18:53.819419246 +0800
-@@ -138,6 +138,10 @@
- 	gen.lo table.lo trace.lo chain.lo object.lo rule.lo set.lo \
- 	set_elem.lo str_array.lo ruleset.lo udata.lo expr.lo \
- 	expr_ops.lo expr/bitwise.lo expr/byteorder.lo expr/cmp.lo \
-+	expr/bandwidth.lo \\
-+	expr/timerange.lo \\
-+	expr/webmon.lo \\
-+	expr/weburl.lo \\
- 	expr/range.lo expr/connlimit.lo expr/counter.lo expr/ct.lo \
- 	expr/data_reg.lo expr/dup.lo expr/exthdr.lo \
- 	expr/flow_offload.lo expr/fib.lo expr/fwd.lo expr/last.lo \
-@@ -181,6 +185,10 @@
- 	./$(DEPDIR)/set.Plo ./$(DEPDIR)/set_elem.Plo \
- 	./$(DEPDIR)/str_array.Plo ./$(DEPDIR)/table.Plo \
- 	./$(DEPDIR)/trace.Plo ./$(DEPDIR)/udata.Plo \
-+	expr/$(DEPDIR)/bandwidth.Plo \\
-+	expr/$(DEPDIR)/timerange.Plo \\
-+	expr/$(DEPDIR)/webmon.Plo \\
-+	expr/$(DEPDIR)/weburl.Plo \\
- 	./$(DEPDIR)/utils.Plo expr/$(DEPDIR)/bitwise.Plo \
- 	expr/$(DEPDIR)/byteorder.Plo expr/$(DEPDIR)/cmp.Plo \
- 	expr/$(DEPDIR)/connlimit.Plo expr/$(DEPDIR)/counter.Plo \
-@@ -412,6 +420,10 @@
- 
- libnftnl_la_SOURCES = utils.c		\
- 		      batch.c		\
-+	      expr/bandwidth.c \\
-+	      expr/timerange.c \\
-+	      expr/webmon.c \\
-+	      expr/weburl.c \\
- 		      flowtable.c	\
- 		      common.c		\
- 		      gen.c		\
-@@ -592,6 +604,10 @@
- expr/synproxy.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
- expr/osf.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
- expr/xfrm.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
-+expr/bandwidth.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
-+expr/timerange.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
-+expr/webmon.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
-+expr/weburl.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
- obj/$(am__dirstamp):
- 	@$(MKDIR_P) obj
- 	@: >>obj/$(am__dirstamp)
-@@ -678,6 +694,10 @@
- @AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/tproxy.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/tunnel.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/xfrm.Plo@am__quote@ # am--include-marker
-+@AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/bandwidth.Plo@am__quote@ # am--include-marker
-+@AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/timerange.Plo@am__quote@ # am--include-marker
-+@AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/webmon.Plo@am__quote@ # am--include-marker
-+@AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/weburl.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@obj/$(DEPDIR)/counter.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@obj/$(DEPDIR)/ct_expect.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@obj/$(DEPDIR)/ct_helper.Plo@am__quote@ # am--include-marker
-@@ -858,6 +878,10 @@
- 
- distclean: distclean-am
- 	-rm -f ./$(DEPDIR)/batch.Plo
-+	-rm -f expr/$(DEPDIR)/bandwidth.Plo
-+	-rm -f expr/$(DEPDIR)/timerange.Plo
-+	-rm -f expr/$(DEPDIR)/webmon.Plo
-+	-rm -f expr/$(DEPDIR)/weburl.Plo
- 	-rm -f ./$(DEPDIR)/chain.Plo
- 	-rm -f ./$(DEPDIR)/common.Plo
- 	-rm -f ./$(DEPDIR)/expr.Plo
-@@ -969,6 +993,10 @@
- 
- maintainer-clean: maintainer-clean-am
- 	-rm -f ./$(DEPDIR)/batch.Plo
-+	-rm -f expr/$(DEPDIR)/bandwidth.Plo
-+	-rm -f expr/$(DEPDIR)/timerange.Plo
-+	-rm -f expr/$(DEPDIR)/webmon.Plo
-+	-rm -f expr/$(DEPDIR)/weburl.Plo
- 	-rm -f ./$(DEPDIR)/chain.Plo
- 	-rm -f ./$(DEPDIR)/common.Plo
- 	-rm -f ./$(DEPDIR)/expr.Plo
---- libnftnl.orig/src/expr_ops.c	2025-12-12 10:18:49.420571234 +0800
-+++ libnftnl.new/src/expr_ops.c	2025-12-12 10:18:53.685807766 +0800
+--- libnftnl.orig/src/expr_ops.c	2026-03-29 17:00:52.408911291 +0800
++++ libnftnl.new/src/expr_ops.c	2026-03-29 17:00:55.651763921 +0800
 @@ -31,6 +31,10 @@
  extern struct expr_ops expr_ops_range;
  extern struct expr_ops expr_ops_redir;
@@ -1453,8 +1453,8 @@
 +
 +
 +
---- libnftnl.orig/src/Makefile.am	2025-12-12 10:18:49.420203529 +0800
-+++ libnftnl.new/src/Makefile.am	2025-12-12 10:18:53.833349132 +0800
+--- libnftnl.orig/src/Makefile.am	2026-03-29 17:00:52.408642472 +0800
++++ libnftnl.new/src/Makefile.am	2026-03-29 17:00:55.759185832 +0800
 @@ -7,6 +7,10 @@
  
  libnftnl_la_SOURCES = utils.c		\
@@ -1466,53 +1466,69 @@
  		      flowtable.c	\
  		      common.c		\
  		      gen.c		\
---- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/include/linux/netfilter/timerange.h	2025-12-12 10:18:52.548401467 +0800
-@@ -0,0 +1,15 @@
-+#ifndef _TIMERANGE_H
-+#define _TIMERANGE_H
-+
-+enum nft_timerange_attributes {
-+	NFTA_TIMERANGE_UNSPEC,
-+	NFTA_TIMERANGE_FLAGS,
-+	NFTA_TIMERANGE_HOURS,
-+	NFTA_TIMERANGE_WEEKDAYS,
-+	NFTA_TIMERANGE_WEEKLYRANGES,
-+	__NFTA_TIMERANGE_MAX,
+--- libnftnl.orig/include/libnftnl/expr.h	2026-03-29 17:00:52.407694414 +0800
++++ libnftnl.new/include/libnftnl/expr.h	2026-03-29 17:00:55.590762927 +0800
+@@ -48,6 +48,50 @@
+ int nftnl_expr_fprintf(FILE *fp, const struct nftnl_expr *expr, uint32_t type, uint32_t flags);
+ 
+ enum {
++	NFTNL_EXPR_BANDWIDTH_ID	= NFTNL_EXPR_BASE,
++	NFTNL_EXPR_BANDWIDTH_CMP,
++	NFTNL_EXPR_BANDWIDTH_TYPE,
++	NFTNL_EXPR_BANDWIDTH_CHECKTYPE,
++	NFTNL_EXPR_BANDWIDTH_BWCUTOFF,
++	NFTNL_EXPR_BANDWIDTH_CURRENTBW,
++	NFTNL_EXPR_BANDWIDTH_SUBNET,
++	NFTNL_EXPR_BANDWIDTH_SUBNET6,
++	NFTNL_EXPR_BANDWIDTH_RSTINTVL,
++	NFTNL_EXPR_BANDWIDTH_RSTINTVLCONST,
++	NFTNL_EXPR_BANDWIDTH_RSTTIME,
++	NFTNL_EXPR_BANDWIDTH_NUMINTVLSTOSAVE,
++	NFTNL_EXPR_BANDWIDTH_NEXTRESET,
++	NFTNL_EXPR_BANDWIDTH_PREVRESET,
++	NFTNL_EXPR_BANDWIDTH_LASTBACKUPTIME,
++	NFTNL_EXPR_BANDWIDTH_MINUTESWEST,
 +};
 +
-+#define NFTA_TIMERANGE_MAX (__NFTA_TIMERANGE_MAX - 1)
-+
-+#endif /* _TIMERANGE_H */
---- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/include/linux/netfilter/webmon.h	2025-12-12 10:18:51.488479169 +0800
-@@ -0,0 +1,24 @@
-+#ifndef _WEBMON_H
-+#define _WEBMON_H
-+
-+#define WEBMON_DOMAIN             16
-+#define WEBMON_SEARCH             32
-+#define WEBMON_SET              3064
-+enum nft_timerange_attributes {
-+	NFTA_WEBMON_UNSPEC,
-+	NFTA_WEBMON_FLAGS,
-+	NFTA_WEBMON_MAXDOMAINS,
-+	NFTA_WEBMON_MAXSEARCHES,
-+	NFTA_WEBMON_IPS,
-+	NFTA_WEBMON_DOMAINLOADFILE,
-+	NFTA_WEBMON_SEARCHLOADFILE,
-+	NFTA_WEBMON_DOMAINLOADDATA,
-+	NFTA_WEBMON_DOMAINLOADDATALEN,
-+	NFTA_WEBMON_SEARCHLOADDATA,
-+	NFTA_WEBMON_SEARCHLOADDATALEN,
-+	__NFTA_WEBMON_MAX,
++enum {
++	NFTNL_EXPR_TIMERANGE_FLAGS	= NFTNL_EXPR_BASE,
++	NFTNL_EXPR_TIMERANGE_HOURS,
++	NFTNL_EXPR_TIMERANGE_WEEKDAYS,
++	NFTNL_EXPR_TIMERANGE_WEEKLYRANGES,
 +};
 +
-+#define NFTA_WEBMON_MAX (__NFTA_WEBMON_MAX - 1)
++enum {
++	NFTNL_EXPR_WEBMON_FLAGS	= NFTNL_EXPR_BASE,
++	NFTNL_EXPR_WEBMON_MAXDOMAINS,
++	NFTNL_EXPR_WEBMON_MAXSEARCHES,
++	NFTNL_EXPR_WEBMON_IPS,
++	NFTNL_EXPR_WEBMON_DOMAINLOADFILE,
++	NFTNL_EXPR_WEBMON_SEARCHLOADFILE,
++	NFTNL_EXPR_WEBMON_DOMAINLOADDATA,
++	NFTNL_EXPR_WEBMON_DOMAINLOADDATALEN,
++	NFTNL_EXPR_WEBMON_SEARCHLOADDATA,
++	NFTNL_EXPR_WEBMON_SEARCHLOADDATALEN,
++};
 +
-+#endif /* _WEBMON_H */
---- libnftnl.orig/include/linux/netfilter/nf_tables.h	2025-12-12 10:18:49.419655845 +0800
-+++ libnftnl.new/include/linux/netfilter/nf_tables.h	2025-12-12 10:18:53.736809734 +0800
++enum {
++	NFTNL_EXPR_WEBURL_FLAGS	= NFTNL_EXPR_BASE,
++	NFTNL_EXPR_WEBURL_MATCH,
++};
++
++enum {
+ 	NFTNL_EXPR_PAYLOAD_DREG	= NFTNL_EXPR_BASE,
+ 	NFTNL_EXPR_PAYLOAD_BASE,
+ 	NFTNL_EXPR_PAYLOAD_OFFSET,
+@@ -375,3 +419,7 @@
+ #endif
+ 
+ #endif /* _LIBNFTNL_EXPR_H_ */
++
++
++
++
+--- libnftnl.orig/include/linux/netfilter/nf_tables.h	2026-03-29 17:00:52.408222202 +0800
++++ libnftnl.new/include/linux/netfilter/nf_tables.h	2026-03-29 17:00:55.687764509 +0800
 @@ -1442,6 +1442,53 @@
  };
  #define NFTA_REJECT_MAX		(__NFTA_REJECT_MAX - 1)
@@ -1575,24 +1591,53 @@
 +
 +
 +
---- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/include/linux/netfilter/weburl.h	2025-12-12 10:18:50.436509815 +0800
-@@ -0,0 +1,13 @@
-+#ifndef _WEBURL_H
-+#define _WEBURL_H
+--- /dev/null	2026-03-29 16:32:29.595302769 +0800
++++ libnftnl.new/include/linux/netfilter/webmon.h	2026-03-29 17:00:54.015205173 +0800
+@@ -0,0 +1,24 @@
++#ifndef _WEBMON_H
++#define _WEBMON_H
 +
-+enum nft_weburl_attributes {
-+	NFTA_WEBURL_UNSPEC,
-+	NFTA_WEBURL_FLAGS,
-+	NFTA_WEBURL_MATCH,
-+	__NFTA_WEBURL_MAX,
++#define WEBMON_DOMAIN             16
++#define WEBMON_SEARCH             32
++#define WEBMON_SET              3064
++enum nft_timerange_attributes {
++	NFTA_WEBMON_UNSPEC,
++	NFTA_WEBMON_FLAGS,
++	NFTA_WEBMON_MAXDOMAINS,
++	NFTA_WEBMON_MAXSEARCHES,
++	NFTA_WEBMON_IPS,
++	NFTA_WEBMON_DOMAINLOADFILE,
++	NFTA_WEBMON_SEARCHLOADFILE,
++	NFTA_WEBMON_DOMAINLOADDATA,
++	NFTA_WEBMON_DOMAINLOADDATALEN,
++	NFTA_WEBMON_SEARCHLOADDATA,
++	NFTA_WEBMON_SEARCHLOADDATALEN,
++	__NFTA_WEBMON_MAX,
 +};
 +
-+#define NFTA_WEBURL_MAX (__NFTA_WEBURL_MAX - 1)
++#define NFTA_WEBMON_MAX (__NFTA_WEBMON_MAX - 1)
 +
-+#endif /* _WEBURL_H */
---- /dev/null	2025-12-09 16:32:26.798657899 +0800
-+++ libnftnl.new/include/linux/netfilter/bandwidth.h	2025-12-12 10:18:53.615048316 +0800
++#endif /* _WEBMON_H */
+--- /dev/null	2026-03-29 16:32:29.595302769 +0800
++++ libnftnl.new/include/linux/netfilter/timerange.h	2026-03-29 17:00:54.815230501 +0800
+@@ -0,0 +1,15 @@
++#ifndef _TIMERANGE_H
++#define _TIMERANGE_H
++
++enum nft_timerange_attributes {
++	NFTA_TIMERANGE_UNSPEC,
++	NFTA_TIMERANGE_FLAGS,
++	NFTA_TIMERANGE_HOURS,
++	NFTA_TIMERANGE_WEEKDAYS,
++	NFTA_TIMERANGE_WEEKLYRANGES,
++	__NFTA_TIMERANGE_MAX,
++};
++
++#define NFTA_TIMERANGE_MAX (__NFTA_TIMERANGE_MAX - 1)
++
++#endif /* _TIMERANGE_H */
+--- /dev/null	2026-03-29 16:32:29.595302769 +0800
++++ libnftnl.new/include/linux/netfilter/bandwidth.h	2026-03-29 17:00:55.601563954 +0800
 @@ -0,0 +1,28 @@
 +#ifndef _BANDWIDTH_H
 +#define _BANDWIDTH_H
@@ -1622,64 +1667,19 @@
 +#define NFTA_BANDWIDTH_MAX (__NFTA_BANDWIDTH_MAX - 1)
 +
 +#endif /* _BANDWIDTH_H */
---- libnftnl.orig/include/libnftnl/expr.h	2025-12-12 10:18:49.419213837 +0800
-+++ libnftnl.new/include/libnftnl/expr.h	2025-12-12 10:18:53.599804446 +0800
-@@ -48,6 +48,50 @@
- int nftnl_expr_fprintf(FILE *fp, const struct nftnl_expr *expr, uint32_t type, uint32_t flags);
- 
- enum {
-+	NFTNL_EXPR_BANDWIDTH_ID	= NFTNL_EXPR_BASE,
-+	NFTNL_EXPR_BANDWIDTH_CMP,
-+	NFTNL_EXPR_BANDWIDTH_TYPE,
-+	NFTNL_EXPR_BANDWIDTH_CHECKTYPE,
-+	NFTNL_EXPR_BANDWIDTH_BWCUTOFF,
-+	NFTNL_EXPR_BANDWIDTH_CURRENTBW,
-+	NFTNL_EXPR_BANDWIDTH_SUBNET,
-+	NFTNL_EXPR_BANDWIDTH_SUBNET6,
-+	NFTNL_EXPR_BANDWIDTH_RSTINTVL,
-+	NFTNL_EXPR_BANDWIDTH_RSTINTVLCONST,
-+	NFTNL_EXPR_BANDWIDTH_RSTTIME,
-+	NFTNL_EXPR_BANDWIDTH_NUMINTVLSTOSAVE,
-+	NFTNL_EXPR_BANDWIDTH_NEXTRESET,
-+	NFTNL_EXPR_BANDWIDTH_PREVRESET,
-+	NFTNL_EXPR_BANDWIDTH_LASTBACKUPTIME,
-+	NFTNL_EXPR_BANDWIDTH_MINUTESWEST,
+--- /dev/null	2026-03-29 16:32:29.595302769 +0800
++++ libnftnl.new/include/linux/netfilter/weburl.h	2026-03-29 17:00:53.219464002 +0800
+@@ -0,0 +1,13 @@
++#ifndef _WEBURL_H
++#define _WEBURL_H
++
++enum nft_weburl_attributes {
++	NFTA_WEBURL_UNSPEC,
++	NFTA_WEBURL_FLAGS,
++	NFTA_WEBURL_MATCH,
++	__NFTA_WEBURL_MAX,
 +};
 +
-+enum {
-+	NFTNL_EXPR_TIMERANGE_FLAGS	= NFTNL_EXPR_BASE,
-+	NFTNL_EXPR_TIMERANGE_HOURS,
-+	NFTNL_EXPR_TIMERANGE_WEEKDAYS,
-+	NFTNL_EXPR_TIMERANGE_WEEKLYRANGES,
-+};
++#define NFTA_WEBURL_MAX (__NFTA_WEBURL_MAX - 1)
 +
-+enum {
-+	NFTNL_EXPR_WEBMON_FLAGS	= NFTNL_EXPR_BASE,
-+	NFTNL_EXPR_WEBMON_MAXDOMAINS,
-+	NFTNL_EXPR_WEBMON_MAXSEARCHES,
-+	NFTNL_EXPR_WEBMON_IPS,
-+	NFTNL_EXPR_WEBMON_DOMAINLOADFILE,
-+	NFTNL_EXPR_WEBMON_SEARCHLOADFILE,
-+	NFTNL_EXPR_WEBMON_DOMAINLOADDATA,
-+	NFTNL_EXPR_WEBMON_DOMAINLOADDATALEN,
-+	NFTNL_EXPR_WEBMON_SEARCHLOADDATA,
-+	NFTNL_EXPR_WEBMON_SEARCHLOADDATALEN,
-+};
-+
-+enum {
-+	NFTNL_EXPR_WEBURL_FLAGS	= NFTNL_EXPR_BASE,
-+	NFTNL_EXPR_WEBURL_MATCH,
-+};
-+
-+enum {
- 	NFTNL_EXPR_PAYLOAD_DREG	= NFTNL_EXPR_BASE,
- 	NFTNL_EXPR_PAYLOAD_BASE,
- 	NFTNL_EXPR_PAYLOAD_OFFSET,
-@@ -375,3 +419,7 @@
- #endif
- 
- #endif /* _LIBNFTNL_EXPR_H_ */
-+
-+
-+
-+
++#endif /* _WEBURL_H */

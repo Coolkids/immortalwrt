@@ -112,11 +112,15 @@ jobs:
           make defconfig
           make download -j8
           df -h
+          if [[ "${{ matrix.target }}" == "glibc" ]]; then
+            echo "glibc环境, 禁用download-ci-llvm"
+            sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
+          fi
 
       - name: Compile firmware
         run: |
           cd ${{ env.WORK_PATH }}
-          make -j$(($(nproc) + 1))  || make -j1 V=s      
+          make -j$(nproc) || make -j1 V=s
 
       - name: Clean Build Files
         working-directory: ${{ env.WORK_PATH }}

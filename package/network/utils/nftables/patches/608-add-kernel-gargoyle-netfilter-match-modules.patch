@@ -1,263 +1,5 @@
---- nftables.orig/src/netlink_linearize.c	2025-12-12 10:18:47.122923276 +0800
-+++ nftables.new/src/netlink_linearize.c	2025-12-12 10:18:53.179580610 +0800
-@@ -1210,6 +1210,83 @@
- 	nft_rule_add_expr(ctx, nle, &stmt->location);
- }
- 
-+static void netlink_gen_weburl_stmt(struct netlink_linearize_ctx *ctx,
-+				    const struct stmt *stmt)
-+{
-+	struct nftnl_expr *nle;
-+
-+	nle = alloc_nft_expr("weburl");
-+	nftnl_expr_set_u32(nle, NFTNL_EXPR_WEBURL_FLAGS, stmt->weburl.flags);
-+	if (stmt->weburl.match != NULL)
-+			nftnl_expr_set_str(nle, NFTNL_EXPR_WEBURL_MATCH, stmt->weburl.match);
-+
-+	nft_rule_add_expr(ctx, nle, &stmt->location);
-+}
-+
-+static void netlink_gen_webmon_stmt(struct netlink_linearize_ctx *ctx,
-+				    const struct stmt *stmt)
-+{
-+	struct nftnl_expr *nle;
-+
-+	nle = alloc_nft_expr("webmon");
-+	nftnl_expr_set_u32(nle, NFTNL_EXPR_WEBMON_FLAGS, stmt->webmon.flags);
-+	nftnl_expr_set_u32(nle, NFTNL_EXPR_WEBMON_MAXDOMAINS, stmt->webmon.max_domains);
-+	nftnl_expr_set_u32(nle, NFTNL_EXPR_WEBMON_MAXSEARCHES, stmt->webmon.max_searches);
-+	if (stmt->webmon.ips != NULL)
-+			nftnl_expr_set_str(nle, NFTNL_EXPR_WEBMON_IPS, stmt->webmon.ips);
-+	if (stmt->webmon.domain_load_file != NULL)
-+			nftnl_expr_set_str(nle, NFTNL_EXPR_WEBMON_DOMAINLOADFILE, stmt->webmon.domain_load_file);
-+	if (stmt->webmon.search_load_file != NULL)
-+			nftnl_expr_set_str(nle, NFTNL_EXPR_WEBMON_SEARCHLOADFILE, stmt->webmon.search_load_file);
-+
-+	nft_rule_add_expr(ctx, nle, &stmt->location);
-+}
-+
-+static void netlink_gen_timerange_stmt(struct netlink_linearize_ctx *ctx,
-+				    const struct stmt *stmt)
-+{
-+	struct nftnl_expr *nle;
-+
-+	nle = alloc_nft_expr("timerange");
-+	nftnl_expr_set_u32(nle, NFTNL_EXPR_TIMERANGE_FLAGS, stmt->timerange.flags);
-+	if (stmt->timerange.hours != NULL)
-+			nftnl_expr_set_str(nle, NFTNL_EXPR_TIMERANGE_HOURS, stmt->timerange.hours);
-+	if (stmt->timerange.weekdays != NULL)
-+			nftnl_expr_set_str(nle, NFTNL_EXPR_TIMERANGE_WEEKDAYS, stmt->timerange.weekdays);
-+	if (stmt->timerange.weeklyranges != NULL)
-+			nftnl_expr_set_str(nle, NFTNL_EXPR_TIMERANGE_WEEKLYRANGES, stmt->timerange.weeklyranges);
-+
-+	nft_rule_add_expr(ctx, nle, &stmt->location);
-+}
-+
-+static void netlink_gen_bandwidth_stmt(struct netlink_linearize_ctx *ctx,
-+				    const struct stmt *stmt)
-+{
-+	struct nftnl_expr *nle;
-+
-+	nle = alloc_nft_expr("bandwidth");
-+	if (stmt->bandwidth.id != NULL)
-+		nftnl_expr_set_str(nle, NFTNL_EXPR_BANDWIDTH_ID, stmt->bandwidth.id);
-+	nftnl_expr_set_u8(nle, NFTNL_EXPR_BANDWIDTH_CMP, stmt->bandwidth.cmp);
-+	nftnl_expr_set_u8(nle, NFTNL_EXPR_BANDWIDTH_TYPE, stmt->bandwidth.type);
-+	nftnl_expr_set_u8(nle, NFTNL_EXPR_BANDWIDTH_CHECKTYPE, stmt->bandwidth.check_type);
-+	nftnl_expr_set_u64(nle, NFTNL_EXPR_BANDWIDTH_BWCUTOFF, stmt->bandwidth.bandwidth_cutoff);
-+	nftnl_expr_set_u64(nle, NFTNL_EXPR_BANDWIDTH_CURRENTBW, stmt->bandwidth.current_bandwidth);
-+	if (stmt->bandwidth.subnet != NULL)
-+		nftnl_expr_set_str(nle, NFTNL_EXPR_BANDWIDTH_SUBNET, stmt->bandwidth.subnet);
-+	if (stmt->bandwidth.subnet6 != NULL)
-+		nftnl_expr_set_str(nle, NFTNL_EXPR_BANDWIDTH_SUBNET6, stmt->bandwidth.subnet6);
-+	nftnl_expr_set_u64(nle, NFTNL_EXPR_BANDWIDTH_RSTINTVL, stmt->bandwidth.reset_interval);
-+	nftnl_expr_set_u8(nle, NFTNL_EXPR_BANDWIDTH_RSTINTVLCONST, stmt->bandwidth.reset_is_constant_interval);
-+	nftnl_expr_set_u64(nle, NFTNL_EXPR_BANDWIDTH_RSTTIME, stmt->bandwidth.reset_time);
-+	nftnl_expr_set_u32(nle, NFTNL_EXPR_BANDWIDTH_NUMINTVLSTOSAVE, stmt->bandwidth.num_intervals_to_save);
-+	nftnl_expr_set_u64(nle, NFTNL_EXPR_BANDWIDTH_NEXTRESET, stmt->bandwidth.next_reset);
-+	nftnl_expr_set_u64(nle, NFTNL_EXPR_BANDWIDTH_PREVRESET, stmt->bandwidth.prev_reset);
-+	nftnl_expr_set_u64(nle, NFTNL_EXPR_BANDWIDTH_LASTBACKUPTIME, stmt->bandwidth.last_backup_time);
-+
-+	nft_rule_add_expr(ctx, nle, &stmt->location);
-+}
-+
- static void netlink_gen_reject_stmt(struct netlink_linearize_ctx *ctx,
- 				    const struct stmt *stmt)
- {
-@@ -1730,6 +1807,14 @@
- 		return netlink_gen_meta_stmt(ctx, stmt);
- 	case STMT_LOG:
- 		return netlink_gen_log_stmt(ctx, stmt);
-+	case STMT_WEBURL:
-+		return netlink_gen_weburl_stmt(ctx, stmt);
-+	case STMT_WEBMON:
-+		return netlink_gen_webmon_stmt(ctx, stmt);
-+	case STMT_TIMERANGE:
-+		return netlink_gen_timerange_stmt(ctx, stmt);
-+	case STMT_BANDWIDTH:
-+		return netlink_gen_bandwidth_stmt(ctx, stmt);
- 	case STMT_REJECT:
- 		return netlink_gen_reject_stmt(ctx, stmt);
- 	case STMT_NAT:
---- nftables.orig/src/evaluate.c	2025-12-05 20:17:57.639743864 +0800
-+++ nftables.new/src/evaluate.c	2025-12-12 10:18:53.030277382 +0800
-@@ -4175,6 +4175,139 @@
- 	return stmt_evaluate_reject_family(ctx, stmt);
- }
- 
-+static int stmt_evaluate_bandwidth(struct eval_ctx *ctx, struct stmt *stmt)
-+{
-+	struct proto_ctx *pctx = eval_proto_ctx(ctx);
-+
-+	switch (pctx->family) {
-+	case NFPROTO_ARP:
-+	case NFPROTO_BRIDGE:
-+	case NFPROTO_NETDEV:
-+		return stmt_error(ctx, stmt, "bandwidth is only supported for inet/ipv4/ipv6 table family");
-+	}
-+
-+	if(strlen(stmt->bandwidth.id) == 0)
-+	{
-+		unsigned long id_num = 0;
-+		srand(time(NULL));
-+		id_num = rand();
-+		if(stmt->bandwidth.id != NULL)
-+			free_const(stmt->bandwidth.id);
-+		stmt->bandwidth.id = malloc(BANDWIDTH_MAX_ID_LENGTH*sizeof(char));
-+		if(stmt->bandwidth.id == NULL)
-+			return stmt_error(ctx, stmt, "bandwidth id malloc failure");
-+		sprintf(stmt->bandwidth.id, "%lu", id_num);
-+	}
-+	if(strlen(stmt->bandwidth.id) > BANDWIDTH_MAX_ID_LENGTH)
-+		return stmt_error(ctx, stmt, "ID must be less than %d characters", BANDWIDTH_MAX_ID_LENGTH);
-+
-+	// Handle defaults
-+	if(stmt->bandwidth.type == 0) stmt->bandwidth.type = NFT_BANDWIDTH_TYPE_COMBINED;
-+	if(stmt->bandwidth.check_type == 0) stmt->bandwidth.check_type = NFT_BANDWIDTH_CHECKTYPE_NOSWAP;
-+	if(stmt->bandwidth.cmp == 0) stmt->bandwidth.cmp = NFT_BANDWIDTH_CMP_MONITOR;
-+	if(stmt->bandwidth.reset_interval == 0) stmt->bandwidth.reset_interval = NFT_BANDWIDTH_RSTINTVL_NEVER;
-+
-+	if(stmt->bandwidth.type == NFT_BANDWIDTH_TYPE_INDIVIDUALLOCAL || stmt->bandwidth.type == NFT_BANDWIDTH_TYPE_INDIVIDUALREMOTE)
-+	{
-+		uint32_t subnetstrlen = strlen(stmt->bandwidth.subnet);
-+		uint32_t subnet6strlen = strlen(stmt->bandwidth.subnet6);
-+		if(pctx->family == NFPROTO_INET && (subnetstrlen == 0 || subnet6strlen == 0))
-+			return stmt_error(ctx, stmt, "Type individual-local/individual-remote requires subnet and subnet6");
-+		else if(pctx->family == NFPROTO_IPV4)
-+		{
-+			if(subnetstrlen == 0)
-+				return stmt_error(ctx, stmt, "Type individual-local/individual-remote requires subnet");
-+			else if(subnet6strlen > 0)
-+				return stmt_error(ctx, stmt, "subnet6 is not supported in IPv4 table family");
-+		}
-+		else if(pctx->family == NFPROTO_IPV6)
-+		{
-+			if(subnet6strlen == 0)
-+				return stmt_error(ctx, stmt, "Type individual-local/individual-remote requires subnet6");
-+			else if(subnetstrlen > 0)
-+				return stmt_error(ctx, stmt, "subnet is not supported in IPv6 table family");
-+		}
-+	}
-+
-+	if(stmt->bandwidth.reset_interval > 0)
-+	{
-+		stmt->bandwidth.reset_is_constant_interval = 0;
-+		if(stmt->bandwidth.reset_interval != NFT_BANDWIDTH_RSTINTVL_MINUTE &&
-+			stmt->bandwidth.reset_interval != NFT_BANDWIDTH_RSTINTVL_HOUR &&
-+			stmt->bandwidth.reset_interval != NFT_BANDWIDTH_RSTINTVL_DAY &&
-+			stmt->bandwidth.reset_interval != NFT_BANDWIDTH_RSTINTVL_WEEK &&
-+			stmt->bandwidth.reset_interval != NFT_BANDWIDTH_RSTINTVL_MONTH &&
-+			stmt->bandwidth.reset_interval != NFT_BANDWIDTH_RSTINTVL_NEVER)
-+		{
-+			stmt->bandwidth.reset_is_constant_interval = 1;
-+		}
-+	}
-+
-+	if(stmt->bandwidth.reset_interval > 0 && stmt->bandwidth.reset_time > 0)
-+	{
-+		if(
-+			(stmt->bandwidth.reset_interval == NFT_BANDWIDTH_RSTINTVL_NEVER) ||
-+			(stmt->bandwidth.reset_interval == NFT_BANDWIDTH_RSTINTVL_MONTH && stmt->bandwidth.reset_time >= 60*60*24*28) ||
-+			(stmt->bandwidth.reset_interval == NFT_BANDWIDTH_RSTINTVL_WEEK && stmt->bandwidth.reset_time >= 60*60*24*7) ||
-+			(stmt->bandwidth.reset_interval == NFT_BANDWIDTH_RSTINTVL_DAY && stmt->bandwidth.reset_time >= 60*60*24) ||
-+			(stmt->bandwidth.reset_interval == NFT_BANDWIDTH_RSTINTVL_HOUR && stmt->bandwidth.reset_time >= 60*60) ||
-+			(stmt->bandwidth.reset_interval == NFT_BANDWIDTH_RSTINTVL_MINUTE && stmt->bandwidth.reset_time >= 60)
-+		)
-+		{
-+			return stmt_error(ctx, stmt, "reset-time is not in a valid range for this reset-interval");
-+		}
-+	}
-+
-+	if(stmt->bandwidth.reset_time > 0 && stmt->bandwidth.reset_interval == 0)
-+		return stmt_error(ctx, stmt, "You must specify a reset-interval with reset-time");
-+
-+	if(stmt->bandwidth.type != NFT_BANDWIDTH_TYPE_COMBINED && stmt->bandwidth.current_bandwidth > 0)
-+		return stmt_error(ctx, stmt, "You may only specify current-bandwidth for combined type. Use user-space library for setting bandwidth for individual types");
-+
-+	return 0;
-+}
-+
-+static int stmt_evaluate_timerange(struct eval_ctx *ctx, struct stmt *stmt)
-+{
-+	// Implement validation here if needed
-+	return 0;
-+}
-+
-+static int stmt_evaluate_webmon(struct eval_ctx *ctx, struct stmt *stmt)
-+{
-+	uint32_t bitmask = 0;
-+	uint32_t testbits = 0;
-+
-+	bitmask = (NFT_WEBMON_F_EXCLUDE | NFT_WEBMON_F_INCLUDE);
-+	testbits = stmt->webmon.flags & bitmask;
-+	if((testbits & NFT_WEBMON_F_EXCLUDE) && (testbits & NFT_WEBMON_F_INCLUDE))
-+		return stmt_error(ctx, stmt, "You may only specify either: include IPs, exclude IPs, or neither (to include all)");
-+
-+	if(stmt->webmon.max_domains <= 0)
-+		return stmt_error(ctx, stmt, "Max Domains must be > 0. If not specified defaults to %d", DEFAULT_NFT_WEBMON_MAX_DOMAINSEARCHES);
-+	if(stmt->webmon.max_searches <= 0)
-+		return stmt_error(ctx, stmt, "Max Searches must be > 0. If not specified defaults to %d", DEFAULT_NFT_WEBMON_MAX_DOMAINSEARCHES);
-+	return 0;
-+}
-+
-+static int stmt_evaluate_weburl(struct eval_ctx *ctx, struct stmt *stmt)
-+{
-+	uint32_t bitmask = 0;
-+	uint32_t testbits = 0;
-+
-+	bitmask = (NFT_WEBURL_F_MT_CONTAINS | NFT_WEBURL_F_MT_CONTAINSREGEX | NFT_WEBURL_F_MT_MATCHESEXACTLY);
-+	testbits = stmt->weburl.flags & bitmask;
-+	if(!(testbits && !(testbits & (testbits - 1))))
-+		return stmt_error(ctx, stmt, "You may only specify one string/pattern to match");
-+
-+	bitmask = (NFT_WEBURL_F_MP_ALL | NFT_WEBURL_F_MP_DOMAINONLY | NFT_WEBURL_F_MP_PATHONLY);
-+	testbits = stmt->weburl.flags & bitmask;
-+	if(!(testbits && !(testbits & (testbits - 1))))
-+		return stmt_error(ctx, stmt, "You may only specify part of the url to match: domain-only, path-only or neither (to match the full url)");
-+
-+	return 0;
-+}
-+
- static int nat_evaluate_family(struct eval_ctx *ctx, struct stmt *stmt)
- {
- 	struct proto_ctx *pctx = eval_proto_ctx(ctx);
-@@ -5071,6 +5204,14 @@
- 		return stmt_evaluate_log(ctx, stmt);
- 	case STMT_REJECT:
- 		return stmt_evaluate_reject(ctx, stmt);
-+	case STMT_BANDWIDTH:
-+		return stmt_evaluate_bandwidth(ctx, stmt);
-+	case STMT_TIMERANGE:
-+		return stmt_evaluate_timerange(ctx, stmt);
-+	case STMT_WEBMON:
-+		return stmt_evaluate_webmon(ctx, stmt);
-+	case STMT_WEBURL:
-+		return stmt_evaluate_weburl(ctx, stmt);
- 	case STMT_NAT:
- 		return stmt_evaluate_nat(ctx, stmt);
- 	case STMT_TPROXY:
---- nftables.orig/src/statement.c	2025-12-12 10:18:47.124324523 +0800
-+++ nftables.new/src/statement.c	2025-12-12 10:18:53.486800083 +0800
+--- nftables.orig/src/statement.c	2026-03-29 17:00:52.241082777 +0800
++++ nftables.new/src/statement.c	2026-03-29 17:00:55.508761590 +0800
 @@ -602,6 +602,229 @@
  	return stmt;
  }
@@ -488,8 +230,333 @@
  static void reject_stmt_print(const struct stmt *stmt, struct output_ctx *octx)
  {
  	nft_print(octx, "reject");
---- nftables.orig/src/parser_bison.y	2025-12-12 10:18:47.123483951 +0800
-+++ nftables.new/src/parser_bison.y	2025-12-12 10:18:53.376795836 +0800
+--- nftables.orig/src/netlink_delinearize.c	2026-03-29 17:00:52.239791124 +0800
++++ nftables.new/src/netlink_delinearize.c	2026-03-29 17:00:55.233354738 +0800
+@@ -1205,6 +1205,77 @@
+ 	ctx->stmt = stmt;
+ }
+ 
++static void netlink_parse_weburl(struct netlink_parse_ctx *ctx,
++				 const struct location *loc,
++				 const struct nftnl_expr *expr)
++{
++	struct stmt *stmt;
++
++	stmt = weburl_stmt_alloc(loc);
++	stmt->weburl.flags = nftnl_expr_get_u32(expr, NFTNL_EXPR_WEBURL_FLAGS);
++	stmt->weburl.match = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_WEBURL_MATCH));
++
++	ctx->stmt = stmt;
++}
++
++static void netlink_parse_webmon(struct netlink_parse_ctx *ctx,
++				 const struct location *loc,
++				 const struct nftnl_expr *expr)
++{
++	struct stmt *stmt;
++
++	stmt = webmon_stmt_alloc(loc);
++	stmt->webmon.flags = nftnl_expr_get_u32(expr, NFTNL_EXPR_WEBMON_FLAGS);
++	stmt->webmon.max_domains = nftnl_expr_get_u32(expr, NFTNL_EXPR_WEBMON_MAXDOMAINS);
++	stmt->webmon.max_searches = nftnl_expr_get_u32(expr, NFTNL_EXPR_WEBMON_MAXSEARCHES);
++	stmt->webmon.ips = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_WEBMON_IPS));
++	stmt->webmon.domain_load_file = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_WEBMON_DOMAINLOADFILE));
++	stmt->webmon.search_load_file = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_WEBMON_SEARCHLOADFILE));
++
++	ctx->stmt = stmt;
++}
++
++static void netlink_parse_timerange(struct netlink_parse_ctx *ctx,
++				 const struct location *loc,
++				 const struct nftnl_expr *expr)
++{
++	struct stmt *stmt;
++
++	stmt = timerange_stmt_alloc(loc);
++	stmt->timerange.flags = nftnl_expr_get_u32(expr, NFTNL_EXPR_TIMERANGE_FLAGS);
++	stmt->timerange.hours = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_TIMERANGE_HOURS));
++	stmt->timerange.weekdays = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_TIMERANGE_WEEKDAYS));
++	stmt->timerange.weeklyranges = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_TIMERANGE_WEEKLYRANGES));
++
++	ctx->stmt = stmt;
++}
++
++static void netlink_parse_bandwidth(struct netlink_parse_ctx *ctx,
++				 const struct location *loc,
++				 const struct nftnl_expr *expr)
++{
++	struct stmt *stmt;
++
++	stmt = bandwidth_stmt_alloc(loc);
++	stmt->bandwidth.id = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_BANDWIDTH_ID));
++	stmt->bandwidth.cmp = nftnl_expr_get_u8(expr, NFTNL_EXPR_BANDWIDTH_CMP);
++	stmt->bandwidth.type = nftnl_expr_get_u8(expr, NFTNL_EXPR_BANDWIDTH_TYPE);
++	stmt->bandwidth.check_type = nftnl_expr_get_u8(expr, NFTNL_EXPR_BANDWIDTH_CHECKTYPE);
++	stmt->bandwidth.bandwidth_cutoff = nftnl_expr_get_u64(expr, NFTNL_EXPR_BANDWIDTH_BWCUTOFF);
++	stmt->bandwidth.current_bandwidth = nftnl_expr_get_u64(expr, NFTNL_EXPR_BANDWIDTH_CURRENTBW);
++	stmt->bandwidth.subnet = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_BANDWIDTH_SUBNET));
++	stmt->bandwidth.subnet6 = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_BANDWIDTH_SUBNET6));
++	stmt->bandwidth.reset_interval = nftnl_expr_get_u64(expr, NFTNL_EXPR_BANDWIDTH_RSTINTVL);
++	stmt->bandwidth.reset_is_constant_interval = nftnl_expr_get_u8(expr, NFTNL_EXPR_BANDWIDTH_RSTINTVLCONST);
++	stmt->bandwidth.reset_time = nftnl_expr_get_u64(expr, NFTNL_EXPR_BANDWIDTH_RSTTIME);
++	stmt->bandwidth.num_intervals_to_save = nftnl_expr_get_u32(expr, NFTNL_EXPR_BANDWIDTH_NUMINTVLSTOSAVE);
++	stmt->bandwidth.next_reset = nftnl_expr_get_u64(expr, NFTNL_EXPR_BANDWIDTH_NEXTRESET);
++	stmt->bandwidth.prev_reset = nftnl_expr_get_u64(expr, NFTNL_EXPR_BANDWIDTH_PREVRESET);
++	stmt->bandwidth.last_backup_time = nftnl_expr_get_u64(expr, NFTNL_EXPR_BANDWIDTH_LASTBACKUPTIME);
++
++	ctx->stmt = stmt;
++}
++
+ static void netlink_parse_reject(struct netlink_parse_ctx *ctx,
+ 				 const struct location *loc,
+ 				 const struct nftnl_expr *expr)
+@@ -1975,6 +2046,10 @@
+ 
+ static const struct expr_handler netlink_parsers[] = {
+ 	{ .name = "immediate",	.parse = netlink_parse_immediate },
++	{ .name = "bandwidth",	.parse = netlink_parse_bandwidth },
++	{ .name = "timerange",	.parse = netlink_parse_timerange },
++	{ .name = "webmon",	.parse = netlink_parse_webmon },
++	{ .name = "weburl",	.parse = netlink_parse_weburl },
+ 	{ .name = "cmp",	.parse = netlink_parse_cmp },
+ 	{ .name = "lookup",	.parse = netlink_parse_lookup },
+ 	{ .name = "bitwise",	.parse = netlink_parse_bitwise },
+--- nftables.orig/src/scanner.l	2026-03-29 17:00:52.240908748 +0800
++++ nftables.new/src/scanner.l	2026-03-29 17:00:55.484346949 +0800
+@@ -258,6 +258,10 @@
+ %s SCANSTATE_STMT_LOG
+ %s SCANSTATE_STMT_NAT
+ %s SCANSTATE_STMT_REJECT
++%s SCANSTATE_STMT_BANDWIDTH
++%s SCANSTATE_STMT_TIMERANGE
++%s SCANSTATE_STMT_WEBMON
++%s SCANSTATE_STMT_WEBURL
+ %s SCANSTATE_STMT_SYNPROXY
+ %s SCANSTATE_STMT_TPROXY
+ 
+@@ -461,6 +465,63 @@
+ "hour"			{ return HOUR; }
+ "day"			{ return DAY; }
+ 
++"weburl"		{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_WEBURL); return WEBURL; }
++<SCANSTATE_STMT_WEBURL>{
++	"!="						{ return NEQ; }
++	"contains"				{ return CONTAINS; }
++	"contains-regex"		{ return CONTAINS_REGEX; }
++	"matches-exactly"		{ return MATCHES_EXACTLY; }
++	"domain-only"			{ return DOMAIN_ONLY; }
++	"path-only"				{ return PATH_ONLY; }
++}
++
++"webmon"			{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_WEBMON); return WEBMON; }
++<SCANSTATE_STMT_WEBMON>{
++	"include-ips"		{ return INCLUDE_IPS; }
++	"exclude-ips"		{ return EXCLUDE_IPS; }
++	"max-domains"		{ return MAX_DOMAINS; }
++	"max-searches"		{ return MAX_SEARCHES; }
++	"domain-load-file"	{ return DOMAIN_LOAD_FILE; }
++	"search-load-file"	{ return SEARCH_LOAD_FILE; }
++	"clear-domain"		{ return CLEAR_DOMAIN; }
++	"clear-search"		{ return CLEAR_SEARCH; }
++}
++"timerange"			{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_TIMERANGE); return TIMERANGE; }
++<SCANSTATE_STMT_TIMERANGE>{
++	"!="		{ return NEQ; }
++	"hours"		{ return HOURS; }
++	"weekdays"		{ return WEEKDAYS; }
++	"weeklyranges"			{ return WEEKLYRANGES; }
++}
++
++"bandwidth"			{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_BANDWIDTH); return BANDWIDTH; }
++<SCANSTATE_STMT_BANDWIDTH>{
++	"combined"					{ return COMBINED; }
++	"individual-src"			{ return INDIVIDUAL_SRC; }
++	"individual-dst"			{ return INDIVIDUAL_DST; }
++	"individual-local"			{ return INDIVIDUAL_LOCAL; }
++	"individual-remote"			{ return INDIVIDUAL_REMOTE; }
++	"monitor"					{ return MONITOR; }
++	"less-than"					{ return LESS_THAN; }
++	"greater-than"				{ return GREATER_THAN; }
++	"bcheck"					{ return BANDWIDTH_CHECK_NOSWAP; }
++	"bcheck-with-src-dst-swap"	{ return BANDWIDTH_CHECK_SWAP; }
++	"minute"					{ return MINUTE; }
++	"hour"						{ return HOUR; }
++	"day"						{ return DAY; }
++	"week"						{ return WEEK; }
++	"month"						{ return MONTH; }
++	"never"						{ return NEVER; }
++	"id"						{ return ID; }
++	"type"						{ return TYPE; }
++	"subnet"					{ return SUBNET; }
++	"subnet6"					{ return SUBNET6; }
++	"current-bandwidth"			{ return CURRENT_BANDWIDTH; }
++	"reset-interval"			{ return RESET_INTERVAL; }
++	"reset-time"				{ return RESET_TIME; }
++	"intervals-to-save"			{ return INTERVALS_TO_SAVE; }
++	"last-backup-time"			{ return LAST_BACKUP_TIME; }
++}
+ "reject"		{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_REJECT); return _REJECT; }
+ <SCANSTATE_STMT_REJECT>{
+ 	"with"			{ return WITH; }
+--- nftables.orig/src/evaluate.c	2025-12-05 20:17:57.639743864 +0800
++++ nftables.new/src/evaluate.c	2026-03-29 17:00:55.174756145 +0800
+@@ -4175,6 +4175,139 @@
+ 	return stmt_evaluate_reject_family(ctx, stmt);
+ }
+ 
++static int stmt_evaluate_bandwidth(struct eval_ctx *ctx, struct stmt *stmt)
++{
++	struct proto_ctx *pctx = eval_proto_ctx(ctx);
++
++	switch (pctx->family) {
++	case NFPROTO_ARP:
++	case NFPROTO_BRIDGE:
++	case NFPROTO_NETDEV:
++		return stmt_error(ctx, stmt, "bandwidth is only supported for inet/ipv4/ipv6 table family");
++	}
++
++	if(strlen(stmt->bandwidth.id) == 0)
++	{
++		unsigned long id_num = 0;
++		srand(time(NULL));
++		id_num = rand();
++		if(stmt->bandwidth.id != NULL)
++			free_const(stmt->bandwidth.id);
++		stmt->bandwidth.id = malloc(BANDWIDTH_MAX_ID_LENGTH*sizeof(char));
++		if(stmt->bandwidth.id == NULL)
++			return stmt_error(ctx, stmt, "bandwidth id malloc failure");
++		sprintf(stmt->bandwidth.id, "%lu", id_num);
++	}
++	if(strlen(stmt->bandwidth.id) > BANDWIDTH_MAX_ID_LENGTH)
++		return stmt_error(ctx, stmt, "ID must be less than %d characters", BANDWIDTH_MAX_ID_LENGTH);
++
++	// Handle defaults
++	if(stmt->bandwidth.type == 0) stmt->bandwidth.type = NFT_BANDWIDTH_TYPE_COMBINED;
++	if(stmt->bandwidth.check_type == 0) stmt->bandwidth.check_type = NFT_BANDWIDTH_CHECKTYPE_NOSWAP;
++	if(stmt->bandwidth.cmp == 0) stmt->bandwidth.cmp = NFT_BANDWIDTH_CMP_MONITOR;
++	if(stmt->bandwidth.reset_interval == 0) stmt->bandwidth.reset_interval = NFT_BANDWIDTH_RSTINTVL_NEVER;
++
++	if(stmt->bandwidth.type == NFT_BANDWIDTH_TYPE_INDIVIDUALLOCAL || stmt->bandwidth.type == NFT_BANDWIDTH_TYPE_INDIVIDUALREMOTE)
++	{
++		uint32_t subnetstrlen = strlen(stmt->bandwidth.subnet);
++		uint32_t subnet6strlen = strlen(stmt->bandwidth.subnet6);
++		if(pctx->family == NFPROTO_INET && (subnetstrlen == 0 || subnet6strlen == 0))
++			return stmt_error(ctx, stmt, "Type individual-local/individual-remote requires subnet and subnet6");
++		else if(pctx->family == NFPROTO_IPV4)
++		{
++			if(subnetstrlen == 0)
++				return stmt_error(ctx, stmt, "Type individual-local/individual-remote requires subnet");
++			else if(subnet6strlen > 0)
++				return stmt_error(ctx, stmt, "subnet6 is not supported in IPv4 table family");
++		}
++		else if(pctx->family == NFPROTO_IPV6)
++		{
++			if(subnet6strlen == 0)
++				return stmt_error(ctx, stmt, "Type individual-local/individual-remote requires subnet6");
++			else if(subnetstrlen > 0)
++				return stmt_error(ctx, stmt, "subnet is not supported in IPv6 table family");
++		}
++	}
++
++	if(stmt->bandwidth.reset_interval > 0)
++	{
++		stmt->bandwidth.reset_is_constant_interval = 0;
++		if(stmt->bandwidth.reset_interval != NFT_BANDWIDTH_RSTINTVL_MINUTE &&
++			stmt->bandwidth.reset_interval != NFT_BANDWIDTH_RSTINTVL_HOUR &&
++			stmt->bandwidth.reset_interval != NFT_BANDWIDTH_RSTINTVL_DAY &&
++			stmt->bandwidth.reset_interval != NFT_BANDWIDTH_RSTINTVL_WEEK &&
++			stmt->bandwidth.reset_interval != NFT_BANDWIDTH_RSTINTVL_MONTH &&
++			stmt->bandwidth.reset_interval != NFT_BANDWIDTH_RSTINTVL_NEVER)
++		{
++			stmt->bandwidth.reset_is_constant_interval = 1;
++		}
++	}
++
++	if(stmt->bandwidth.reset_interval > 0 && stmt->bandwidth.reset_time > 0)
++	{
++		if(
++			(stmt->bandwidth.reset_interval == NFT_BANDWIDTH_RSTINTVL_NEVER) ||
++			(stmt->bandwidth.reset_interval == NFT_BANDWIDTH_RSTINTVL_MONTH && stmt->bandwidth.reset_time >= 60*60*24*28) ||
++			(stmt->bandwidth.reset_interval == NFT_BANDWIDTH_RSTINTVL_WEEK && stmt->bandwidth.reset_time >= 60*60*24*7) ||
++			(stmt->bandwidth.reset_interval == NFT_BANDWIDTH_RSTINTVL_DAY && stmt->bandwidth.reset_time >= 60*60*24) ||
++			(stmt->bandwidth.reset_interval == NFT_BANDWIDTH_RSTINTVL_HOUR && stmt->bandwidth.reset_time >= 60*60) ||
++			(stmt->bandwidth.reset_interval == NFT_BANDWIDTH_RSTINTVL_MINUTE && stmt->bandwidth.reset_time >= 60)
++		)
++		{
++			return stmt_error(ctx, stmt, "reset-time is not in a valid range for this reset-interval");
++		}
++	}
++
++	if(stmt->bandwidth.reset_time > 0 && stmt->bandwidth.reset_interval == 0)
++		return stmt_error(ctx, stmt, "You must specify a reset-interval with reset-time");
++
++	if(stmt->bandwidth.type != NFT_BANDWIDTH_TYPE_COMBINED && stmt->bandwidth.current_bandwidth > 0)
++		return stmt_error(ctx, stmt, "You may only specify current-bandwidth for combined type. Use user-space library for setting bandwidth for individual types");
++
++	return 0;
++}
++
++static int stmt_evaluate_timerange(struct eval_ctx *ctx, struct stmt *stmt)
++{
++	// Implement validation here if needed
++	return 0;
++}
++
++static int stmt_evaluate_webmon(struct eval_ctx *ctx, struct stmt *stmt)
++{
++	uint32_t bitmask = 0;
++	uint32_t testbits = 0;
++
++	bitmask = (NFT_WEBMON_F_EXCLUDE | NFT_WEBMON_F_INCLUDE);
++	testbits = stmt->webmon.flags & bitmask;
++	if((testbits & NFT_WEBMON_F_EXCLUDE) && (testbits & NFT_WEBMON_F_INCLUDE))
++		return stmt_error(ctx, stmt, "You may only specify either: include IPs, exclude IPs, or neither (to include all)");
++
++	if(stmt->webmon.max_domains <= 0)
++		return stmt_error(ctx, stmt, "Max Domains must be > 0. If not specified defaults to %d", DEFAULT_NFT_WEBMON_MAX_DOMAINSEARCHES);
++	if(stmt->webmon.max_searches <= 0)
++		return stmt_error(ctx, stmt, "Max Searches must be > 0. If not specified defaults to %d", DEFAULT_NFT_WEBMON_MAX_DOMAINSEARCHES);
++	return 0;
++}
++
++static int stmt_evaluate_weburl(struct eval_ctx *ctx, struct stmt *stmt)
++{
++	uint32_t bitmask = 0;
++	uint32_t testbits = 0;
++
++	bitmask = (NFT_WEBURL_F_MT_CONTAINS | NFT_WEBURL_F_MT_CONTAINSREGEX | NFT_WEBURL_F_MT_MATCHESEXACTLY);
++	testbits = stmt->weburl.flags & bitmask;
++	if(!(testbits && !(testbits & (testbits - 1))))
++		return stmt_error(ctx, stmt, "You may only specify one string/pattern to match");
++
++	bitmask = (NFT_WEBURL_F_MP_ALL | NFT_WEBURL_F_MP_DOMAINONLY | NFT_WEBURL_F_MP_PATHONLY);
++	testbits = stmt->weburl.flags & bitmask;
++	if(!(testbits && !(testbits & (testbits - 1))))
++		return stmt_error(ctx, stmt, "You may only specify part of the url to match: domain-only, path-only or neither (to match the full url)");
++
++	return 0;
++}
++
+ static int nat_evaluate_family(struct eval_ctx *ctx, struct stmt *stmt)
+ {
+ 	struct proto_ctx *pctx = eval_proto_ctx(ctx);
+@@ -5071,6 +5204,14 @@
+ 		return stmt_evaluate_log(ctx, stmt);
+ 	case STMT_REJECT:
+ 		return stmt_evaluate_reject(ctx, stmt);
++	case STMT_BANDWIDTH:
++		return stmt_evaluate_bandwidth(ctx, stmt);
++	case STMT_TIMERANGE:
++		return stmt_evaluate_timerange(ctx, stmt);
++	case STMT_WEBMON:
++		return stmt_evaluate_webmon(ctx, stmt);
++	case STMT_WEBURL:
++		return stmt_evaluate_weburl(ctx, stmt);
+ 	case STMT_NAT:
+ 		return stmt_evaluate_nat(ctx, stmt);
+ 	case STMT_TPROXY:
+--- nftables.orig/src/parser_bison.y	2026-03-29 17:00:52.240489925 +0800
++++ nftables.new/src/parser_bison.y	2026-03-29 17:00:55.432407439 +0800
 @@ -674,6 +674,55 @@
  %token FULLY_RANDOM		"fully-random"
  %token PERSISTENT		"persistent"
@@ -814,176 +881,109 @@
  nat_stmt		:	nat_stmt_alloc	nat_stmt_args
  			;
  
---- nftables.orig/src/netlink_delinearize.c	2025-12-12 10:18:47.122543405 +0800
-+++ nftables.new/src/netlink_delinearize.c	2025-12-12 10:18:53.104785336 +0800
-@@ -1205,6 +1205,77 @@
- 	ctx->stmt = stmt;
+--- nftables.orig/src/netlink_linearize.c	2026-03-29 17:00:52.240102763 +0800
++++ nftables.new/src/netlink_linearize.c	2026-03-29 17:00:55.294758101 +0800
+@@ -1210,6 +1210,83 @@
+ 	nft_rule_add_expr(ctx, nle, &stmt->location);
  }
  
-+static void netlink_parse_weburl(struct netlink_parse_ctx *ctx,
-+				 const struct location *loc,
-+				 const struct nftnl_expr *expr)
++static void netlink_gen_weburl_stmt(struct netlink_linearize_ctx *ctx,
++				    const struct stmt *stmt)
 +{
-+	struct stmt *stmt;
++	struct nftnl_expr *nle;
 +
-+	stmt = weburl_stmt_alloc(loc);
-+	stmt->weburl.flags = nftnl_expr_get_u32(expr, NFTNL_EXPR_WEBURL_FLAGS);
-+	stmt->weburl.match = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_WEBURL_MATCH));
++	nle = alloc_nft_expr("weburl");
++	nftnl_expr_set_u32(nle, NFTNL_EXPR_WEBURL_FLAGS, stmt->weburl.flags);
++	if (stmt->weburl.match != NULL)
++			nftnl_expr_set_str(nle, NFTNL_EXPR_WEBURL_MATCH, stmt->weburl.match);
 +
-+	ctx->stmt = stmt;
++	nft_rule_add_expr(ctx, nle, &stmt->location);
 +}
 +
-+static void netlink_parse_webmon(struct netlink_parse_ctx *ctx,
-+				 const struct location *loc,
-+				 const struct nftnl_expr *expr)
++static void netlink_gen_webmon_stmt(struct netlink_linearize_ctx *ctx,
++				    const struct stmt *stmt)
 +{
-+	struct stmt *stmt;
++	struct nftnl_expr *nle;
 +
-+	stmt = webmon_stmt_alloc(loc);
-+	stmt->webmon.flags = nftnl_expr_get_u32(expr, NFTNL_EXPR_WEBMON_FLAGS);
-+	stmt->webmon.max_domains = nftnl_expr_get_u32(expr, NFTNL_EXPR_WEBMON_MAXDOMAINS);
-+	stmt->webmon.max_searches = nftnl_expr_get_u32(expr, NFTNL_EXPR_WEBMON_MAXSEARCHES);
-+	stmt->webmon.ips = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_WEBMON_IPS));
-+	stmt->webmon.domain_load_file = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_WEBMON_DOMAINLOADFILE));
-+	stmt->webmon.search_load_file = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_WEBMON_SEARCHLOADFILE));
++	nle = alloc_nft_expr("webmon");
++	nftnl_expr_set_u32(nle, NFTNL_EXPR_WEBMON_FLAGS, stmt->webmon.flags);
++	nftnl_expr_set_u32(nle, NFTNL_EXPR_WEBMON_MAXDOMAINS, stmt->webmon.max_domains);
++	nftnl_expr_set_u32(nle, NFTNL_EXPR_WEBMON_MAXSEARCHES, stmt->webmon.max_searches);
++	if (stmt->webmon.ips != NULL)
++			nftnl_expr_set_str(nle, NFTNL_EXPR_WEBMON_IPS, stmt->webmon.ips);
++	if (stmt->webmon.domain_load_file != NULL)
++			nftnl_expr_set_str(nle, NFTNL_EXPR_WEBMON_DOMAINLOADFILE, stmt->webmon.domain_load_file);
++	if (stmt->webmon.search_load_file != NULL)
++			nftnl_expr_set_str(nle, NFTNL_EXPR_WEBMON_SEARCHLOADFILE, stmt->webmon.search_load_file);
 +
-+	ctx->stmt = stmt;
++	nft_rule_add_expr(ctx, nle, &stmt->location);
 +}
 +
-+static void netlink_parse_timerange(struct netlink_parse_ctx *ctx,
-+				 const struct location *loc,
-+				 const struct nftnl_expr *expr)
++static void netlink_gen_timerange_stmt(struct netlink_linearize_ctx *ctx,
++				    const struct stmt *stmt)
 +{
-+	struct stmt *stmt;
++	struct nftnl_expr *nle;
 +
-+	stmt = timerange_stmt_alloc(loc);
-+	stmt->timerange.flags = nftnl_expr_get_u32(expr, NFTNL_EXPR_TIMERANGE_FLAGS);
-+	stmt->timerange.hours = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_TIMERANGE_HOURS));
-+	stmt->timerange.weekdays = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_TIMERANGE_WEEKDAYS));
-+	stmt->timerange.weeklyranges = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_TIMERANGE_WEEKLYRANGES));
++	nle = alloc_nft_expr("timerange");
++	nftnl_expr_set_u32(nle, NFTNL_EXPR_TIMERANGE_FLAGS, stmt->timerange.flags);
++	if (stmt->timerange.hours != NULL)
++			nftnl_expr_set_str(nle, NFTNL_EXPR_TIMERANGE_HOURS, stmt->timerange.hours);
++	if (stmt->timerange.weekdays != NULL)
++			nftnl_expr_set_str(nle, NFTNL_EXPR_TIMERANGE_WEEKDAYS, stmt->timerange.weekdays);
++	if (stmt->timerange.weeklyranges != NULL)
++			nftnl_expr_set_str(nle, NFTNL_EXPR_TIMERANGE_WEEKLYRANGES, stmt->timerange.weeklyranges);
 +
-+	ctx->stmt = stmt;
++	nft_rule_add_expr(ctx, nle, &stmt->location);
 +}
 +
-+static void netlink_parse_bandwidth(struct netlink_parse_ctx *ctx,
-+				 const struct location *loc,
-+				 const struct nftnl_expr *expr)
++static void netlink_gen_bandwidth_stmt(struct netlink_linearize_ctx *ctx,
++				    const struct stmt *stmt)
 +{
-+	struct stmt *stmt;
++	struct nftnl_expr *nle;
 +
-+	stmt = bandwidth_stmt_alloc(loc);
-+	stmt->bandwidth.id = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_BANDWIDTH_ID));
-+	stmt->bandwidth.cmp = nftnl_expr_get_u8(expr, NFTNL_EXPR_BANDWIDTH_CMP);
-+	stmt->bandwidth.type = nftnl_expr_get_u8(expr, NFTNL_EXPR_BANDWIDTH_TYPE);
-+	stmt->bandwidth.check_type = nftnl_expr_get_u8(expr, NFTNL_EXPR_BANDWIDTH_CHECKTYPE);
-+	stmt->bandwidth.bandwidth_cutoff = nftnl_expr_get_u64(expr, NFTNL_EXPR_BANDWIDTH_BWCUTOFF);
-+	stmt->bandwidth.current_bandwidth = nftnl_expr_get_u64(expr, NFTNL_EXPR_BANDWIDTH_CURRENTBW);
-+	stmt->bandwidth.subnet = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_BANDWIDTH_SUBNET));
-+	stmt->bandwidth.subnet6 = xstrdup(nftnl_expr_get_str(expr, NFTNL_EXPR_BANDWIDTH_SUBNET6));
-+	stmt->bandwidth.reset_interval = nftnl_expr_get_u64(expr, NFTNL_EXPR_BANDWIDTH_RSTINTVL);
-+	stmt->bandwidth.reset_is_constant_interval = nftnl_expr_get_u8(expr, NFTNL_EXPR_BANDWIDTH_RSTINTVLCONST);
-+	stmt->bandwidth.reset_time = nftnl_expr_get_u64(expr, NFTNL_EXPR_BANDWIDTH_RSTTIME);
-+	stmt->bandwidth.num_intervals_to_save = nftnl_expr_get_u32(expr, NFTNL_EXPR_BANDWIDTH_NUMINTVLSTOSAVE);
-+	stmt->bandwidth.next_reset = nftnl_expr_get_u64(expr, NFTNL_EXPR_BANDWIDTH_NEXTRESET);
-+	stmt->bandwidth.prev_reset = nftnl_expr_get_u64(expr, NFTNL_EXPR_BANDWIDTH_PREVRESET);
-+	stmt->bandwidth.last_backup_time = nftnl_expr_get_u64(expr, NFTNL_EXPR_BANDWIDTH_LASTBACKUPTIME);
++	nle = alloc_nft_expr("bandwidth");
++	if (stmt->bandwidth.id != NULL)
++		nftnl_expr_set_str(nle, NFTNL_EXPR_BANDWIDTH_ID, stmt->bandwidth.id);
++	nftnl_expr_set_u8(nle, NFTNL_EXPR_BANDWIDTH_CMP, stmt->bandwidth.cmp);
++	nftnl_expr_set_u8(nle, NFTNL_EXPR_BANDWIDTH_TYPE, stmt->bandwidth.type);
++	nftnl_expr_set_u8(nle, NFTNL_EXPR_BANDWIDTH_CHECKTYPE, stmt->bandwidth.check_type);
++	nftnl_expr_set_u64(nle, NFTNL_EXPR_BANDWIDTH_BWCUTOFF, stmt->bandwidth.bandwidth_cutoff);
++	nftnl_expr_set_u64(nle, NFTNL_EXPR_BANDWIDTH_CURRENTBW, stmt->bandwidth.current_bandwidth);
++	if (stmt->bandwidth.subnet != NULL)
++		nftnl_expr_set_str(nle, NFTNL_EXPR_BANDWIDTH_SUBNET, stmt->bandwidth.subnet);
++	if (stmt->bandwidth.subnet6 != NULL)
++		nftnl_expr_set_str(nle, NFTNL_EXPR_BANDWIDTH_SUBNET6, stmt->bandwidth.subnet6);
++	nftnl_expr_set_u64(nle, NFTNL_EXPR_BANDWIDTH_RSTINTVL, stmt->bandwidth.reset_interval);
++	nftnl_expr_set_u8(nle, NFTNL_EXPR_BANDWIDTH_RSTINTVLCONST, stmt->bandwidth.reset_is_constant_interval);
++	nftnl_expr_set_u64(nle, NFTNL_EXPR_BANDWIDTH_RSTTIME, stmt->bandwidth.reset_time);
++	nftnl_expr_set_u32(nle, NFTNL_EXPR_BANDWIDTH_NUMINTVLSTOSAVE, stmt->bandwidth.num_intervals_to_save);
++	nftnl_expr_set_u64(nle, NFTNL_EXPR_BANDWIDTH_NEXTRESET, stmt->bandwidth.next_reset);
++	nftnl_expr_set_u64(nle, NFTNL_EXPR_BANDWIDTH_PREVRESET, stmt->bandwidth.prev_reset);
++	nftnl_expr_set_u64(nle, NFTNL_EXPR_BANDWIDTH_LASTBACKUPTIME, stmt->bandwidth.last_backup_time);
 +
-+	ctx->stmt = stmt;
++	nft_rule_add_expr(ctx, nle, &stmt->location);
 +}
 +
- static void netlink_parse_reject(struct netlink_parse_ctx *ctx,
- 				 const struct location *loc,
- 				 const struct nftnl_expr *expr)
-@@ -1975,6 +2046,10 @@
- 
- static const struct expr_handler netlink_parsers[] = {
- 	{ .name = "immediate",	.parse = netlink_parse_immediate },
-+	{ .name = "bandwidth",	.parse = netlink_parse_bandwidth },
-+	{ .name = "timerange",	.parse = netlink_parse_timerange },
-+	{ .name = "webmon",	.parse = netlink_parse_webmon },
-+	{ .name = "weburl",	.parse = netlink_parse_weburl },
- 	{ .name = "cmp",	.parse = netlink_parse_cmp },
- 	{ .name = "lookup",	.parse = netlink_parse_lookup },
- 	{ .name = "bitwise",	.parse = netlink_parse_bitwise },
---- nftables.orig/src/scanner.l	2025-12-12 10:18:47.124073993 +0800
-+++ nftables.new/src/scanner.l	2025-12-12 10:18:53.449798654 +0800
-@@ -258,6 +258,10 @@
- %s SCANSTATE_STMT_LOG
- %s SCANSTATE_STMT_NAT
- %s SCANSTATE_STMT_REJECT
-+%s SCANSTATE_STMT_BANDWIDTH
-+%s SCANSTATE_STMT_TIMERANGE
-+%s SCANSTATE_STMT_WEBMON
-+%s SCANSTATE_STMT_WEBURL
- %s SCANSTATE_STMT_SYNPROXY
- %s SCANSTATE_STMT_TPROXY
- 
-@@ -461,6 +465,63 @@
- "hour"			{ return HOUR; }
- "day"			{ return DAY; }
- 
-+"weburl"		{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_WEBURL); return WEBURL; }
-+<SCANSTATE_STMT_WEBURL>{
-+	"!="						{ return NEQ; }
-+	"contains"				{ return CONTAINS; }
-+	"contains-regex"		{ return CONTAINS_REGEX; }
-+	"matches-exactly"		{ return MATCHES_EXACTLY; }
-+	"domain-only"			{ return DOMAIN_ONLY; }
-+	"path-only"				{ return PATH_ONLY; }
-+}
-+
-+"webmon"			{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_WEBMON); return WEBMON; }
-+<SCANSTATE_STMT_WEBMON>{
-+	"include-ips"		{ return INCLUDE_IPS; }
-+	"exclude-ips"		{ return EXCLUDE_IPS; }
-+	"max-domains"		{ return MAX_DOMAINS; }
-+	"max-searches"		{ return MAX_SEARCHES; }
-+	"domain-load-file"	{ return DOMAIN_LOAD_FILE; }
-+	"search-load-file"	{ return SEARCH_LOAD_FILE; }
-+	"clear-domain"		{ return CLEAR_DOMAIN; }
-+	"clear-search"		{ return CLEAR_SEARCH; }
-+}
-+"timerange"			{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_TIMERANGE); return TIMERANGE; }
-+<SCANSTATE_STMT_TIMERANGE>{
-+	"!="		{ return NEQ; }
-+	"hours"		{ return HOURS; }
-+	"weekdays"		{ return WEEKDAYS; }
-+	"weeklyranges"			{ return WEEKLYRANGES; }
-+}
-+
-+"bandwidth"			{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_BANDWIDTH); return BANDWIDTH; }
-+<SCANSTATE_STMT_BANDWIDTH>{
-+	"combined"					{ return COMBINED; }
-+	"individual-src"			{ return INDIVIDUAL_SRC; }
-+	"individual-dst"			{ return INDIVIDUAL_DST; }
-+	"individual-local"			{ return INDIVIDUAL_LOCAL; }
-+	"individual-remote"			{ return INDIVIDUAL_REMOTE; }
-+	"monitor"					{ return MONITOR; }
-+	"less-than"					{ return LESS_THAN; }
-+	"greater-than"				{ return GREATER_THAN; }
-+	"bcheck"					{ return BANDWIDTH_CHECK_NOSWAP; }
-+	"bcheck-with-src-dst-swap"	{ return BANDWIDTH_CHECK_SWAP; }
-+	"minute"					{ return MINUTE; }
-+	"hour"						{ return HOUR; }
-+	"day"						{ return DAY; }
-+	"week"						{ return WEEK; }
-+	"month"						{ return MONTH; }
-+	"never"						{ return NEVER; }
-+	"id"						{ return ID; }
-+	"type"						{ return TYPE; }
-+	"subnet"					{ return SUBNET; }
-+	"subnet6"					{ return SUBNET6; }
-+	"current-bandwidth"			{ return CURRENT_BANDWIDTH; }
-+	"reset-interval"			{ return RESET_INTERVAL; }
-+	"reset-time"				{ return RESET_TIME; }
-+	"intervals-to-save"			{ return INTERVALS_TO_SAVE; }
-+	"last-backup-time"			{ return LAST_BACKUP_TIME; }
-+}
- "reject"		{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_REJECT); return _REJECT; }
- <SCANSTATE_STMT_REJECT>{
- 	"with"			{ return WITH; }
+ static void netlink_gen_reject_stmt(struct netlink_linearize_ctx *ctx,
+ 				    const struct stmt *stmt)
+ {
+@@ -1730,6 +1807,14 @@
+ 		return netlink_gen_meta_stmt(ctx, stmt);
+ 	case STMT_LOG:
+ 		return netlink_gen_log_stmt(ctx, stmt);
++	case STMT_WEBURL:
++		return netlink_gen_weburl_stmt(ctx, stmt);
++	case STMT_WEBMON:
++		return netlink_gen_webmon_stmt(ctx, stmt);
++	case STMT_TIMERANGE:
++		return netlink_gen_timerange_stmt(ctx, stmt);
++	case STMT_BANDWIDTH:
++		return netlink_gen_bandwidth_stmt(ctx, stmt);
+ 	case STMT_REJECT:
+ 		return netlink_gen_reject_stmt(ctx, stmt);
+ 	case STMT_NAT:
 --- nftables.orig/include/parser.h	2025-12-05 20:17:57.635743839 +0800
-+++ nftables.new/include/parser.h	2025-12-12 10:18:53.559240402 +0800
++++ nftables.new/include/parser.h	2026-03-29 17:00:55.561762454 +0800
 @@ -86,6 +86,10 @@
  	PARSER_SC_STMT_LOG,
  	PARSER_SC_STMT_NAT,
@@ -995,8 +995,8 @@
  	PARSER_SC_STMT_SYNPROXY,
  	PARSER_SC_STMT_TPROXY,
  
---- nftables.orig/include/linux/netfilter/nf_tables.h	2025-12-12 10:18:47.121543363 +0800
-+++ nftables.new/include/linux/netfilter/nf_tables.h	2025-12-12 10:18:53.523564676 +0800
+--- nftables.orig/include/linux/netfilter/nf_tables.h	2026-03-29 17:00:52.239161914 +0800
++++ nftables.new/include/linux/netfilter/nf_tables.h	2026-03-29 17:00:55.535762030 +0800
 @@ -1432,6 +1432,55 @@
  };
  #define NFTA_REJECT_MAX		(__NFTA_REJECT_MAX - 1)
@@ -1053,8 +1053,8 @@
  /**
   * enum nft_nat_types - nf_tables nat expression NAT types
   *
---- nftables.orig/include/statement.h	2025-12-12 10:18:47.121924736 +0800
-+++ nftables.new/include/statement.h	2025-12-12 10:18:52.953779482 +0800
+--- nftables.orig/include/statement.h	2026-03-29 17:00:52.239368064 +0800
++++ nftables.new/include/statement.h	2026-03-29 17:00:55.118755232 +0800
 @@ -125,6 +125,54 @@
  
  extern struct stmt *reject_stmt_alloc(const struct location *loc);
