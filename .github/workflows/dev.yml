@@ -18,7 +18,7 @@ jobs:
     outputs:
       sha: ${{ steps.ctx.outputs.ref }}
       tag: ${{ steps.ctx.outputs.tag }}
-      is_release: ${{ steps.ctx.outputs.is_release }}"
+      is_release: ${{ steps.ctx.outputs.is_release }}
     steps:
       - name: Set workspace
         run: |
