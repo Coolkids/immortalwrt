@@ -70,6 +70,7 @@ define BuildTemplate
     CATEGORY:=Network
     TITLE:=$(2) iptables extension
     DEPENDS:=iptables $(if $(4),+kmod-ipt-$(1))
+    DEFAULT_VARIANT:=1
   endef
 
   define Package/iptables-mod-$(1)/install
