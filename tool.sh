@@ -3,8 +3,6 @@
 set -e
 
 PKGS=(
-    smartdns
-    luci-app-smartdns
     luci-app-passwall
     v2ray-geodata
     mosdns
@@ -14,8 +12,6 @@ PKGS=(
 )
 
 declare -A PKG_PATHS=(
-    [smartdns]="feeds/packages/net/smartdns"
-    [luci-app-smartdns]="feeds/luci/applications/luci-app-smartdns"
     [luci-app-passwall]="feeds/luci/applications/luci-app-passwall"
     [v2ray-geodata]="feeds/packages/net/v2ray-geodata"
     [mosdns]="feeds/packages/net/mosdns"
