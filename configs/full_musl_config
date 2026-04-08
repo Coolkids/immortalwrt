@@ -1609,6 +1609,8 @@ CONFIG_BUSYBOX_DEFAULT_FEATURE_SYSLOGD_READ_BUFFER_SIZE=0
 # CONFIG_BUSYBOX_DEFAULT_FEATURE_IPC_SYSLOG is not set
 CONFIG_BUSYBOX_DEFAULT_FEATURE_IPC_SYSLOG_BUFFER_SIZE=0
 # CONFIG_BUSYBOX_DEFAULT_FEATURE_KMSG_SYSLOG is not set
+# CONFIG_BUSYBOX_CONFIG_IP is not set
+# CONFIG_BUSYBOX_CONFIG_FEATURE_IP_LINK is not set
 # CONFIG_PACKAGE_busybox-selinux is not set
 CONFIG_PACKAGE_ca-bundle=y
 CONFIG_PACKAGE_ca-certificates=y
@@ -2759,6 +2761,7 @@ CONFIG_PACKAGE_kmod-e1000e=y
 # CONFIG_PACKAGE_kmod-hfcmulti is not set
 # CONFIG_PACKAGE_kmod-hfcpci is not set
 # CONFIG_PACKAGE_kmod-hinic is not set
+# CONFIG_PACKAGE_kmod-hinic3 is not set
 CONFIG_PACKAGE_kmod-i40e=y
 # CONFIG_PACKAGE_kmod-iavf is not set
 # CONFIG_PACKAGE_kmod-ice is not set
@@ -2898,9 +2901,6 @@ CONFIG_PACKAGE_kmod-mdio=y
 CONFIG_PACKAGE_kmod-netlink-diag=y
 # CONFIG_PACKAGE_kmod-nlmon is not set
 # CONFIG_PACKAGE_kmod-nsh is not set
-# CONFIG_PACKAGE_kmod-openvswitch-geneve is not set
-# CONFIG_PACKAGE_kmod-openvswitch-gre is not set
-# CONFIG_PACKAGE_kmod-openvswitch-vxlan is not set
 # CONFIG_PACKAGE_kmod-ovpn-dco-v2 is not set
 # CONFIG_PACKAGE_kmod-packet-diag is not set
 # CONFIG_PACKAGE_kmod-pf-ring is not set
@@ -3501,9 +3501,9 @@ CONFIG_HAS_LUAJIT_ARCH=y
 #
 # Configuration
 #
-CONFIG_NODEJS_20=y
 # CONFIG_NODEJS_22 is not set
-# CONFIG_NODEJS_24 is not set
+CONFIG_NODEJS_24=y
+# CONFIG_NODEJS_25 is not set
 # CONFIG_NODEJS_NPM_KEEP_CACHE is not set
 CONFIG_NODEJS_NPM_CACHE_DIR=""
 # CONFIG_NODEJS_HOST_BIN is not set
@@ -3590,7 +3590,6 @@ CONFIG_NODEJS_NPM_CACHE_DIR=""
 # CONFIG_PACKAGE_node-level is not set
 # CONFIG_PACKAGE_node-logfmt is not set
 # CONFIG_PACKAGE_node-lwm2m-node-lib is not set
-# CONFIG_PACKAGE_node-mdns is not set
 # CONFIG_PACKAGE_node-megahash is not set
 # CONFIG_PACKAGE_node-mocha is not set
 # CONFIG_PACKAGE_node-modbus-serial is not set
@@ -3618,7 +3617,6 @@ CONFIG_NODEJS_NPM_CACHE_DIR=""
 # CONFIG_PACKAGE_node-red-contrib-modbus is not set
 # CONFIG_PACKAGE_node-red-dashboard is not set
 # CONFIG_PACKAGE_node-red-node-arduino is not set
-# CONFIG_PACKAGE_node-red-node-discovery is not set
 # CONFIG_PACKAGE_node-red-node-serialport is not set
 # CONFIG_PACKAGE_node-red-node-sqlite is not set
 # CONFIG_PACKAGE_node-rimraf is not set
@@ -3641,7 +3639,6 @@ CONFIG_NODEJS_NPM_CACHE_DIR=""
 # CONFIG_PACKAGE_node-terser is not set
 # CONFIG_PACKAGE_node-twilio is not set
 # CONFIG_PACKAGE_node-typescript is not set
-# CONFIG_PACKAGE_node-ubus is not set
 # CONFIG_PACKAGE_node-uglify-js is not set
 # CONFIG_PACKAGE_node-usb is not set
 # CONFIG_PACKAGE_node-utf-8-validate is not set
@@ -3703,6 +3700,7 @@ CONFIG_NODEJS_NPM_CACHE_DIR=""
 # CONFIG_PACKAGE_python3-bidict is not set
 # CONFIG_PACKAGE_python3-ble2mqtt is not set
 # CONFIG_PACKAGE_python3-bleak is not set
+# CONFIG_PACKAGE_python3-blinker is not set
 # CONFIG_PACKAGE_python3-boto3 is not set
 # CONFIG_PACKAGE_python3-botocore is not set
 # CONFIG_PACKAGE_python3-bottle is not set
@@ -3743,7 +3741,6 @@ CONFIG_NODEJS_NPM_CACHE_DIR=""
 # CONFIG_PACKAGE_python3-docutils is not set
 # CONFIG_PACKAGE_python3-dotenv is not set
 # CONFIG_PACKAGE_python3-drf-nested-routers is not set
-# CONFIG_PACKAGE_python3-email is not set
 # CONFIG_PACKAGE_python3-engineio is not set
 # CONFIG_PACKAGE_python3-et_xmlfile is not set
 # CONFIG_PACKAGE_python3-evdev is not set
@@ -3762,9 +3759,11 @@ CONFIG_NODEJS_NPM_CACHE_DIR=""
 # CONFIG_PACKAGE_python3-frozenlist is not set
 # CONFIG_PACKAGE_python3-gensio is not set
 # CONFIG_PACKAGE_python3-gevent is not set
+# CONFIG_PACKAGE_python3-gmpy2 is not set
 # CONFIG_PACKAGE_python3-gnupg is not set
 # CONFIG_PACKAGE_python3-gpiod is not set
 # CONFIG_PACKAGE_python3-greenlet is not set
+# CONFIG_PACKAGE_python3-h11 is not set
 # CONFIG_PACKAGE_python3-hyperlink is not set
 # CONFIG_PACKAGE_python3-idna is not set
 # CONFIG_PACKAGE_python3-ifaddr is not set
@@ -3837,6 +3836,7 @@ CONFIG_NODEJS_NPM_CACHE_DIR=""
 # CONFIG_PACKAGE_python3-pydoc is not set
 # CONFIG_PACKAGE_python3-pyelftools is not set
 # CONFIG_PACKAGE_python3-pyfuse3 is not set
+# CONFIG_PACKAGE_python3-pygments is not set
 # CONFIG_PACKAGE_python3-pyinotify is not set
 # CONFIG_PACKAGE_python3-pymysql is not set
 # CONFIG_PACKAGE_python3-pymysql-sha-pwd is not set
@@ -3854,11 +3854,13 @@ CONFIG_NODEJS_NPM_CACHE_DIR=""
 # CONFIG_PACKAGE_python3-pytest-forked is not set
 # CONFIG_PACKAGE_python3-pytest-xdist is not set
 # CONFIG_PACKAGE_python3-pytz is not set
+# CONFIG_PACKAGE_python3-pyudev is not set
 # CONFIG_PACKAGE_python3-readline is not set
 # CONFIG_PACKAGE_python3-referencing is not set
 # CONFIG_PACKAGE_python3-requests is not set
 # CONFIG_PACKAGE_python3-rpds-py is not set
 # CONFIG_PACKAGE_python3-rsa is not set
+# CONFIG_PACKAGE_python3-rtslib-fb is not set
 # CONFIG_PACKAGE_python3-ruamel-yaml is not set
 # CONFIG_PACKAGE_python3-s3transfer is not set
 # CONFIG_PACKAGE_python3-schedule is not set
@@ -3872,6 +3874,7 @@ CONFIG_NODEJS_NPM_CACHE_DIR=""
 # CONFIG_PACKAGE_python3-service-identity is not set
 # CONFIG_PACKAGE_python3-setools is not set
 # CONFIG_PACKAGE_python3-setuptools is not set
+# CONFIG_PACKAGE_python3-simple-websocket is not set
 # CONFIG_PACKAGE_python3-six is not set
 # CONFIG_PACKAGE_python3-slugify is not set
 # CONFIG_PACKAGE_python3-smbus is not set
@@ -3899,10 +3902,10 @@ CONFIG_NODEJS_NPM_CACHE_DIR=""
 # CONFIG_PACKAGE_python3-uuid is not set
 # CONFIG_PACKAGE_python3-venv is not set
 # CONFIG_PACKAGE_python3-vobject is not set
-# CONFIG_PACKAGE_python3-wcwidth is not set
 # CONFIG_PACKAGE_python3-websocket-client is not set
 # CONFIG_PACKAGE_python3-websockets is not set
 # CONFIG_PACKAGE_python3-werkzeug is not set
+# CONFIG_PACKAGE_python3-wsproto is not set
 # CONFIG_PACKAGE_python3-xml is not set
 # CONFIG_PACKAGE_python3-xmltodict is not set
 # CONFIG_PACKAGE_python3-yaml is not set
@@ -5583,7 +5586,7 @@ CONFIG_PACKAGE_luci-app-qos-gargoyle=y
 # CONFIG_PACKAGE_luci-app-scutclient is not set
 # CONFIG_PACKAGE_luci-app-ser2net is not set
 CONFIG_PACKAGE_luci-app-smartdns=y
-CONFIG_PACKAGE_luci-app-smartdns_INCLUDE_WebUI=y
+CONFIG_PACKAGE_luci-app-smartdns_INCLUDE_smartdns_ui=y
 # CONFIG_PACKAGE_luci-app-sms-tool-js is not set
 # CONFIG_PACKAGE_luci-app-snmpd is not set
 # CONFIG_PACKAGE_luci-app-softether is not set
@@ -5639,7 +5642,13 @@ CONFIG_PACKAGE_luci-theme-bootstrap=y
 # end of 4. Themes
 
 #
-# 5. Protocols
+# 5. Plugins
+#
+# CONFIG_PACKAGE_plugins-example is not set
+# end of 5. Plugins
+
+#
+# 6. Protocols
 #
 # CONFIG_PACKAGE_luci-proto-3g is not set
 # CONFIG_PACKAGE_luci-proto-autoip is not set
@@ -5668,10 +5677,10 @@ CONFIG_PACKAGE_luci-proto-ppp=y
 # CONFIG_PACKAGE_luci-proto-vxlan is not set
 CONFIG_PACKAGE_luci-proto-wireguard=y
 # CONFIG_PACKAGE_luci-proto-yggdrasil is not set
-# end of 5. Protocols
+# end of 6. Protocols
 
 #
-# 6. Libraries
+# 7. Libraries
 #
 CONFIG_PACKAGE_luci-lib-base=y
 # CONFIG_PACKAGE_luci-lib-chartjs is not set
@@ -5689,7 +5698,7 @@ CONFIG_PACKAGE_luci-lib-nixio=y
 CONFIG_PACKAGE_luci-lib-nixio_openssl=y
 # CONFIG_PACKAGE_luci-lib-px5g is not set
 CONFIG_PACKAGE_luci-lib-uqr=y
-# end of 6. Libraries
+# end of 7. Libraries
 
 CONFIG_PACKAGE_default-settings=y
 CONFIG_PACKAGE_default-settings-chn=y
@@ -5873,40 +5882,8 @@ CONFIG_PACKAGE_luci-i18n-passwall-zh-cn=y
 CONFIG_PACKAGE_luci-i18n-passwall2-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-passwall2-zh-tw is not set
 CONFIG_PACKAGE_luci-i18n-qos-gargoyle-zh-cn=y
-# CONFIG_PACKAGE_luci-i18n-smartdns-ar is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-bg is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-bn is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ca is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-cs is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-da is not set
 # CONFIG_PACKAGE_luci-i18n-smartdns-de is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-el is not set
 # CONFIG_PACKAGE_luci-i18n-smartdns-es is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-fi is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-fr is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ga is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-he is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-hi is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-hu is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-it is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ja is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ko is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-lt is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-mr is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ms is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-nl is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-no is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-pl is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-pt is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-pt-br is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ro is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ru is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-sk is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-sv is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ta is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-tr is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-uk is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-vi is not set
 CONFIG_PACKAGE_luci-i18n-smartdns-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-smartdns-zh-tw is not set
 # CONFIG_PACKAGE_luci-i18n-statistics-ar is not set
@@ -6561,11 +6538,8 @@ CONFIG_PACKAGE_v2ray-geosite=y
 #
 # Open vSwitch
 #
-# CONFIG_PACKAGE_openvswitch is not set
-# CONFIG_PACKAGE_openvswitch-ovn-host is not set
 # CONFIG_PACKAGE_openvswitch-ovn-north is not set
 # CONFIG_PACKAGE_openvswitch-python3 is not set
-# CONFIG_PACKAGE_ovsd is not set
 # end of Open vSwitch
 
 #
@@ -7910,6 +7884,7 @@ CONFIG_PACKAGE_collectd-mod-rrdtool=y
 # CONFIG_PACKAGE_collectd-mod-write-http is not set
 # CONFIG_PACKAGE_collectd-mod-write-prometheus is not set
 # CONFIG_PACKAGE_colrm is not set
+# CONFIG_PACKAGE_column is not set
 # CONFIG_PACKAGE_conmon is not set
 # CONFIG_PACKAGE_containerd is not set
 # CONFIG_PACKAGE_coremark is not set
@@ -8074,6 +8049,19 @@ CONFIG_PACKAGE_coreutils-nohup=y
 # CONFIG_PACKAGE_fuse-overlayfs is not set
 # CONFIG_PACKAGE_fwupd-daemon is not set
 # CONFIG_PACKAGE_fwupd-libs is not set
+
+#
+# Select fwupd options
+#
+# CONFIG_FWUPD_FIRMWARE_PACKAGER is not set
+# CONFIG_FWUPD_HSI is not set
+CONFIG_FWUPD_LVFS=y
+# CONFIG_FWUPD_CBOR is not set
+# CONFIG_FWUPD_LIBDRM is not set
+CONFIG_FWUPD_PLUGIN_MODEMMANAGER=y
+CONFIG_FWUPD_PLUGIN_FLASHROM=y
+# end of Select fwupd options
+
 # CONFIG_PACKAGE_fwupd-tools is not set
 # CONFIG_PACKAGE_fx is not set
 # CONFIG_PACKAGE_fxload is not set
