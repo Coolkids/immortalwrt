@@ -84,9 +84,14 @@ function bandix(){
 		PKG_SOURCE:=bandix-$(RUST_BANDIX_VERSION)-x86_64-unknown-linux-musl.tar.gz' "./feeds/custom/openwrt-bandix/openwrt-bandix/Makefile"
 }
 
+function nodejs(){
+    rm -rf ./feeds/packages/lang/node
+    cp -r $patchs/patchs/node ./feeds/packages/lang 
+}
+
 function delete_dep(){
 	# 定义A和B文件夹的路径
-	A_DIR="./feeds/diy1"
+	A_DIR="./feeds/custom/openwrt-passwall-packages"
 	B_DIR="./feeds/packages/net"
 
 	# 遍历A文件夹中的子文件夹
@@ -106,14 +111,14 @@ function delete_dep(){
 
 function install_dep(){
 	# 定义A和B文件夹的路径
-	A_DIR="./feeds/diy1"
+	A_DIR="./feeds/custom/openwrt-passwall-packages"
 
 	# 遍历A文件夹中的子文件夹
 	for subdir in "$A_DIR"/*; do
 		if [ -d "$subdir" ]; then
 			# 提取子文件夹的名字
 			subdir_name=$(basename "$subdir")
-			./scripts/feeds install -p diy1 -f "$subdir_name"
+			./scripts/feeds install -p custom -f "$subdir_name"
 			echo "install $subdir_name"
 		fi
 	done
@@ -151,6 +156,7 @@ function feed(){
 	check_xtables_addons
 	smartdns
 	bandix
+	nodejs
 	##sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
 	./scripts/feeds install -a
 	install_new_package
