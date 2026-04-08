@@ -72,13 +72,6 @@ function version_lt() {
     return 1
 }
 
-function smartdns(){
-	FILE="./feeds/custom/openwrt-smartdns/Makefile"
-	if [ -f "$FILE" ]; then
-		sed -i 's|include ../../lang/rust/rust-package.mk|include $(TOPDIR)/feeds/packages/lang/rust/rust-package.mk|g' "$FILE"
-	fi
-}
-
 function bandix(){
 	sed -i '/^else ifeq (\$(ARCH),x86_64)$/a\
 		PKG_SOURCE:=bandix-$(RUST_BANDIX_VERSION)-x86_64-unknown-linux-musl.tar.gz' "./feeds/custom/openwrt-bandix/openwrt-bandix/Makefile"
@@ -154,7 +147,6 @@ function feed(){
 	delete_dep
 	remove_old_packages
 	check_xtables_addons
-	smartdns
 	bandix
 	nodejs
 	##sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
