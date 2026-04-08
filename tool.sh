@@ -1,25 +1,49 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -e
+
+PKGS=(
+    smartdns
+    luci-app-smartdns
+    luci-app-passwall
+    v2ray-geodata
+    mosdns
+    luci-app-unblockneteasemusic
+    luci-theme-argon
+    curl
+)
+
+declare -A PKG_PATHS=(
+    [smartdns]="feeds/packages/net/smartdns"
+    [luci-app-smartdns]="feeds/luci/applications/luci-app-smartdns"
+    [luci-app-passwall]="feeds/luci/applications/luci-app-passwall"
+    [v2ray-geodata]="feeds/packages/net/v2ray-geodata"
+    [mosdns]="feeds/packages/net/mosdns"
+    [luci-app-unblockneteasemusic]="feeds/luci/applications/luci-app-unblockneteasemusic"
+    [luci-theme-argon]="feeds/luci/themes/luci-theme-argon"
+    [curl]="feeds/packages/net/curl"
+)
 
 function main(){
-case $1 in
-"feed")
-	echo "update feed"
-	feed
-	echo "update feed finish"
-	;;
-"build")
-	build $2
-	;;
-"restore")
-	restore_config $2
-	;;
-"save")
-	save_config $2
-	;;
-*)
-	echo "param invalid"
-	;;
-esac
+	case $1 in
+	"feed")
+		echo "update feed"
+		feed
+		echo "update feed finish"
+		;;
+	"build")
+		build $2
+		;;
+	"restore")
+		restore_config $2
+		;;
+	"save")
+		save_config $2
+		;;
+	*)
+		echo "param invalid"
+		;;
+	esac
 }
 
 # 版本比较函数（返回 0 表示 $1 < $2）
@@ -52,6 +76,72 @@ function version_lt() {
     return 1
 }
 
+function smartdns(){
+	FILE="./feeds/custom/openwrt-smartdns/Makefile"
+	if [ -f "$FILE" ]; then
+		sed -i 's|include ../../lang/rust/rust-package.mk|include $(TOPDIR)/feeds/packages/lang/rust/rust-package.mk|g' "$FILE"
+	fi
+}
+
+function bandix(){
+	sed -i '/^else ifeq (\$(ARCH),x86_64)$/a\
+		PKG_SOURCE:=bandix-$(RUST_BANDIX_VERSION)-x86_64-unknown-linux-musl.tar.gz' "./feeds/custom/openwrt-bandix/openwrt-bandix/Makefile"
+}
+
+function delete_dep(){
+	# 定义A和B文件夹的路径
+	A_DIR="./feeds/diy1"
+	B_DIR="./feeds/packages/net"
+
+	# 遍历A文件夹中的子文件夹
+	for subdir in "$A_DIR"/*; do
+		if [ -d "$subdir" ]; then
+			# 提取子文件夹的名字
+			subdir_name=$(basename "$subdir")
+			
+			# 在B文件夹中查找并删除同名的文件夹
+			if [ -d "$B_DIR/$subdir_name" ]; then
+				rm -rf "$B_DIR/$subdir_name"
+				echo "Deleted $B_DIR/$subdir_name"
+			fi
+		fi
+	done
+}
+
+function install_dep(){
+	# 定义A和B文件夹的路径
+	A_DIR="./feeds/diy1"
+
+	# 遍历A文件夹中的子文件夹
+	for subdir in "$A_DIR"/*; do
+		if [ -d "$subdir" ]; then
+			# 提取子文件夹的名字
+			subdir_name=$(basename "$subdir")
+			./scripts/feeds install -p diy1 -f "$subdir_name"
+			echo "install $subdir_name"
+		fi
+	done
+}
+
+function remove_old_packages(){
+	echo "===> Remove old packages"
+	for pkg in "${PKGS[@]}"; do
+		path="${PKG_PATHS[$pkg]}"
+		if [[ -n "$path" ]]; then
+			echo "Removing $path"
+			rm -rf "./$path"
+		fi
+	done
+}
+
+function install_new_package(){
+	echo "===> Install packages from custom feed"
+	for pkg in "${PKGS[@]}"; do
+		echo "Installing $pkg"
+		./scripts/feeds install -p custom -f "$pkg"
+	done
+}
+
 
 function feed(){
 	patchs=`pwd`
@@ -60,28 +150,15 @@ function feed(){
 	fi
 	rm -rf ./feeds/*
 	./scripts/feeds update -a
-	##禁用luci_app_attendedsysupgrade
-	##pushd ./feeds/luci
-	##git apply $patchs/patchs/0000-Revert-collections-Add-luciappattendedsysupgrade.patch
-	##popd
-	rm -rf ./feeds/luci/applications/luci-app-passwall
-	rm -rf ./feeds/packages/net/v2ray-geodata
-	rm -rf ./feeds/packages/net/mosdns
-	rm -rf ./feeds/luci/applications/luci-app-unblockneteasemusic
-	rm -rf ./feeds/luci/themes/luci-theme-argon
+	delete_dep
+	remove_old_packages
 	check_xtables_addons
-	# curl - http3/quic
-	rm -rf feeds/packages/net/curl
-	git clone https://github.com/sbwml/feeds_packages_net_curl feeds/packages/net/curl
-
-	sed -i '/^else ifeq (\$(ARCH),x86_64)$/a\
-		PKG_SOURCE:=bandix-$(RUST_BANDIX_VERSION)-x86_64-unknown-linux-musl.tar.gz' "./feeds/custom/openwrt-bandix/openwrt-bandix/Makefile"
+	smartdns
+	bandix
 	##sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
 	./scripts/feeds install -a
-	./scripts/feeds install -p custom -f luci-app-passwall
-	./scripts/feeds install -p custom -f v2ray-geodata
-	./scripts/feeds install -p custom -f mosdns
-	./scripts/feeds install -p custom -f luci-theme-argon
+	install_new_package
+	install_dep
 }
 
 function check_xtables_addons(){
