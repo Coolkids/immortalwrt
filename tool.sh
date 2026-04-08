@@ -77,11 +77,6 @@ function bandix(){
 		PKG_SOURCE:=bandix-$(RUST_BANDIX_VERSION)-x86_64-unknown-linux-musl.tar.gz' "./feeds/custom/openwrt-bandix/openwrt-bandix/Makefile"
 }
 
-function nodejs(){
-    rm -rf ./feeds/packages/lang/node
-    cp -r $patchs/patchs/node ./feeds/packages/lang 
-}
-
 function delete_dep(){
 	# 定义A和B文件夹的路径
 	A_DIR="./feeds/custom/openwrt-passwall-packages"
@@ -148,7 +143,6 @@ function feed(){
 	remove_old_packages
 	check_xtables_addons
 	bandix
-	nodejs
 	##sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
 	./scripts/feeds install -a
 	install_new_package
