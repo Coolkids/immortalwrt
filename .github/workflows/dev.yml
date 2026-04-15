@@ -14,7 +14,6 @@ jobs:
   prebuild:
     name: Resolve build context
     runs-on: ubuntu-latest
-    if: github.event.repository.owner.id == github.event.sender.id
     outputs:
       sha: ${{ steps.ctx.outputs.ref }}
       tag: ${{ steps.ctx.outputs.tag }}

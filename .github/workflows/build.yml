@@ -16,7 +16,6 @@ jobs:
   build:
     name: Build x86_64 OpenWrt Firmware
     runs-on: ubuntu-24.04
-    if: github.event.repository.owner.id == github.event.sender.id
     outputs:
       is_release: ${{ steps.ctx.outputs.is_release }}
     strategy:
