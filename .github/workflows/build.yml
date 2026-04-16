@@ -25,21 +25,23 @@ jobs:
           - name: openwrt-musl-lite
             config: base_musl_config
             target: musl
+            cache_key: base_musl_config
           - name: openwrt-glibc-lite
             config: base_glibc_config
             target: glibc
+            cache_key: base_glibc_config
           - name: openwrt-musl-full
             config: full_musl_config
             target: musl
+            cache_key: full_musl_config
           - name: openwrt-glibc-full
             config: full_glibc_config
             target: glibc
+            cache_key: full_glibc_config
             
     steps:
       - name: Set workspace
         run: |
-          sudo mkdir -p -m 777 /mnt/openwrt
-          echo "WORK_PATH=/mnt/openwrt" >> $GITHUB_ENV
           sudo -E timedatectl set-timezone Asia/Shanghai
 
       - name: Resolve build context
@@ -73,14 +75,33 @@ jobs:
           echo "TAG: ${{ steps.ctx.outputs.tag }}"
           echo "Release: ${{ steps.ctx.outputs.is_release }}"
 
+      - name: Maximize Build Space
+        uses: easimon/maximize-build-space@master
+        with:
+          swap-size-mb: 1024
+          temp-reserve-mb: 100
+          root-reserve-mb: 1024
+
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
       - name: Checkout
         uses: actions/checkout@v6
         with:
           ref: ${{ steps.ctx.outputs.ref }}
-          path: openwrt
+
       - uses: actions/setup-node@v6
         with:
           node-version: 24
+
       - name: Configure compilation environment
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -93,23 +114,43 @@ jobs:
             libreadline-dev libssl-dev libtool libyaml-dev libz-dev lld llvm lrzsz mkisofs msmtp nano \
             ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-docutils \
             python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs \
-            upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd yasm
-          df -h
+            upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd yasm    
 
-      - name: Change Build Path
+      - name: Show System Info
         run: |
-          sudo rsync -a "$GITHUB_WORKSPACE/openwrt/" ${{ env.WORK_PATH }}/        
+          echo "==================== System Info ===================="
+          uname -a
+          echo ""
+          echo "==================== CPU Info ===================="
+          echo "Physical CPUs: $(cat /proc/cpuinfo | grep 'physical id' | sort -u | wc -l)"
+          echo "CPU Cores: $(nproc)"
+          echo "CPU Model: $(cat /proc/cpuinfo | grep -m1 'model name' | cut -d: -f2 | xargs)"
+          echo ""
+          echo "==================== Memory Info ===================="
+          free -h
+          echo ""
+          echo "==================== Disk Info ===================="
+          df -hT
+
+      - name: Setup Build Cache
+        uses: stupidloud/cachewrtbuild@main
+        with:
+          ccache: true
+          toolchain: true
+          mixkey: ${{ matrix.cache_key }}
+          skip: false
+          clean: false
 
       - name: Update feeds
-        working-directory: ${{ env.WORK_PATH }}
         run: |
           ./tool.sh feed
 
       - name: Generate configuration file
-        working-directory: ${{ env.WORK_PATH }}
         run: |
           rm -f ./.config*
           cp ./configs/${{ matrix.config }} ./.config
+          echo 'CONFIG_DEVEL=y' >> .config
+          echo 'CONFIG_CCACHE=y' >> .config
           make defconfig
           make download -j8
           df -h
@@ -120,17 +161,14 @@ jobs:
 
       - name: Compile firmware
         run: |
-          cd ${{ env.WORK_PATH }}
           make -j$(nproc) || make -j1 V=s
 
       - name: Clean Build Files
-        working-directory: ${{ env.WORK_PATH }}
         run: |
           rm -rf ./staging_dir
           rm -rf ./build_dir
 
       - name: Prepare artifact
-        working-directory: ${{ env.WORK_PATH }}
         run: |
           mkdir -p ./artifact/firmware
           mkdir -p ./artifact/buildinfo
@@ -140,7 +178,6 @@ jobs:
           cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
 
       - name: Clean Bin Files
-        working-directory: ${{ env.WORK_PATH }}
         run: |
           rm -rf ./bin
 
@@ -148,10 +185,10 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.name }}-buildinfo
-          path: ${{ env.WORK_PATH }}/artifact/buildinfo/
+          path: artifact/buildinfo/
 
       - name: Deliver firmware
         uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.name }}
-          path: ${{ env.WORK_PATH }}/artifact/firmware/
+          path: artifact/firmware/

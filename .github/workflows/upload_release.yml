@@ -78,23 +78,24 @@ jobs:
           mv ../sha256sums .
 
       - name: Upload release asset
-        uses: svenstaro/upload-release-action@v2
+        uses: softprops/action-gh-release@v3
         with:
-          repo_token: ${{ secrets.release_token }}
-          file: firmware/*
-          overwrite: true
-          release_name: ${{ inputs.tag }}
-          tag: ${{ inputs.tag }}
-          file_glob: true
+          token: ${{ secrets.release_token }}
+          files: firmware/*
+          overwrite_files: true
+          name: ${{ inputs.tag }}
+          tag_name: ${{ inputs.tag }}
           body: |
             release ${{ inputs.tag }}
   
-      - name: Delete loder releases
-        uses: dev-drprasad/delete-older-releases@v0.3.3
+      - name: Delete releases and workflows runs
+        uses: ophub/delete-releases-workflows@main
         with:
-          keep_latest: 5
-        env:
-          GITHUB_TOKEN: ${{ secrets.release_token }}
+          delete_releases: true
+          releases_keep_latest: 5
+          delete_workflows: true
+          workflows_keep_day: 10
+          gh_token: ${{ secrets.release_token }}
 
 
 
