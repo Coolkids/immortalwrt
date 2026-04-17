@@ -11,6 +11,10 @@ on:
       release_token:
         required: true
 
+permissions:
+  contents: write
+  actions: write
+
 jobs:
   upload_release:
     name: Upload OpenWrt Release Firmware
@@ -79,6 +83,8 @@ jobs:
 
       - name: Upload release asset
         uses: softprops/action-gh-release@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.release_token }}
         with:
           token: ${{ secrets.release_token }}
           files: firmware/*
