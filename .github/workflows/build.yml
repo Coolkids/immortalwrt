@@ -139,7 +139,7 @@ jobs:
           toolchain: true
           mixkey: ${{ matrix.cache_key }}
           skip: false
-          clean: false
+          clean: true
 
       - name: Update feeds
         run: |
