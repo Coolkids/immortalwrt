@@ -162,11 +162,10 @@ jobs:
       - name: Compile firmware
         run: |
           make -j$(nproc) || make -j1 V=s
-
-      - name: Clean Build Files
+          
+      - name: Show ccache stats
         run: |
-          rm -rf ./staging_dir
-          rm -rf ./build_dir
+          ccache -s
 
       - name: Prepare artifact
         run: |
@@ -176,10 +175,6 @@ jobs:
           cp -rf $(find ./bin/targets/ -type f -name "immortalwrt-*") ./artifact/firmware/
           cp -rf $(find ./bin/targets/ -type f -name "sha256sums") ./artifact/firmware/
           cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
-
-      - name: Clean Bin Files
-        run: |
-          rm -rf ./bin
 
       - name: Deliver buildinfo
         uses: actions/upload-artifact@v7
