@@ -82,8 +82,6 @@ jobs:
 
       - name: Upload release asset
         uses: softprops/action-gh-release@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.release_token }}
         with:
           token: ${{ secrets.release_token }}
           files: firmware/*
