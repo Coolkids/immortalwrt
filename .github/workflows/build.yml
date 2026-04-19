@@ -132,16 +132,6 @@ jobs:
           echo "==================== Disk Info ===================="
           df -hT
 
-      - name: Setup Build Cache
-        uses: stupidloud/cachewrtbuild@main
-        id: sbc
-        with:
-          ccache: true
-          toolchain: true
-          mixkey: ${{ matrix.cache_key }}
-          skip: false
-          clean: true
-
       - name: Update feeds
         run: |
           ./tool.sh feed
@@ -149,9 +139,14 @@ jobs:
       - name: Generate configuration file
         run: |
           rm -f ./.config*
+          mkdir .ccache
           cp ./configs/${{ matrix.config }} ./.config
           echo 'CONFIG_DEVEL=y' >> .config
           echo 'CONFIG_CCACHE=y' >> .config
+          # 设置 ccache 缓存目录并启用
+          echo "CONFIG_CCACHE_DIR=/home/runner/work/immortalwrt/immortalwrt/.ccache" >> .config
+          ccache -M 2G
+          ccache -s
           make defconfig
           make download -j8
           df -h
@@ -159,14 +154,27 @@ jobs:
             echo "glibc环境, 禁用download-ci-llvm"
             sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
           fi
+      
+      # 恢复 ccache
+      - name: Restore ccache
+        uses: actions/cache/restore@v5
+        with:
+          path: /home/runner/work/immortalwrt/immortalwrt/.ccache
+          key: ccache-${{ matrix.config }}
 
       - name: Compile firmware
         run: |
           make -j$(nproc) || make -j1 V=s
-          
+
+      - name: Save ccache
+        uses: actions/cache/save@v5
+        with:
+          path: /home/runner/work/immortalwrt/immortalwrt/.ccache
+          key: ccache-${{ matrix.config }}
+      
       - name: Show ccache stats
         run: |
-          echo "Cacbe Hit: ${{ steps.sbc.outputs.hit }}"
+          ccache -s
 
       - name: Prepare artifact
         run: |
