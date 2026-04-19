@@ -134,6 +134,7 @@ jobs:
 
       - name: Setup Build Cache
         uses: stupidloud/cachewrtbuild@main
+        id: sbc
         with:
           ccache: true
           toolchain: true
@@ -165,7 +166,7 @@ jobs:
           
       - name: Show ccache stats
         run: |
-          ccache -s
+          echo "Cacbe Hit: ${{ steps.sbc.outputs.hit }}"
 
       - name: Prepare artifact
         run: |
