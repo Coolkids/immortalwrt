@@ -160,7 +160,9 @@ jobs:
         uses: actions/cache/restore@v5
         with:
           path: /home/runner/work/immortalwrt/immortalwrt/.ccache
-          key: ccache-${{ matrix.config }}
+          key: ccache-${{ runner.os }}-${{ matrix.config }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ runner.os }}-${{ matrix.config }}-
 
       - name: Compile firmware
         run: |
@@ -170,7 +172,7 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: /home/runner/work/immortalwrt/immortalwrt/.ccache
-          key: ccache-${{ matrix.config }}
+          key: ccache-${{ runner.os }}-${{ matrix.config }}-${{ github.run_id }}
       
       - name: Show ccache stats
         run: |
