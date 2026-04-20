@@ -163,6 +163,8 @@ jobs:
           key: ccache-${{ runner.os }}-${{ matrix.config }}-${{ github.run_id }}
           restore-keys: |
             ccache-${{ runner.os }}-${{ matrix.config }}-
+            ccache-${{ matrix.config }}-
+            ccache-${{ matrix.config }}
 
       - name: Compile firmware
         run: |
