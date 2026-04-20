@@ -25,19 +25,19 @@ jobs:
           - name: openwrt-musl-lite
             config: base_musl_config
             target: musl
-            cache_key: base_musl_config
+            type: lite
           - name: openwrt-glibc-lite
             config: base_glibc_config
             target: glibc
-            cache_key: base_glibc_config
+            type: lite
           - name: openwrt-musl-full
             config: full_musl_config
             target: musl
-            cache_key: full_musl_config
+            type: full
           - name: openwrt-glibc-full
             config: full_glibc_config
             target: glibc
-            cache_key: full_glibc_config
+            type: full
             
     steps:
       - name: Set workspace
@@ -145,7 +145,11 @@ jobs:
           echo 'CONFIG_CCACHE=y' >> .config
           # 设置 ccache 缓存目录并启用
           echo "CONFIG_CCACHE_DIR=/home/runner/work/immortalwrt/immortalwrt/.ccache" >> .config
-          ccache -M 2G
+          if [[ "${{ matrix.type }}" == "full" ]]; then
+            ccache -M 3G
+          else
+            ccache -M 2G
+          fi
           ccache -s
           make defconfig
           make download -j8
