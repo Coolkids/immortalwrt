@@ -128,7 +128,6 @@ CONFIG_DEFAULT_uci=y
 CONFIG_DEFAULT_uclient-fetch=y
 CONFIG_DEFAULT_urandom-seed=y
 CONFIG_DEFAULT_urngd=y
-CONFIG_HAS_TESTING_KERNEL=y
 CONFIG_HAS_FPU=y
 CONFIG_AUDIO_SUPPORT=y
 CONFIG_GPIO_SUPPORT=y
@@ -215,7 +214,6 @@ CONFIG_SIGN_EACH_PACKAGE=y
 #
 # General build options
 #
-# CONFIG_TESTING_KERNEL is not set
 CONFIG_DISPLAY_SUPPORT=y
 # CONFIG_BUILD_PATENTED is not set
 # CONFIG_BUILD_NLS is not set
@@ -487,10 +485,9 @@ CONFIG_TOOLCHAINOPTS=y
 #
 # Binary tools
 #
-# CONFIG_BINUTILS_USE_VERSION_2_42 is not set
-# CONFIG_BINUTILS_USE_VERSION_2_43 is not set
-CONFIG_BINUTILS_USE_VERSION_2_44=y
+# CONFIG_BINUTILS_USE_VERSION_2_44 is not set
 # CONFIG_BINUTILS_USE_VERSION_2_45 is not set
+CONFIG_BINUTILS_USE_VERSION_2_46=y
 CONFIG_EXTRA_BINUTILS_CONFIG_OPTIONS=""
 # CONFIG_DWARVES is not set
 
@@ -524,8 +521,8 @@ CONFIG_HAS_BPF_TOOLCHAIN=y
 # CONFIG_HAS_PREBUILT_LLVM_TOOLCHAIN is not set
 CONFIG_USE_GLIBC=y
 CONFIG_SSP_SUPPORT=y
-CONFIG_BINUTILS_VERSION_2_44=y
-CONFIG_BINUTILS_VERSION="2.44"
+CONFIG_BINUTILS_VERSION_2_46=y
+CONFIG_BINUTILS_VERSION="2.46.0"
 CONFIG_GCC_VERSION_15=y
 CONFIG_GCC_VERSION="15.2.0"
 CONFIG_LIBC="glibc"
@@ -2167,8 +2164,6 @@ CONFIG_PACKAGE_libiwinfo-data=y
 # CONFIG_PACKAGE_mt7925bt-firmware is not set
 # CONFIG_PACKAGE_mt7981-wo-firmware is not set
 # CONFIG_PACKAGE_mt7986-wo-firmware is not set
-# CONFIG_PACKAGE_mt7987-2p5g-phy-firmware is not set
-# CONFIG_PACKAGE_mt7988-2p5g-phy-firmware is not set
 # CONFIG_PACKAGE_mt7988-wo-firmware is not set
 # CONFIG_PACKAGE_murata-firmware-43430-sdio is not set
 # CONFIG_PACKAGE_murata-nvram-43430-sdio is not set
@@ -2404,6 +2399,7 @@ CONFIG_PACKAGE_kmod-fs-f2fs=y
 # CONFIG_PACKAGE_kmod-fs-nfs-v4 is not set
 # CONFIG_PACKAGE_kmod-fs-nfsd is not set
 # CONFIG_PACKAGE_kmod-fs-nilfs2 is not set
+# CONFIG_PACKAGE_kmod-fs-ntfs is not set
 CONFIG_PACKAGE_kmod-fs-ntfs3=y
 # CONFIG_PACKAGE_kmod-fs-reiserfs is not set
 CONFIG_PACKAGE_kmod-fs-squashfs=y
@@ -2955,7 +2951,7 @@ CONFIG_PACKAGE_kmod-mdio=y
 CONFIG_PACKAGE_kmod-netlink-diag=y
 # CONFIG_PACKAGE_kmod-nlmon is not set
 # CONFIG_PACKAGE_kmod-nsh is not set
-# CONFIG_PACKAGE_kmod-ovpn-dco-v2 is not set
+# CONFIG_PACKAGE_kmod-ovpn-backports is not set
 # CONFIG_PACKAGE_kmod-packet-diag is not set
 # CONFIG_PACKAGE_kmod-pf-ring is not set
 # CONFIG_PACKAGE_kmod-pktgen is not set
@@ -3211,6 +3207,7 @@ CONFIG_PACKAGE_kmod-usb-hid=y
 # Video Support
 #
 # CONFIG_PACKAGE_kmod-drm-amdgpu is not set
+# CONFIG_PACKAGE_kmod-drm-client-lib is not set
 # CONFIG_PACKAGE_kmod-drm-i915 is not set
 # CONFIG_PACKAGE_kmod-drm-ivpu is not set
 # CONFIG_PACKAGE_kmod-drm-kms-helper is not set
@@ -4075,7 +4072,6 @@ CONFIG_PERL_NOCOMMENT=y
 # CONFIG_PACKAGE_python3-pyelftools is not set
 # CONFIG_PACKAGE_python3-pyfuse3 is not set
 # CONFIG_PACKAGE_python3-pygments is not set
-# CONFIG_PACKAGE_python3-pyinotify is not set
 # CONFIG_PACKAGE_python3-pymysql is not set
 # CONFIG_PACKAGE_python3-pymysql-sha-pwd is not set
 # CONFIG_PACKAGE_python3-pynacl is not set
@@ -4093,6 +4089,7 @@ CONFIG_PERL_NOCOMMENT=y
 # CONFIG_PACKAGE_python3-pytest-xdist is not set
 # CONFIG_PACKAGE_python3-pytz is not set
 # CONFIG_PACKAGE_python3-pyudev is not set
+# CONFIG_PACKAGE_python3-pyusb is not set
 # CONFIG_PACKAGE_python3-readline is not set
 # CONFIG_PACKAGE_python3-referencing is not set
 # CONFIG_PACKAGE_python3-requests is not set
@@ -4257,6 +4254,9 @@ CONFIG_SQLITE3_RTREE=y
 # CONFIG_PACKAGE_redis-utils is not set
 # CONFIG_PACKAGE_tdb is not set
 # CONFIG_PACKAGE_unixodbc is not set
+# CONFIG_PACKAGE_valkey-cli is not set
+# CONFIG_PACKAGE_valkey-server is not set
+# CONFIG_PACKAGE_valkey-utils is not set
 # end of Database
 
 #
@@ -5883,7 +5883,9 @@ CONFIG_PACKAGE_luci-theme-bootstrap=y
 #
 # 5. Plugins
 #
-# CONFIG_PACKAGE_plugins-example is not set
+# CONFIG_PACKAGE_luci-plugin-2fa is not set
+# CONFIG_PACKAGE_luci-plugin-auth-example is not set
+# CONFIG_PACKAGE_luci-plugin-examples is not set
 # end of 5. Plugins
 
 #
@@ -5990,10 +5992,15 @@ CONFIG_PACKAGE_luci-i18n-bandix-zh-cn=y
 CONFIG_PACKAGE_luci-i18n-base-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-base-zh-tw is not set
 # CONFIG_PACKAGE_luci-i18n-chrony-cs is not set
+# CONFIG_PACKAGE_luci-i18n-chrony-de is not set
 # CONFIG_PACKAGE_luci-i18n-chrony-es is not set
+# CONFIG_PACKAGE_luci-i18n-chrony-ga is not set
 # CONFIG_PACKAGE_luci-i18n-chrony-ko is not set
+# CONFIG_PACKAGE_luci-i18n-chrony-lt is not set
 # CONFIG_PACKAGE_luci-i18n-chrony-pl is not set
 # CONFIG_PACKAGE_luci-i18n-chrony-ro is not set
+# CONFIG_PACKAGE_luci-i18n-chrony-ru is not set
+# CONFIG_PACKAGE_luci-i18n-chrony-uk is not set
 CONFIG_PACKAGE_luci-i18n-chrony-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-chrony-zh-tw is not set
 # CONFIG_PACKAGE_luci-i18n-ddns-ar is not set
@@ -7472,8 +7479,8 @@ CONFIG_PACKAGE_odhcpd-ipv6only=y
 # CONFIG_PACKAGE_openelp is not set
 # CONFIG_PACKAGE_openlist is not set
 # CONFIG_PACKAGE_openthread-br is not set
-# CONFIG_PACKAGE_oping is not set
 # CONFIG_PACKAGE_oscam is not set
+# CONFIG_PACKAGE_oping is not set
 # CONFIG_PACKAGE_pagekitec is not set
 # CONFIG_PACKAGE_pcapplusplus is not set
 # CONFIG_PACKAGE_pen is not set
@@ -7574,6 +7581,7 @@ CONFIG_PACKAGE_tcping=y
 # CONFIG_PACKAGE_tunneldigger-broker is not set
 # CONFIG_PACKAGE_u2pnpd is not set
 # CONFIG_PACKAGE_uacme is not set
+# CONFIG_PACKAGE_uacme-dnsapi-adapter is not set
 # CONFIG_PACKAGE_uacme-ualpn is not set
 CONFIG_PACKAGE_uclient-fetch=y
 # CONFIG_PACKAGE_udhcpsnoop is not set
@@ -8413,6 +8421,16 @@ CONFIG_PACKAGE_lm-sensors=y
 # CONFIG_PACKAGE_look is not set
 # CONFIG_PACKAGE_losetup is not set
 # CONFIG_PACKAGE_lpac is not set
+
+#
+# Configuration
+#
+CONFIG_LPAC_WITH_PCSC=y
+CONFIG_LPAC_WITH_AT=y
+CONFIG_LPAC_WITH_UQMI=y
+CONFIG_LPAC_WITH_MBIM=y
+# end of Configuration
+
 # CONFIG_PACKAGE_lrzsz is not set
 # CONFIG_PACKAGE_lscpu is not set
 # CONFIG_PACKAGE_lsd is not set
