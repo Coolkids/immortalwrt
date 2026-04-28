@@ -150,7 +150,10 @@ jobs:
           else
             ccache -M 2G
           fi
-          ccache -s
+          ccache --set-config cache_dir=/home/runner/work/immortalwrt/immortalwrt/.ccache
+          ccache --set-config compression=true
+          ccache --set-config compression_level=3
+          ccache -s -v
           make defconfig
           make download -j8
           df -h
@@ -182,7 +185,7 @@ jobs:
       
       - name: Show ccache stats
         run: |
-          ccache -s
+          ccache -s -v
 
       - name: Prepare artifact
         run: |
