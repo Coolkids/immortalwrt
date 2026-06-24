@@ -143,6 +143,7 @@ function feed(){
 	remove_old_packages
 	check_xtables_addons
 	bandix
+	patch_unbound
 	##sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
 	./scripts/feeds install -a
 	install_new_package
@@ -175,6 +176,14 @@ function check_xtables_addons(){
 function patch_xtables_addons(){
 	rm -rf ./feeds/packages/net/xtables-addons
 	cp -r $patchs/patchs/xtables-addons ./feeds/packages/net
+}
+
+function patch_unbound(){
+	echo "patch unbound"
+	pushd ./feeds/packages/net/unbound
+	git apply $patchs/patchs/unbound/001-add-cachedb.patch
+	popd
+	./scripts/feeds install -p packages -f unbound
 }
 
 function restore_config(){
