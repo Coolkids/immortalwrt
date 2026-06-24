@@ -144,6 +144,7 @@ function feed(){
 	check_xtables_addons
 	bandix
 	patch_unbound
+	patch_valkey
 	##sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
 	./scripts/feeds install -a
 	install_new_package
@@ -184,6 +185,13 @@ function patch_unbound(){
 	git apply $patchs/patchs/unbound/001-add-cachedb.patch
 	popd
 	./scripts/feeds install -p packages -f unbound
+}
+
+function patch_valkey(){
+	echo "patch valkey"
+	pushd ./feeds/packages/libs/valkey/files
+	git apply $patchs/patchs/valkey/001-valkey.patch
+	popd
 }
 
 function restore_config(){

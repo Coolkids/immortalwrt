@@ -1,0 +1,21 @@
+--- valkey.init.old	2026-06-24 20:22:13.641918335 +0800
++++ valkey.init	2026-06-25 00:11:37.913664106 +0800
+@@ -82,7 +82,6 @@ valkey_instance() {
+ 	procd_set_param respawn ${respawn_threshold:-3600} ${respawn_timeout:-5} ${respawn_retry:-5}
+ 	procd_set_param stdout 1
+ 	procd_set_param stderr 1
+-	procd_set_param user valkey
+ 	procd_close_instance
+ }
+ 
+--- valkey.config.old	2026-06-24 20:22:13.641885933 +0800
++++ valkey.config	2026-06-25 00:11:35.330259754 +0800
+@@ -6,8 +6,5 @@ config instance 'main'
+ 	option logfile '/var/log/valkey.log'
+ 	option maxmemory '64mb'
+ 	option maxmemory_policy 'allkeys-lru'
+-	list save '900 1'
+-	list save '300 10'
+-	list save '60 10000'
+ 	option appendonly '0'
+ 	option appendfilename 'appendonly.aof'
