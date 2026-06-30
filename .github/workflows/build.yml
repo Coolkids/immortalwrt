@@ -26,18 +26,18 @@ jobs:
             config: base_musl_config
             target: musl
             type: lite
-          # - name: openwrt-glibc-lite
-          #   config: base_glibc_config
-          #   target: glibc
-          #   type: lite
           - name: openwrt-musl-full
             config: full_musl_config
             target: musl
             type: full
-          # - name: openwrt-glibc-full
-          #   config: full_glibc_config
-          #   target: glibc
-          #   type: full
+          - name: openwrt-glibc-lite
+            config: base_glibc_config
+            target: glibc
+            type: lite
+          - name: openwrt-glibc-full
+            config: full_glibc_config
+            target: glibc
+            type: full
             
     steps:
       - name: Set workspace
