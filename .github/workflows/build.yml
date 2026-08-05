@@ -167,11 +167,13 @@ jobs:
         uses: actions/cache/restore@v5
         with:
           path: /home/runner/work/immortalwrt/immortalwrt/.ccache
-          key: ccache-${{ runner.os }}-${{ matrix.config }}-${{ github.run_id }}
+          key: ccache-${{ runner.os }}-${{ matrix.target }}-${{ matrix.type }}-${{ github.run_id }}
           restore-keys: |
+            ccache-${{ runner.os }}-${{ matrix.target }}-${{ matrix.type }}-
+            ccache-${{ runner.os }}-${{ matrix.target }}-
             ccache-${{ runner.os }}-${{ matrix.config }}-
-            ccache-${{ matrix.config }}-
-            ${{ matrix.target }}
+              
+
 
       - name: Compile firmware
         run: |
@@ -181,7 +183,7 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: /home/runner/work/immortalwrt/immortalwrt/.ccache
-          key: ccache-${{ runner.os }}-${{ matrix.config }}-${{ github.run_id }}
+          key: ccache-${{ runner.os }}-${{ matrix.target }}-${{ matrix.type }}-${{ github.run_id }}
       
       - name: Show ccache stats
         run: |
