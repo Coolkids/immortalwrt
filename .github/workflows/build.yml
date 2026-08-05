@@ -171,7 +171,7 @@ jobs:
           restore-keys: |
             ccache-${{ runner.os }}-${{ matrix.config }}-
             ccache-${{ matrix.config }}-
-            ccache-${{ matrix.config }}
+            ${{ matrix.target }}
 
       - name: Compile firmware
         run: |
