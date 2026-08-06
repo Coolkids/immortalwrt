@@ -145,11 +145,7 @@ jobs:
           echo 'CONFIG_CCACHE=y' >> .config
           # 设置 ccache 缓存目录并启用
           echo "CONFIG_CCACHE_DIR=/home/runner/work/immortalwrt/immortalwrt/.ccache" >> .config
-          if [[ "${{ matrix.type }}" == "full" ]]; then
-            ccache -M 3G
-          else
-            ccache -M 2G
-          fi
+          ccache -M 5G
           ccache --set-config cache_dir=/home/runner/work/immortalwrt/immortalwrt/.ccache
           ccache --set-config compression=true
           ccache --set-config compression_level=3
