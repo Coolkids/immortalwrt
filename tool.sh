@@ -141,7 +141,6 @@ function feed(){
 	./scripts/feeds update -a
 	delete_dep
 	remove_old_packages
-	check_xtables_addons
 	bandix
 	patch_unbound
 	patch_valkey
@@ -149,34 +148,6 @@ function feed(){
 	./scripts/feeds install -a
 	install_new_package
 	install_dep
-}
-
-function check_xtables_addons(){
-	local makefile_path="./feeds/packages/net/xtables-addons/Makefile"
-	if [[ -z "$makefile_path" || ! -f "$makefile_path" ]]; then
-		echo "xtables-addons Makefile not exist"
-		return
-	fi
-
-	local pkg_version=$(grep -E '^PKG_VERSION[:=]' "$makefile_path" | head -n1 | sed -E 's/.*[:=][[:space:]]*//')
-
-	if [[ -z "$pkg_version" ]]; then
-		echo "xtables-addons  PKG_VERSION not found"
-		return
-	fi
-
-	echo "xtables-addons version: $pkg_version"
-	if version_lt "$pkg_version" "3.30"; then
-    	echo "xtables-addons Version < 3.30"
-		patch_xtables_addons
-	else
-    	echo "xtables-addons Version >= 3.30, skip"
-	fi
-}
-
-function patch_xtables_addons(){
-	rm -rf ./feeds/packages/net/xtables-addons
-	cp -r $patchs/patchs/xtables-addons ./feeds/packages/net
 }
 
 function patch_unbound(){
