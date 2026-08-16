@@ -72,11 +72,6 @@ function version_lt() {
     return 1
 }
 
-function bandix(){
-	sed -i '/^else ifeq (\$(ARCH),x86_64)$/a\
-		PKG_SOURCE:=bandix-$(RUST_BANDIX_VERSION)-x86_64-unknown-linux-musl.tar.gz' "./feeds/custom/openwrt-bandix/openwrt-bandix/Makefile"
-}
-
 function delete_dep(){
 	# 定义A和B文件夹的路径
 	A_DIR="./feeds/custom/openwrt-passwall-packages"
@@ -141,7 +136,6 @@ function feed(){
 	./scripts/feeds update -a
 	delete_dep
 	remove_old_packages
-	bandix
 	patch_unbound
 	patch_valkey
 	##sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
