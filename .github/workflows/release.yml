@@ -3,8 +3,7 @@ name: Auto Release CI
 on:
   workflow_dispatch:
   schedule:
-    # 每周二触发（后面脚本判断是否第二周）
-    - cron: "0 5 15 * *"
+    - cron: "0 0 15 * *"
 
 permissions:
   contents: write
