@@ -1,3 +1,4 @@
 # add your custom package feeds here
 #
 # http://www.example.com/path/to/files/packages.adb
+https://coolkids.github.io/custom-packages/packages/x86_64/packages.adb
