@@ -139,6 +139,7 @@ function feed(){
 	patch_unbound
 	patch_valkey
 	patch_nlbwmon
+	patch_golang
 	##sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
 	./scripts/feeds install -a
 	install_new_package
@@ -166,6 +167,14 @@ function patch_valkey(){
 	rm valkey.init
 	cp $patchs/patchs/valkey/valkey.init .
 	chmod +x valkey.init
+	popd
+}
+
+function patch_golang(){
+	echo "patch golang"
+	pushd ./feeds/packages/lang
+	rm -rf golang
+	cp -r $patchs/patchs/golang .
 	popd
 }
 
