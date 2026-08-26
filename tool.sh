@@ -138,6 +138,7 @@ function feed(){
 	remove_old_packages
 	patch_unbound
 	patch_valkey
+	patch_nlbwmon
 	##sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
 	./scripts/feeds install -a
 	install_new_package
@@ -152,10 +153,19 @@ function patch_unbound(){
 	./scripts/feeds install -p packages -f unbound
 }
 
+function patch_nlbwmon(){
+	echo "patch nlbwmon"
+	pushd ./feeds/packages/net/nlbwmon/files
+	git apply $patchs/patchs/nlbwmon/reload-nf-conntrack-netlink.patch
+	popd
+}
+
 function patch_valkey(){
 	echo "patch valkey"
 	pushd ./feeds/packages/libs/valkey/files
-	git apply $patchs/patchs/valkey/001-valkey.patch
+	rm valkey.init
+	cp $patchs/patchs/valkey/valkey.init .
+	chmod +x valkey.init
 	popd
 }
 
