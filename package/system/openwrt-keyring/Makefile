@@ -6,10 +6,10 @@ PKG_NAME:=openwrt-keyring
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL=https://github.com/immortalwrt/keyring.git
-PKG_SOURCE_DATE:=2025-12-11
-PKG_SOURCE_VERSION:=14e1f88b521f6466dfcc06b055646cfa25e8e02f
-PKG_MIRROR_HASH:=1928719f41b4aa2709829618e54a1dbd1322cdccf6bc56213354bf9c50017995
+PKG_SOURCE_URL=https://github.com/Coolkids/openwrt-keyring.git
+PKG_SOURCE_DATE:=2026-08-26
+PKG_SOURCE_VERSION:=215ac5eac33c3ac2ea5f2e5082783e357944a6b0
+PKG_MIRROR_HASH:=
 
 PKG_MAINTAINER:=John Crispin <john@phrozen.org>
 PKG_LICENSE:=GPL-2.0
@@ -34,6 +34,7 @@ ifneq ($(CONFIG_USE_APK),)
 define Package/openwrt-keyring/install
 	$(INSTALL_DIR) $(1)/etc/apk/keys/
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/apk/openwrt-snapshots.pem $(1)/etc/apk/keys/
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/apk/coolkidwrt-snapshots.pem $(1)/etc/apk/keys/
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/apk/immortalwrt-snapshots.pem $(1)/etc/apk/keys/
 endef
 else
