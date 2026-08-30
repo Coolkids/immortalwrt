@@ -2,6 +2,11 @@ name: OpenWrt Build CI
 
 on:
   workflow_call:
+    secrets:
+      apk_signing_key:
+        required: true
+      apk_signing_pubkey:
+        required: true
     inputs:
       ref:
         required: true
@@ -113,9 +118,23 @@ jobs:
           restore-keys: |
             openwrt-ccache-${{ runner.os }}-
             ccache-${{ runner.os }}-musl-full-
-            
+
+      - name: Restore APK signing key
+        run: |
+          mkdir -p keys
+          echo "${{ secrets.apk_signing_key }}" > \
+            keys/coolkidwrt-snapshots.pem
+          chmod 600 keys/coolkidwrt-snapshots.pem
+          echo "${{ secrets.apk_signing_pubkey }}" > \
+            keys/coolkidwrt-snapshots.pem.pub
+          chmod 600 keys/coolkidwrt-snapshots.pem.pub
+                
       - name: Compile firmware
-        run: make -j"$(nproc)" || make -j1 V=s
+        run: |
+          make \
+            BUILD_KEY_APK_SEC="${{ github.workspace }}/keys/coolkidwrt-snapshots.pem" \
+            BUILD_KEY_APK_PUB="${{ github.workspace }}/keys/coolkidwrt-snapshots.pem.pub" \
+            -j$(nproc) || make -j1 V=s
 
       - name: Save ccache
         uses: actions/cache/save@v5
