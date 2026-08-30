@@ -21,8 +21,6 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       ref: ${{ github.sha }}
-    secrets:
-      apk_signing_key: ${{ secrets.APK_SIGNING_KEY }}
 
   upload_release:
     needs: build
