@@ -108,7 +108,7 @@ jobs:
           key: openwrt-ccache-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
             openwrt-ccache-${{ runner.os }}-
-            ccache-${{ runner.os }}-
+            ccache-${{ runner.os }}-musl-full-
             
       - name: Compile firmware
         run: make -j"$(nproc)" || make -j1 V=s
