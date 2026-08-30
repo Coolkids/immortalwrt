@@ -31,7 +31,7 @@ jobs:
 
           git add feeds.conf.default include/version.mk
 
-          git commit -m "release ${VERSION}" || echo "Nothing to commit"
+          git commit -m "[skip ci] release ${VERSION}" || echo "Nothing to commit"
 
           git tag "${VERSION}"
 
@@ -48,14 +48,19 @@ jobs:
           echo "sha=$SHA" >> $GITHUB_OUTPUT
   build:
     needs: release
-    uses: Coolkids/immortalwrt/.github/workflows/build.yml@master
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/build.yml
     with:
       ref: ${{ needs.release.outputs.sha }}
-      tag: ${{ needs.release.outputs.tag }}
+    secrets:
+      apk_signing_key: ${{ secrets.APK_SIGNING_KEY }}
 
   upload_release:
     needs: [release, build]
-    uses: Coolkids/immortalwrt/.github/workflows/upload_release.yml@master
+    uses: ./.github/workflows/upload_release.yml
     with:
       tag: ${{ needs.release.outputs.tag }}
     secrets:
@@ -63,7 +68,7 @@ jobs:
 
   push_msg:
     needs: [release, build, upload_release]
-    uses: Coolkids/immortalwrt/.github/workflows/msg.yml@master
+    uses: ./.github/workflows/msg.yml
     secrets:
       corpid: ${{ secrets.CORPID }}
       corpsecret: ${{ secrets.CORPSECRET }}

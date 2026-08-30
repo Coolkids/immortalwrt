@@ -1,4 +1,3 @@
-
 name: OpenWrt Build CI
 
 on:
@@ -7,114 +6,57 @@ on:
       ref:
         required: true
         type: string
-      tag:
-        required: false
-        type: string
-
 
 jobs:
   build:
     name: Build x86_64 OpenWrt Firmware
     runs-on: ubuntu-24.04
-    outputs:
-      is_release: ${{ steps.ctx.outputs.is_release }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: openwrt-musl-lite
-            config: base_musl_config
-            target: musl
-            type: lite
-          - name: openwrt-musl-full
-            config: full_musl_config
-            target: musl
-            type: full
-          - name: openwrt-glibc-lite
-            config: base_glibc_config
-            target: glibc
-            type: lite
-          - name: openwrt-glibc-full
-            config: full_glibc_config
-            target: glibc
-            type: full
-            
+    permissions:
+      contents: read
+      pages: read
+
     steps:
-      - name: Set workspace
-        run: |
-          sudo -E timedatectl set-timezone Asia/Shanghai
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: "false"
+          android: "true"
+          dotnet: "true"
+          haskell: "true"
+          large-packages: "true"
+          docker-images: "true"
+          swap-storage: "true"
 
-      - name: Resolve build context
-        id: ctx
-        run: |
-          EVENT="${{ github.event_name }}"
-
-          if [[ "$EVENT" == "workflow_call" || "$EVENT" == "workflow_dispatch" ]]; then
-            REF="${{ inputs.ref }}"
-            TAG="${{ inputs.tag }}"
-          elif [[ "$EVENT" == "push" && "${GITHUB_REF}" == refs/tags/* ]]; then
-            REF="${GITHUB_SHA}"
-            TAG="${GITHUB_REF#refs/tags/}"
-          else
-            REF="${GITHUB_SHA}"
-            TAG=""
-          fi
-
-          echo "ref=$REF" >> $GITHUB_OUTPUT
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-
-          if [[ "$TAG" == v* ]]; then
-            echo "is_release=true" >> $GITHUB_OUTPUT
-          else
-            echo "is_release=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Show build type
-        run: |
-          echo "REF: ${{ steps.ctx.outputs.ref }}"
-          echo "TAG: ${{ steps.ctx.outputs.tag }}"
-          echo "Release: ${{ steps.ctx.outputs.is_release }}"
-
-      - name: Maximize Build Space
+      - name: Maximize build space
         uses: easimon/maximize-build-space@master
         with:
           swap-size-mb: 1024
           temp-reserve-mb: 100
-          root-reserve-mb: 1024
-
-      - name: Free Disk Space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: true
+          root-reserve-mb: 4096
 
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ steps.ctx.outputs.ref }}
+          ref: ${{ inputs.ref }}
 
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v6
 
-      - name: Configure compilation environment
+      - name: Install build dependencies
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo apt update -y
-          sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
             bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib \
             g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev \
             libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev libpython3-dev \
             libreadline-dev libssl-dev libtool libyaml-dev libz-dev lld llvm lrzsz mkisofs msmtp nano \
             ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-docutils \
             python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs \
-            upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd yasm    
+            upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd yasm
 
       - name: Show System Info
         run: |
@@ -133,75 +75,127 @@ jobs:
           df -hT
 
       - name: Update feeds
-        run: |
-          ./tool.sh feed
+        run: ./tool.sh feed
 
-      - name: Generate configuration file
+      - name: Generate build configuration
         run: |
-          rm -f ./.config*
-          mkdir .ccache
-          cp ./configs/${{ matrix.config }} ./.config
+          set -euo pipefail
+          rm -f .config .config.old
+          cp configs/full_musl_config .config
+          mkdir -p .ccache
+
           echo 'CONFIG_DEVEL=y' >> .config
           echo 'CONFIG_CCACHE=y' >> .config
-          # 设置 ccache 缓存目录并启用
           echo "CONFIG_CCACHE_DIR=/home/runner/work/immortalwrt/immortalwrt/.ccache" >> .config
-          ccache -M 5G
+
+          
+          ccache --max-size 5G
           ccache --set-config cache_dir=/home/runner/work/immortalwrt/immortalwrt/.ccache
           ccache --set-config compression=true
           ccache --set-config compression_level=3
-          ccache -s -v
+
           make defconfig
+
+      - name: Download build packages
+        run: |
           make download -j8
-          df -h
-          if [[ "${{ matrix.target }}" == "glibc" ]]; then
-            echo "glibc环境, 禁用download-ci-llvm"
-            sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
-          fi
-      
-      # 恢复 ccache
+          df -h  
+
       - name: Restore ccache
         uses: actions/cache/restore@v5
         with:
-          path: /home/runner/work/immortalwrt/immortalwrt/.ccache
-          key: ccache-${{ runner.os }}-${{ matrix.target }}-${{ matrix.type }}-${{ github.run_id }}
+          path: .ccache
+          key: openwrt-ccache-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
-            ccache-${{ runner.os }}-${{ matrix.target }}-${{ matrix.type }}-
-            ccache-${{ runner.os }}-${{ matrix.target }}-
-            ccache-${{ runner.os }}-${{ matrix.config }}-
-              
-
-
+            openwrt-ccache-${{ runner.os }}-
+            ccache-${{ runner.os }}-
+            
       - name: Compile firmware
-        run: |
-          make -j$(nproc) || make -j1 V=s
+        run: make -j"$(nproc)" || make -j1 V=s
 
       - name: Save ccache
         uses: actions/cache/save@v5
         with:
-          path: /home/runner/work/immortalwrt/immortalwrt/.ccache
-          key: ccache-${{ runner.os }}-${{ matrix.target }}-${{ matrix.type }}-${{ github.run_id }}
-      
-      - name: Show ccache stats
+          path: .ccache
+          key: openwrt-ccache-${{ runner.os }}-${{ github.run_id }}
+
+      - name: Show ccache statistics
         run: |
           ccache -s -v
 
-      - name: Prepare artifact
+      - name: Prepare firmware artifacts
         run: |
-          mkdir -p ./artifact/firmware
-          mkdir -p ./artifact/buildinfo
-          rm -rf $(find ./bin/targets/ -type d -name "packages")
-          cp -rf $(find ./bin/targets/ -type f -name "immortalwrt-*") ./artifact/firmware/
-          cp -rf $(find ./bin/targets/ -type f -name "sha256sums") ./artifact/firmware/
-          cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
+          set -euo pipefail
+          mkdir -p artifact/firmware artifact/buildinfo
+          find bin/targets -type f -name 'immortalwrt-*' ! -name '*.manifest' \
+            -exec cp -t artifact/firmware {} +
+          find bin/targets -type f -name sha256sums \
+            -exec cp -t artifact/firmware {} +
+          find bin/targets -type f \( -name '*.buildinfo' -o -name '*.manifest' \) \
+            -exec cp -t artifact/buildinfo {} +
 
-      - name: Deliver buildinfo
+      - name: Prepare APK repository
+        env:
+          PAGES_URL: ${{ steps.pages.outputs.base_url }}
+        run: |
+          set -euo pipefail
+          PAGES_DIR="${RUNNER_TEMP}/apk-repository"
+          mkdir -p \
+            "$PAGES_DIR/targets/x86/64" \
+            "$PAGES_DIR/packages"
+
+          cp -a bin/targets/x86/64/packages "$PAGES_DIR/targets/x86/64/"
+          cp -a bin/packages/x86_64 "$PAGES_DIR/packages/"
+          
+          while IFS= read -r index; do
+            printf '%s/%s\n' "${PAGES_URL%/}" "$index"
+          done < <(find "$PAGES_DIR" -type f -name packages.adb -printf '%P\n' | sort) \
+            > "$PAGES_DIR/repositories.list"
+
+          {
+            printf '%s\n' '<!doctype html>' '<meta charset="utf-8">'
+            printf '%s\n' '<title>ImmortalWrt APK Repository</title>' '<h1>ImmortalWrt APK Repository</h1>'
+            printf '%s\n' '<p><a href="repositories.list">repositories.list</a></p>' '<ul>'
+            while IFS= read -r url; do
+              printf '<li><a href="%s"><code>%s</code></a></li>\n' "$url" "$url"
+            done < "$PAGES_DIR/repositories.list"
+            printf '%s\n' '</ul>'
+          } > "$PAGES_DIR/index.html"
+
+      - name: Upload build information
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ matrix.name }}-buildinfo
+          name: openwrt-buildinfo
           path: artifact/buildinfo/
+          if-no-files-found: error
 
-      - name: Deliver firmware
+      - name: Upload firmware
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ matrix.name }}
+          name: openwrt-firmware
           path: artifact/firmware/
+          if-no-files-found: error
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ${{ runner.temp }}/apk-repository
+
+  deploy_pages:
+    name: Deploy APK repository to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
