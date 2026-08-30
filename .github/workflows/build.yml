@@ -16,6 +16,13 @@ jobs:
       pages: read
 
     steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          swap-size-mb: 1024
+          temp-reserve-mb: 100
+          root-reserve-mb: 1024
+          
       - name: Free disk space
         uses: jlumbroso/free-disk-space@main
         with:
@@ -27,17 +34,14 @@ jobs:
           docker-images: "true"
           swap-storage: "true"
 
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
-        with:
-          swap-size-mb: 1024
-          temp-reserve-mb: 100
-          root-reserve-mb: 4096
-
       - name: Checkout
         uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
 
       - name: Configure GitHub Pages
         id: pages
@@ -104,7 +108,7 @@ jobs:
       - name: Restore ccache
         uses: actions/cache/restore@v5
         with:
-          path: .ccache
+          path: /home/runner/work/immortalwrt/immortalwrt/.ccache
           key: openwrt-ccache-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
             openwrt-ccache-${{ runner.os }}-
@@ -116,7 +120,7 @@ jobs:
       - name: Save ccache
         uses: actions/cache/save@v5
         with:
-          path: .ccache
+          path: /home/runner/work/immortalwrt/immortalwrt/.ccache
           key: openwrt-ccache-${{ runner.os }}-${{ github.run_id }}
 
       - name: Show ccache statistics
