@@ -121,20 +121,14 @@ jobs:
 
       - name: Restore APK signing key
         run: |
-          mkdir -p keys
           echo "${{ secrets.apk_signing_key }}" > \
-            keys/coolkidwrt-snapshots.pem
-          chmod 600 keys/coolkidwrt-snapshots.pem
+            private-key.pem
           echo "${{ secrets.apk_signing_pubkey }}" > \
-            keys/coolkidwrt-snapshots.pem.pub
-          chmod 600 keys/coolkidwrt-snapshots.pem.pub
+            public-key.pem
                 
       - name: Compile firmware
         run: |
-          make \
-            BUILD_KEY_APK_SEC="${{ github.workspace }}/keys/coolkidwrt-snapshots.pem" \
-            BUILD_KEY_APK_PUB="${{ github.workspace }}/keys/coolkidwrt-snapshots.pem.pub" \
-            -j$(nproc) || make -j1 V=s
+          make -j$(nproc) || make -j1 V=s
 
       - name: Save ccache
         uses: actions/cache/save@v5
