@@ -177,7 +177,7 @@ function restore_config(){
 
 function save_config(){
 	echo "save $1 config"
-	cp .config ./configs/$1
+	./scripts/diffconfig.sh > ./configs/$1
 }
 
 function build(){
