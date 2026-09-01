@@ -139,6 +139,7 @@ function feed(){
 	patch_unbound
 	patch_valkey
 	patch_nlbwmon
+	patch_libndpi
 	##sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
 	./scripts/feeds install -a
 	install_new_package
@@ -168,6 +169,14 @@ function patch_valkey(){
 	cp $patchs/patchs/valkey/valkey.init .
 	chmod +x valkey.init
 	popd
+}
+
+function patch_libndpi(){
+	echo "patch libndpi"
+	pushd ./feeds/packages/libs/libndpi
+	git apply $patchs/patchs/libndpi/001-ndpi-build-ndpiread.patch
+	popd
+	./scripts/feeds install -p packages -f libndpi
 }
 
 function restore_config(){
