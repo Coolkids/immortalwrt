@@ -9,6 +9,6 @@ backwards compatible with `/etc/config/qos_gargoyle`; the shaping backend is
 still provided by the separate `qos-gargoyle` package.
 
 The interface is available under `Network -> Gargoyle QoS` with separate
-Global, Upload, Download and Status views. Upload and download classes and
+Global, Upload, Download and Troubleshooting views. Upload and download classes and
 classification rules are edited through standard LuCI grid sections and
 modal dialogs.

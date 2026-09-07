@@ -2,9 +2,11 @@
 	"luci-app-qos-gargoyle": {
 		"description": "Grant access to LuCI Gargoyle QoS",
 		"read": {
-			"uci": [ "qos_gargoyle" ],
+			"uci": [ "qos_gargoyle", "luci", "network", "wireless" ],
 			"ubus": {
-				"luci-rpc": [ "getHostHints" ],
+				"network": [ "get_proto_handlers" ],
+				"network.interface": [ "dump" ],
+				"luci-rpc": [ "getBoardJSON", "getHostHints", "getNetworkDevices", "getWirelessDevices" ],
 				"luci": [ "setInitAction" ]
 			},
 			"file": {
@@ -12,6 +14,7 @@
 				"/proc/modules": [ "read" ],
 				"/tmp/qosmon.status": [ "read" ],
 				"/usr/sbin/iptables": [ "exec" ],
+				"/sbin/tc": [ "exec" ],
 				"/usr/sbin/tc": [ "exec" ]
 			}
 		},

@@ -1,5 +1,5 @@
 'use strict';
 
-'require qos_gargoyle.direction as direction';
+'require view.qos_gargoyle.direction as direction';
 
-return direction('download');
+return direction.createView('download');

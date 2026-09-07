@@ -29,7 +29,7 @@
 		"depends": { "acl": [ "luci-app-qos-gargoyle" ] }
 	},
 	"admin/network/qos_gargoyle/status": {
-		"title": "Status",
+		"title": "Troubleshooting",
 		"order": 40,
 		"action": { "type": "view", "path": "qos_gargoyle/status" },
 		"depends": { "acl": [ "luci-app-qos-gargoyle" ] }

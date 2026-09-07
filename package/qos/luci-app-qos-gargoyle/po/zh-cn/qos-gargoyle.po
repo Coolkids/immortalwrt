@@ -13,9 +13,6 @@ msgstr "全部"
 msgid "Auto"
 msgstr "自动"
 
-msgid "WAN Interface"
-msgstr "WAN接口"
-
 msgid "Class Name"
 msgstr "类型名称"
 
@@ -163,6 +160,9 @@ msgstr "服务类型"
 msgid "Should be set to around 98% of your available upload bandwidth. Entering a <br />number which is too high will result in QoS not meeting its class <br />requirements. Entering a number which is too low will needlessly penalize <br />your upload speed. You should use a speed test program (with QoS off) to <br />determine available upload bandwidth. Note that bandwidth is specified in <br />kbps, leave blank to disable update QoS. There are 8 kilobits per kilobyte.<br />"
 msgstr "应被设置为你可用上传带宽的 98% 左右。输入数值太高将导致 QoS 不能匹配服务类型<br />的要求。输入数值太低将造成不必要的上传速度限制。你应当在 QoS 关闭的情况下使用<br />测速程序以确定可用的上传带宽。带宽以 kbps 为单位，留空以禁用上传 QoS。<br />（1KByte/s=8Kbps）"
 
+msgid "Should be set to around 98% of your available upload bandwidth. Entering a <br />number which is too high will result in QoS not meeting its class <br />requirements. Entering a number which is too low will needlessly penalize <br />your upload speed. You should use a speed test program (with QoS off) to <br />determine available upload bandwidth. Enter the bandwidth in Mbps or kbps <br />(for example, 20m or 512k); a value without a unit is treated as kbps. <br />Leave blank to disable upload QoS."
+msgstr "应被设置为你可用上传带宽的 98% 左右。输入数值太高将导致 QoS 不能匹配服务类型<br />的要求。输入数值太低将造成不必要的上传速度限制。你应当在 QoS 关闭的情况下使用<br />测速程序确定可用的上传带宽。带宽可使用 Mbps 或 kbps（例如 20m 或 512k），不带<br />单位时按 kbps 处理。留空以禁用上传 QoS。"
+
 msgid "Source IP(s)"
 msgstr "源 IP"
 
@@ -175,11 +175,23 @@ msgstr "指定当数据包不匹配任何规则时将被如何归类。"
 msgid "Specifying correctly is crucial to making QoS work. Note that bandwidth is <br />specified in kbps, leave blank to disable download QoS. There are 8 kilobits <br />per kilobyte."
 msgstr "正确设置对于 QoS 的工作至关重要。带宽以 kbps 为单位，留空以禁用下载 QoS。（1KByte/s=8Kbps）"
 
+msgid "Specifying correctly is crucial to making QoS work. Enter the bandwidth in <br />Mbps or kbps (for example, 20m or 512k); a value without a unit is treated as <br />kbps. Leave blank to disable download QoS."
+msgstr "正确设置对于 QoS 的工作至关重要。带宽可使用 Mbps 或 kbps（例如 20m 或 512k），不带<br />单位时按 kbps 处理。留空以禁用下载 QoS。"
+
+msgid "Enter a valid bandwidth such as 20m or 512k."
+msgstr "请输入有效的带宽值，例如 20m 或 512k。"
+
 msgid "The maximum amount of bandwidth this class will be allocated in kbit/s. Even <br />if unused bandwidth is available, this service class will never be permitted <br />to use more than this amount of bandwidth."
 msgstr "该服务类型可被分配的带宽最大值（以 kbit/s 为单位）。即使存在未使用带宽，该服务类型也将永远不被允许使用超过此量的带宽。"
 
+msgid "The maximum amount of bandwidth this class will be allocated. Even <br />if unused bandwidth is available, this service class will never be permitted <br />to use more than this amount of bandwidth. Enter Mbps or kbps (for example, <br />20m or 512k); values without a unit are treated as kbps. Leave empty for unlimited."
+msgstr "该服务类型可被分配的带宽最大值。即使存在未使用带宽，该服务类型也将永远不被允许<br />使用超过此量的带宽。可输入 Mbps 或 kbps（例如 20m 或 512k），不带单位时按 kbps<br />处理。留空表示不限制。"
+
 msgid "The minimum service this class will be allocated when the link is at <br />capacity. Classes which specify minimum service are known as realtime <br />classes by the active congestion controller. Streaming video, VoIP and <br />interactive online gaming are all examples of applications that must have a <br />minimum bandwith to function. To determine what to enter use the application <br />on an unloaded LAN and observe how much bandwidth it uses. Then enter a <br />number only slightly higher than this into this field. QoS will satisfiy the <br />minimum service of all classes first before allocating to other waiting <br />classes so be careful to use minimum bandwidths sparingly."
 msgstr "将被分配用于该服务类型的最低链路带宽容量。指定了最小带宽的服务类型会被主动拥<br />塞控制器看作实时类应用。例如视频流、VoIP 和在线互动游戏都应该设置最小带宽。要<br />确定需要多少最小带宽，可以在一个没有负载的局域网中使用应用程序并观察它使用了<br />多少带宽。然后输入一个略高于这个值的数字到字段中。在分配剩余带宽到其它服务类<br />型前，QoS 将优先满足所有服务类型的最小带宽要求，所以要谨慎地使用最小带宽。<br />"
+
+msgid "The minimum service this class will be allocated when the link is at <br />capacity. Classes which specify minimum service are known as realtime <br />classes by the active congestion controller. Streaming video, VoIP and <br />interactive online gaming are all examples of applications that must have a <br />minimum bandwith to function. To determine what to enter use the application <br />on an unloaded LAN and observe how much bandwidth it uses. Then enter a <br />number only slightly higher than this into this field. QoS will satisfiy the <br />minimum service of all classes first before allocating to other waiting <br />classes so be careful to use minimum bandwidths sparingly. Enter Mbps or kbps <br />(for example, 1m or 512k); values without a unit are treated as kbps."
+msgstr "将被分配用于该服务类型的最低链路带宽容量。指定了最小带宽的服务类型会被主动拥<br />塞控制器看作实时类应用。例如视频流、VoIP 和在线互动游戏都应该设置最小带宽。要<br />确定需要多少最小带宽，可以在一个没有负载的局域网中使用应用程序并观察它使用了<br />多少带宽。然后输入一个略高于这个值的数字。可输入 Mbps 或 kbps（例如 1m 或 512k），<br />不带单位时按 kbps 处理。"
 
 msgid "The percentage of the total available bandwidth that should be allocated to <br />this class when all available bandwidth is being used. If unused bandwidth <br />is available, more can (and will) be allocated. The percentages can be <br />configured to equal more (or less) than 100, but when the settings are <br />applied the percentages will be adjusted proportionally so that they add to <br />100. This setting only comes into effect when the WAN link is saturated.<br />"
 msgstr "当所有可用带宽被占满后该服务类型占据总带宽的百分比。如果带宽未用完，该服务类<br />型会被分配更多带宽。该百分比值可被设置为等于、大于或小于 100，但当设置被应用<br />时，百分比值将会被按比例调整以便使它们加起来等于 100。该设置只在 WAN 端链路饱<br />和时才生效。<em>（PS：WAN 端链路饱和即带宽被占用完）</em>"
@@ -217,6 +229,9 @@ msgstr "使用自定义 Ping 目标"
 msgid "Zero"
 msgstr "零"
 
+msgid "Yes"
+msgstr "是"
+
 msgid "Priority"
 msgstr "优先级"
 
@@ -225,3 +240,51 @@ msgstr "数字越小规则优先级越高"
 
 msgid "Family"
 msgstr "IP协议堆栈"
+
+msgid "This class is still used by a default class or classification rule."
+msgstr "此服务类型仍被默认服务类型或分类规则使用。"
+
+msgid "Maximum bandwidth must be greater than or equal to the minimum bandwidth."
+msgstr "最大带宽必须大于或等于最小带宽。"
+
+msgid "Rule %s"
+msgstr "规则 %s"
+
+msgid "Match"
+msgstr "匹配"
+
+msgid "from %s"
+msgstr "来自 %s"
+
+msgid "to %s"
+msgstr "到 %s"
+
+msgid "port %s"
+msgstr "端口 %s"
+
+msgid "All traffic"
+msgstr "所有流量"
+
+msgid "Maximum packet length must be greater than or equal to the minimum packet length."
+msgstr "最大数据包长度必须大于或等于最小数据包长度。"
+
+msgid "Packet's minimum size (in bytes). You may suffix the value with KB; values without a unit are bytes."
+msgstr "数据包的最小大小（单位：byte）。数值后可添加 KB；未填写单位时按 byte 处理。"
+
+msgid "Packet's maximum size (in bytes). You may suffix the value with KB; values without a unit are bytes."
+msgstr "数据包的最大大小（单位：byte）。数值后可添加 KB；未填写单位时按 byte 处理。"
+
+msgid "The total size of data transmitted since the establishment of the link (in kBytes). You may suffix the value with MB; values without a unit are kBytes."
+msgstr "自连接建立以来传输的数据总量（单位：kBytes）。数值后可添加 MB；未填写单位时按 kBytes 处理。"
+
+msgid "Enter a packet length between 1 and 1500 bytes; optionally suffix with KB."
+msgstr "请输入 1 到 1500 byte 的数据包长度，也可以添加 KB 单位。"
+
+msgid "Enter a connection byte threshold between 0 and 4194303 kB; optionally suffix with MB."
+msgstr "请输入 0 到 4194303 kB 的连接流量阈值，也可以添加 MB 单位。"
+
+msgid "Upload QoS"
+msgstr "上传 QoS"
+
+msgid "Download QoS"
+msgstr "下载 QoS"
