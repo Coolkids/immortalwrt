@@ -171,59 +171,6 @@ insert_remote_accept_rules()
 	config_foreach parse_remote_accept_config "$section_type"
 }
 
-# creates a chain that sets third byte of connmark to a value that denotes what l7 proto
-# is associated with connection. This only sets the connmark, it does not save it to mark
-create_l7marker_chain()
-{
-	# eliminate chain if it exists
-	delete_chain_from_table "mangle" "l7marker"
-
-	app_proto_num=1
-	app_proto_shift=16
-	app_proto_mask="0xFF0000"
-
-	all_prots=$(ls /etc/l7-protocols/* | sed 's/^.*\///' | sed 's/\.pat$//' )
-	qos_active=$(ls /etc/rc.d/*qos_gargoyle* 2>/dev/null)
-	if [ -n "$qos_active" ] ; then
-		qos_l7=$(uci show qos_gargoyle | sed '/layer7=/!d; s/^.*=//g')
-	fi
-	fw_l7=$(uci show firewall | sed '/app_proto/!d; s/^.*=//g')
-	all_used="$fw_l7 $qos_l7"
-
-	if [ "$all_used" != " " ] ; then
-		iptables -t mangle -N l7marker
-		iptables -t mangle -I PREROUTING  -m connbytes --connbytes 0:20 --connbytes-dir both --connbytes-mode packets -m connmark --mark 0x0/$app_proto_mask -j l7marker
-		iptables -t mangle -I POSTROUTING -m connbytes --connbytes 0:20 --connbytes-dir both --connbytes-mode packets -m connmark --mark 0x0/$app_proto_mask -j l7marker
-
-		for proto in $all_prots ; do
-			proto_is_used=$(echo "$all_used" | grep "$proto")
-			if [ -n "$proto_is_used" ] ; then
-				app_proto_mark=$(printf "0x%X" $(($app_proto_num << $app_proto_shift)) )
-				iptables -t mangle -A l7marker -m connmark --mark 0x0/$app_proto_mask -m layer7 --l7proto $proto -j CONNMARK --set-mark $app_proto_mark/$app_proto_mask
-				echo "$proto	$app_proto_mark	$app_proto_mask" >> /tmp/l7marker.marks.tmp
-				app_proto_num=$((app_proto_num + 1))
-			fi
-		done
-
-		copy_file="y"
-		if [ -e /etc/md5/layer7.md5 ] ; then
-			old_md5=$(cat /etc/md5/layer7.md5)
-			current_md5=$(md5sum /tmp/l7marker.marks.tmp | awk ' { print $1 ; } ' )
-			if [ "$current_md5" = "$old_md5" ] ; then
-				copy_file="n"
-			fi
-		fi
-
-		if [ "$copy_file" = "y" ] ; then
-			mv /tmp/l7marker.marks.tmp /etc/l7marker.marks
-			mkdir -p /etc/md5
-			md5sum /etc/l7marker.marks | awk ' { print $1 ; }' > /etc/md5/layer7.md5
-		else
-			rm /tmp/l7marker.marks.tmp
-		fi
-	fi
-}
-
 insert_pf_loopback_rules()
 {
 	config_name="firewall"
@@ -348,21 +295,6 @@ insert_restriction_rules()
 		config_get "enabled" "$section" "enabled"
 		if [ -z "$enabled" ] ; then enabled="1" ; fi
 		if [ "$enabled" = "1" ] && ( [ "$section_type"  = "restriction_rule" ] || [ "$section_type" = "whitelist_rule" ] ) ; then
-			#convert app_proto && not_app_proto to connmark here
-			config_get "app_proto" "$section" "app_proto"
-			config_get "not_app_proto" "$section" "not_app_proto"
-
-			if [ -n "$app_proto" ] ; then
-				app_proto_connmark=$(cat /etc/l7marker.marks 2>/dev/null | grep $app_proto | awk '{ print $2 ; }' )
-				app_proto_mask=$(cat /etc/l7marker.marks 2>/dev/null | grep $app_proto | awk '{ print $3 ;  }' )
-				uci set "$package_name"."$section".connmark="$app_proto_connmark/$app_proto_mask"
-			fi
-			if [ -n "$not_app_proto" ] ; then
-				not_app_proto_connmark=$(cat /etc/l7marker.marks 2>/dev/null | grep "$not_app_proto" | awk '{ print $2 }')
-				not_app_proto_mask=$(cat /etc/l7marker.marks 2>/dev/null | grep "$not_app_proto" | awk '{ print $3 }')
-				uci set "$package_name"."$section".not_connmark="$not_app_proto_connmark/$not_app_proto_mask"
-			fi
-
 			table="inet fw4"
 			chain="egress_restrictions"
 			ingress=""
@@ -657,10 +589,13 @@ add_adsl_modem_routes()
 
 initialize_firewall()
 {
+	# Remove legacy layer7 state. QoS classification uses xt_ndpi directly.
+	delete_chain_from_table "mangle" "l7marker"
+	rm -f /etc/l7marker.marks /etc/md5/layer7.md5
+
 	nft insert rule inet fw4 forward_lan iifname br-lan oifname br-lan accept
 	insert_remote_accept_rules
 	insert_dmz_rule
-	create_l7marker_chain
 	enforce_dhcp_assignments
 	force_router_dns
 	add_adsl_modem_routes
@@ -740,4 +675,3 @@ ifup_firewall()
 	initialize_quotas
 	insert_pf_loopback_rules
 }
-
