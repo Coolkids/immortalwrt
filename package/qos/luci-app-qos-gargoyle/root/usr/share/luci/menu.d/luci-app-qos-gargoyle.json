@@ -1,0 +1,37 @@
+{
+	"admin/network/qos_gargoyle": {
+		"title": "Gargoyle QoS",
+		"order": 90,
+		"action": {
+			"type": "alias",
+			"path": "admin/network/qos_gargoyle/global"
+		},
+		"depends": {
+			"acl": [ "luci-app-qos-gargoyle" ],
+			"uci": { "qos_gargoyle": true }
+		}
+	},
+	"admin/network/qos_gargoyle/global": {
+		"title": "Global Settings",
+		"order": 10,
+		"action": { "type": "view", "path": "qos_gargoyle/global" }
+	},
+	"admin/network/qos_gargoyle/upload": {
+		"title": "Upload Settings",
+		"order": 20,
+		"action": { "type": "view", "path": "qos_gargoyle/upload" },
+		"depends": { "acl": [ "luci-app-qos-gargoyle" ] }
+	},
+	"admin/network/qos_gargoyle/download": {
+		"title": "Download Settings",
+		"order": 30,
+		"action": { "type": "view", "path": "qos_gargoyle/download" },
+		"depends": { "acl": [ "luci-app-qos-gargoyle" ] }
+	},
+	"admin/network/qos_gargoyle/status": {
+		"title": "Status",
+		"order": 40,
+		"action": { "type": "view", "path": "qos_gargoyle/status" },
+		"depends": { "acl": [ "luci-app-qos-gargoyle" ] }
+	}
+}

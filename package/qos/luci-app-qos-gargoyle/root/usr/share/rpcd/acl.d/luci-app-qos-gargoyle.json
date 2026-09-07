@@ -1,0 +1,25 @@
+{
+	"luci-app-qos-gargoyle": {
+		"description": "Grant access to LuCI Gargoyle QoS",
+		"read": {
+			"uci": [ "qos_gargoyle" ],
+			"ubus": {
+				"luci-rpc": [ "getHostHints" ],
+				"luci": [ "setInitAction" ]
+			},
+			"file": {
+				"/etc/init.d/qos_gargoyle": [ "read", "exec" ],
+				"/proc/modules": [ "read" ],
+				"/tmp/qosmon.status": [ "read" ],
+				"/usr/sbin/iptables": [ "exec" ],
+				"/usr/sbin/tc": [ "exec" ]
+			}
+		},
+		"write": {
+			"uci": [ "qos_gargoyle" ],
+			"ubus": {
+				"luci": [ "setInitAction" ]
+			}
+		}
+	}
+}
