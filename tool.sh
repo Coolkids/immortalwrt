@@ -128,7 +128,6 @@ function install_new_package(){
 
 
 function feed(){
-	patchs=`pwd`
 	if [ -d "./tmp" ]; then
 		rm -rf ./tmp
 	fi
@@ -136,52 +135,33 @@ function feed(){
 	./scripts/feeds update -a
 	delete_dep
 	remove_old_packages
-	patch_unbound
-	patch_valkey
-	patch_nlbwmon
-	patch_libndpi
+	apply_patches
 	##sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' ./feeds/packages/lang/rust/Makefile
 	./scripts/feeds install -a
 	install_new_package
 	install_dep
 }
 
-function patch_unbound(){
-	echo "patch unbound"
-	pushd ./feeds/packages/net/unbound
-	git apply $patchs/patchs/unbound/001-add-cachedb.patch
-	cp $patchs/patchs/unbound/root.hints files/
-	popd
-	./scripts/feeds install -p packages -f unbound
-}
+function apply_patches(){
+	local patch_dir patch_script
+	local project_root="$PWD"
 
-function patch_nlbwmon(){
-	echo "patch nlbwmon"
-	pushd ./feeds/packages/net/nlbwmon/files
-	git apply $patchs/patchs/nlbwmon/reload-nf-conntrack-netlink.patch
-	popd
-}
+	while IFS= read -r -d '' patch_dir; do
+		patch_script="$patch_dir/patch.sh"
+		if [[ ! -f "$patch_script" ]]; then
+			echo "Missing patch definition: $patch_script" >&2
+			return 1
+		fi
 
-function patch_valkey(){
-	echo "patch valkey"
-	pushd ./feeds/packages/libs/valkey/files
-	rm valkey.init
-	cp $patchs/patchs/valkey/valkey.init .
-	chmod +x valkey.init
-	popd
-}
-
-function patch_libndpi(){
-	echo "patch libndpi"
-	pushd ./feeds/packages/libs/libndpi
-	git apply $patchs/patchs/libndpi/001-ndpi-build-ndpiread.patch
-	popd
-	./scripts/feeds install -p packages -f libndpi
+		echo "===> Apply patch: $(basename "$patch_dir")"
+		PATCH_DIR="$patch_dir" PROJECT_ROOT="$project_root" bash -e "$patch_script"
+	done < <(find "$project_root/patchs" -mindepth 1 -maxdepth 1 -type d -print0 | sort -z)
 }
 
 function restore_config(){
 	echo "restore $1 config"
 	cp ./configs/$1 .config
+	make defconfig
 }
 
 function save_config(){
