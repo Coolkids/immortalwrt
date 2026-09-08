@@ -138,7 +138,7 @@ function addClassSection(m, direction) {
 		return qos.formatBandwidth(uci.get('qos_gargoyle', id, 'max_bandwidth')) || _('Unlimited');
 	};
 
-	o = s.option(form.DummyValue, '_ld', '%s (kbps)'.format(_('Load')));
+	o = s.option(form.DummyValue, '_ld', _('Load'));
 	o.modalonly = false;
 	o.textvalue = function() {
 		return '*';

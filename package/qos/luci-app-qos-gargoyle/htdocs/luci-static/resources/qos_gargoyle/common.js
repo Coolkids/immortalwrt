@@ -85,7 +85,8 @@ function parseSize(value, units, defaultUnit) {
 	if (!match || !match[1])
 		return null;
 
-	var unit = (match[2] || defaultUnit || '').toUpperCase();
+	/* Size units are deliberately case-insensitive (b, B, kb, KB, etc.). */
+	var unit = String(match[2] || defaultUnit || '').toUpperCase();
 	var multiplier = units && units[unit];
 	var number = +match[1];
 	if (!multiplier || !isFinite(number) || number < 0)
@@ -131,7 +132,8 @@ function formatBandwidth(value) {
 		return '%s mbps'.format(text);
 	}
 
-	return '%d kbps'.format(Math.round(kbps));
+	return kbps > 0 && kbps < 1 ? '%.1f kbps'.format(kbps) :
+		'%d kbps'.format(Math.round(kbps));
 }
 
 function parseTcRates(text) {
@@ -156,7 +158,7 @@ function rateText(current, previous) {
 		return '*';
 
 	var kbps = (current.bytes - previous.bytes) * 8 / elapsed;
-	return kbps < 1 ? kbps.toFixed(1) : Math.round(kbps).toString();
+	return formatBandwidth(kbps);
 }
 
 function serviceAction(action) {
