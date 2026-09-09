@@ -799,6 +799,17 @@ define_interface()
 	$echo_off
 }
 
+delete_prerouting_mark_rule()
+{
+	# QoS download marking may not have been configured, so this rule is not
+	# necessarily present when start() calls stop() or when stop() is repeated.
+	# Check each ruleset first to avoid iptables/ip6tables emitting "Bad rule".
+	for xtables in iptables ip6tables ; do
+		$xtables -t mangle -C PREROUTING -i "$qos_interface" -j MARK --set-mark 0 2>/dev/null && \
+			$xtables -t mangle -D PREROUTING -i "$qos_interface" -j MARK --set-mark 0 2>/dev/null
+	done
+}
+
 stop()
 {
 	#if already in process of being initialized, do not continue
@@ -828,7 +839,7 @@ stop()
 	if [ -z "$qos_interface" ] ; then
 		define_interface
 	fi
-	apply_xtables_rule "-t mangle -D PREROUTING -i $qos_interface -j MARK --set-mark 0" "any"
+	delete_prerouting_mark_rule
 
 	$echo_off
 }
