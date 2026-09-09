@@ -560,7 +560,7 @@
 +	settimeofday(NULL, &new_tz);
 +#endif
 +}
-\ 文件末尾没有换行符
+
 --- /dev/null	2026-09-09 10:15:22.730002345 +0800
 +++ libnftnl.new/src/expr/timerange.c	2026-09-09 11:00:07.518824624 +0800
 @@ -0,0 +1,289 @@
@@ -853,7 +853,7 @@
 +	settimeofday(NULL, &new_tz);
 +#endif
 +}
-\ 文件末尾没有换行符
+
 --- /dev/null	2026-09-09 10:15:22.730002345 +0800
 +++ libnftnl.new/src/expr/webmon.c	2026-09-09 11:00:06.171205571 +0800
 @@ -0,0 +1,333 @@
@@ -1190,7 +1190,7 @@
 +	.build		= nftnl_expr_webmon_build,
 +	.output	= nftnl_expr_webmon_snprintf,
 +};
-\ 文件末尾没有换行符
+
 --- /dev/null	2026-09-09 10:15:22.730002345 +0800
 +++ libnftnl.new/src/expr/weburl.c	2026-09-09 11:00:04.850845856 +0800
 @@ -0,0 +1,191 @@
@@ -1385,7 +1385,7 @@
 +	.build		= nftnl_expr_weburl_build,
 +	.output	= nftnl_expr_weburl_snprintf,
 +};
-\ 文件末尾没有换行符
+
 --- libnftnl.orig/src/expr_ops.c	2026-09-09 11:00:03.367633695 +0800
 +++ libnftnl.new/src/expr_ops.c	2026-09-09 11:00:08.886418287 +0800
 @@ -31,6 +31,10 @@
@@ -1507,7 +1507,7 @@
 +#define WEBURL_TEXT_SIZE 1024
 +
 +#endif /* _WEBURL_H */
-\ 文件末尾没有换行符
+
 --- /dev/null	2026-09-09 10:15:22.730002345 +0800
 +++ libnftnl.new/include/linux/netfilter/timerange.h	2026-09-09 11:00:07.401427965 +0800
 @@ -0,0 +1,17 @@
@@ -1528,7 +1528,7 @@
 +#define TIMERANGE_TEXT_SIZE 1024
 +
 +#endif /* _TIMERANGE_H */
-\ 文件末尾没有换行符
+
 --- /dev/null	2026-09-09 10:15:22.730002345 +0800
 +++ libnftnl.new/include/linux/netfilter/webmon.h	2026-09-09 11:00:06.066296103 +0800
 @@ -0,0 +1,26 @@
@@ -1558,7 +1558,7 @@
 +#define WEBMON_TEXT_SIZE 1024
 +
 +#endif /* _WEBMON_H */
-\ 文件末尾没有换行符
+
 --- /dev/null	2026-09-09 10:15:22.730002345 +0800
 +++ libnftnl.new/include/linux/netfilter/bandwidth.h	2026-09-09 11:00:08.802471971 +0800
 @@ -0,0 +1,31 @@
@@ -1593,7 +1593,7 @@
 +#define BANDWIDTH_SUBNET_STR_SIZE 128
 +
 +#endif /* _BANDWIDTH_H */
-\ 文件末尾没有换行符
+
 --- libnftnl.orig/include/linux/netfilter/nf_tables.h	2026-09-09 11:00:03.366915834 +0800
 +++ libnftnl.new/include/linux/netfilter/nf_tables.h	2026-09-09 11:00:08.956420029 +0800
 @@ -1442,6 +1442,53 @@
