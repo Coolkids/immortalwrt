@@ -1,3 +1,15 @@
+--- libnftnl.orig/src/Makefile.am	2025-12-03 20:01:26.442586461 +0800
++++ libnftnl.new/src/Makefile.am	2026-09-09 14:50:00.000000000 +0800
+@@ -8,5 +8,9 @@
+ libnftnl_la_SOURCES = utils.c		\
+ 		      batch.c		\
++		      expr/bandwidth.c \
++		      expr/timerange.c \
++		      expr/webmon.c \
++		      expr/weburl.c \
+ 		      flowtable.c	\
+ 		      common.c		\
+ 		      gen.c		\
 --- /dev/null	2026-09-09 10:15:22.730002345 +0800
 +++ libnftnl.new/src/expr/bandwidth.c	2026-09-09 11:00:08.906861224 +0800
 @@ -0,0 +1,559 @@
@@ -906,7 +918,7 @@
 +		{
 +			unsigned char *new_str;
 +			max_read_size = max_read_size + read_block_size;
-+		       	new_str = (unsigned char*)malloc(max_read_size+1);
++			new_str = (unsigned char*)malloc(max_read_size+1);
 +			memcpy(new_str, read_string, bytes_read);
 +			free(read_string);
 +			read_string = new_str;
@@ -1410,85 +1422,7 @@
  	&expr_ops_rt,
  	&expr_ops_queue,
  	&expr_ops_quota,
---- libnftnl.orig/src/Makefile.in	2025-12-03 20:01:26.442586461 +0800
-+++ libnftnl.new/src/Makefile.in	2026-09-09 11:00:09.084423212 +0800
-@@ -138,6 +138,10 @@
- 	gen.lo table.lo trace.lo chain.lo object.lo rule.lo set.lo \
- 	set_elem.lo str_array.lo ruleset.lo udata.lo expr.lo \
- 	expr_ops.lo expr/bitwise.lo expr/byteorder.lo expr/cmp.lo \
-+	expr/bandwidth.lo \
-+	expr/timerange.lo \
-+	expr/webmon.lo \
-+	expr/weburl.lo \
- 	expr/range.lo expr/connlimit.lo expr/counter.lo expr/ct.lo \
- 	expr/data_reg.lo expr/dup.lo expr/exthdr.lo \
- 	expr/flow_offload.lo expr/fib.lo expr/fwd.lo expr/last.lo \
-@@ -181,6 +185,10 @@
- 	./$(DEPDIR)/set.Plo ./$(DEPDIR)/set_elem.Plo \
- 	./$(DEPDIR)/str_array.Plo ./$(DEPDIR)/table.Plo \
- 	./$(DEPDIR)/trace.Plo ./$(DEPDIR)/udata.Plo \
-+	expr/$(DEPDIR)/bandwidth.Plo \
-+	expr/$(DEPDIR)/timerange.Plo \
-+	expr/$(DEPDIR)/webmon.Plo \
-+	expr/$(DEPDIR)/weburl.Plo \
- 	./$(DEPDIR)/utils.Plo expr/$(DEPDIR)/bitwise.Plo \
- 	expr/$(DEPDIR)/byteorder.Plo expr/$(DEPDIR)/cmp.Plo \
- 	expr/$(DEPDIR)/connlimit.Plo expr/$(DEPDIR)/counter.Plo \
-@@ -412,6 +420,10 @@
- 
- libnftnl_la_SOURCES = utils.c		\
- 		      batch.c		\
-+	      expr/bandwidth.c \
-+	      expr/timerange.c \
-+	      expr/webmon.c \
-+	      expr/weburl.c \
- 		      flowtable.c	\
- 		      common.c		\
- 		      gen.c		\
-@@ -592,6 +604,10 @@
- expr/synproxy.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
- expr/osf.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
- expr/xfrm.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
-+expr/bandwidth.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
-+expr/timerange.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
-+expr/webmon.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
-+expr/weburl.lo: expr/$(am__dirstamp) expr/$(DEPDIR)/$(am__dirstamp)
- obj/$(am__dirstamp):
- 	@$(MKDIR_P) obj
- 	@: >>obj/$(am__dirstamp)
-@@ -678,6 +694,10 @@
- @AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/tproxy.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/tunnel.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/xfrm.Plo@am__quote@ # am--include-marker
-+@AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/bandwidth.Plo@am__quote@ # am--include-marker
-+@AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/timerange.Plo@am__quote@ # am--include-marker
-+@AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/webmon.Plo@am__quote@ # am--include-marker
-+@AMDEP_TRUE@@am__include@ @am__quote@expr/$(DEPDIR)/weburl.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@obj/$(DEPDIR)/counter.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@obj/$(DEPDIR)/ct_expect.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@obj/$(DEPDIR)/ct_helper.Plo@am__quote@ # am--include-marker
-@@ -858,6 +878,10 @@
- 
- distclean: distclean-am
- 	-rm -f ./$(DEPDIR)/batch.Plo
-+	-rm -f expr/$(DEPDIR)/bandwidth.Plo
-+	-rm -f expr/$(DEPDIR)/timerange.Plo
-+	-rm -f expr/$(DEPDIR)/webmon.Plo
-+	-rm -f expr/$(DEPDIR)/weburl.Plo
- 	-rm -f ./$(DEPDIR)/chain.Plo
- 	-rm -f ./$(DEPDIR)/common.Plo
- 	-rm -f ./$(DEPDIR)/expr.Plo
-@@ -969,6 +993,10 @@
- 
- maintainer-clean: maintainer-clean-am
- 	-rm -f ./$(DEPDIR)/batch.Plo
-+	-rm -f expr/$(DEPDIR)/bandwidth.Plo
-+	-rm -f expr/$(DEPDIR)/timerange.Plo
-+	-rm -f expr/$(DEPDIR)/webmon.Plo
-+	-rm -f expr/$(DEPDIR)/weburl.Plo
- 	-rm -f ./$(DEPDIR)/chain.Plo
- 	-rm -f ./$(DEPDIR)/common.Plo
- 	-rm -f ./$(DEPDIR)/expr.Plo
+
 --- /dev/null	2026-09-09 10:15:22.730002345 +0800
 +++ libnftnl.new/include/linux/netfilter/weburl.h	2026-09-09 11:00:04.748547558 +0800
 @@ -0,0 +1,15 @@
