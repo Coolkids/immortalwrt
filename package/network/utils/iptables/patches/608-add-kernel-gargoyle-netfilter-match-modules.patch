@@ -1,6 +1,6 @@
 --- /dev/null	2026-09-09 10:15:22.730002345 +0800
 +++ iptables.new/extensions/libxt_webmon.c	2026-09-09 11:00:03.575235671 +0800
-@@ -0,0 +1,850 @@
+@@ -0,0 +1,851 @@
 +/*  webmon --	An iptables extension to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
 + *  		Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -28,6 +28,7 @@
 +#include <string.h>
 +#include <stdlib.h>
 +#include <getopt.h>
++#include <unistd.h>
 +
 +#include <arpa/inet.h>
 +
@@ -1154,7 +1155,7 @@
 +
 +int get_minutes_west(void);
 +void set_kernel_timezone(void);
-+int parse_sub(char* subnet_string, ipany* subnet, ipany* subnet_mask, int family);
++int parse_sub(char* subnet_string, union xt_bandwidth_ipany* subnet, union xt_bandwidth_ipany* subnet_mask, int family);
 +static void param_problem_exit_error(char* msg);
 +char** split_on_separators(char* line, char* separators, int num_separators, int max_pieces, int include_remainder_at_max);
 +char* trim_flanking_whitespace(char* str);
@@ -1692,7 +1693,7 @@
 +	xtables_error(PARAMETER_PROBLEM, "%s", msg);
 +}
 +
-+int parse_sub(char* subnet_string, ipany* subnet, ipany* subnet_mask, int family)
++int parse_sub(char* subnet_string, union xt_bandwidth_ipany* subnet, union xt_bandwidth_ipany* subnet_mask, int family)
 +{
 +	char** sub_parts = split_on_separators(subnet_string,"/",1,2,1);
 +	char* substr = trim_flanking_whitespace(sub_parts[0]);
