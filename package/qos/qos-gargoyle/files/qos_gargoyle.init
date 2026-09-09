@@ -847,6 +847,14 @@ stop()
 
 start()
 {
+	# UCI changes trigger this script through ucitrack.  Do not let a reload
+	# start QoS again after it has been disabled in the LuCI global switch.
+	qos_enabled="$(uci -q get "$config_file_name".global.enable)"
+	if [ "$qos_enabled" != "true" ] ; then
+		stop
+		return 0
+	fi
+
 	test_total_up=$(uci get qos_gargoyle.upload.total_bandwidth 2>/dev/null)
 	test_total_down=$(uci get qos_gargoyle.download.total_bandwidth 2>/dev/null)
 	if [ -z "$test_total_up" ] && [ -z "$test_total_down" ] ;then

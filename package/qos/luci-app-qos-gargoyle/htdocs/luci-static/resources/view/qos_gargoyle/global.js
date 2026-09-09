@@ -31,8 +31,7 @@ return view.extend({
 		o.inputstyle = enabled ? 'reset' : 'apply';
 		o.onclick = function() {
 			var nextEnabled = !enabled;
-			var action = enabled ? 'stop' : 'enable';
-			var followup = enabled ? 'disable' : 'start';
+			var action = enabled ? 'stop' : 'start';
 			var runInitAction = function(name) {
 				return fs.exec('/etc/init.d/qos_gargoyle', [ name ]).then(function(reply) {
 					if (reply && reply.code !== 0)
@@ -50,8 +49,6 @@ return view.extend({
 				});
 			}).then(function() {
 				return runInitAction(action);
-			}).then(function() {
-				return runInitAction(followup);
 			}).then(function() {
 				location.reload();
 			});
