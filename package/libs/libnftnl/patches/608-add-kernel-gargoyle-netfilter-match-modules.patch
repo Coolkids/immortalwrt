@@ -1,18 +1,6 @@
---- libnftnl.orig/src/Makefile.am	2025-12-03 20:01:26.442586461 +0800
-+++ libnftnl.new/src/Makefile.am	2026-09-09 14:50:00.000000000 +0800
-@@ -8,5 +8,9 @@
- libnftnl_la_SOURCES = utils.c		\
- 		      batch.c		\
-+		      expr/bandwidth.c \
-+		      expr/timerange.c \
-+		      expr/webmon.c \
-+		      expr/weburl.c \
- 		      flowtable.c	\
- 		      common.c		\
- 		      gen.c		\
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ libnftnl.new/src/expr/bandwidth.c	2026-09-09 11:00:08.906861224 +0800
-@@ -0,0 +1,559 @@
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ libnftnl.new/src/expr/bandwidth.c	2026-09-09 20:55:16.183494114 +0800
+@@ -0,0 +1,566 @@
 +#include <stdio.h>
 +#include <stdint.h>
 +#include <string.h>
@@ -56,11 +44,14 @@
 +				 const void *data, uint32_t data_len)
 +{
 +	struct nftnl_expr_bandwidth *bandwidth = nftnl_expr_data(e);
++	char *new_value;
 +	switch(type){
 +	case NFTNL_EXPR_BANDWIDTH_ID:
-+		bandwidth->id = strdup(data);
-+		if (!bandwidth->id)
++		new_value = strdup(data);
++		if (!new_value)
 +			return -1;
++		xfree(bandwidth->id);
++		bandwidth->id = new_value;
 +		break;
 +	case NFTNL_EXPR_BANDWIDTH_CMP:
 +		memcpy(&bandwidth->cmp, data, data_len);
@@ -78,14 +69,18 @@
 +		memcpy(&bandwidth->current_bandwidth, data, data_len);
 +		break;
 +	case NFTNL_EXPR_BANDWIDTH_SUBNET:
-+		bandwidth->subnet = strdup(data);
-+		if (!bandwidth->subnet)
++		new_value = strdup(data);
++		if (!new_value)
 +			return -1;
++		xfree(bandwidth->subnet);
++		bandwidth->subnet = new_value;
 +		break;
 +	case NFTNL_EXPR_BANDWIDTH_SUBNET6:
-+		bandwidth->subnet6 = strdup(data);
-+		if (!bandwidth->subnet6)
++		new_value = strdup(data);
++		if (!new_value)
 +			return -1;
++		xfree(bandwidth->subnet6);
++		bandwidth->subnet6 = new_value;
 +		break;
 +	case NFTNL_EXPR_BANDWIDTH_RSTINTVL:
 +		memcpy(&bandwidth->reset_interval, data, data_len);
@@ -572,10 +567,9 @@
 +	settimeofday(NULL, &new_tz);
 +#endif
 +}
-
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ libnftnl.new/src/expr/timerange.c	2026-09-09 11:00:07.518824624 +0800
-@@ -0,0 +1,289 @@
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ libnftnl.new/src/expr/timerange.c	2026-09-09 20:55:14.512319113 +0800
+@@ -0,0 +1,296 @@
 +#include <stdio.h>
 +#include <stdint.h>
 +#include <string.h>
@@ -606,24 +600,31 @@
 +				 const void *data, uint32_t data_len)
 +{
 +	struct nftnl_expr_timerange *timerange = nftnl_expr_data(e);
++	char *new_value;
 +	switch(type){
 +	case NFTNL_EXPR_TIMERANGE_FLAGS:
 +		memcpy(&timerange->flags, data, data_len);
 +		break;
 +	case NFTNL_EXPR_TIMERANGE_HOURS:
-+		timerange->hours = strdup(data);
-+		if (!timerange->hours)
++		new_value = strdup(data);
++		if (!new_value)
 +			return -1;
++		xfree(timerange->hours);
++		timerange->hours = new_value;
 +		break;
 +	case NFTNL_EXPR_TIMERANGE_WEEKDAYS:
-+		timerange->weekdays = strdup(data);
-+		if (!timerange->weekdays)
++		new_value = strdup(data);
++		if (!new_value)
 +			return -1;
++		xfree(timerange->weekdays);
++		timerange->weekdays = new_value;
 +		break;
 +	case NFTNL_EXPR_TIMERANGE_WEEKLYRANGES:
-+		timerange->weeklyranges = strdup(data);
-+		if (!timerange->weeklyranges)
++		new_value = strdup(data);
++		if (!new_value)
 +			return -1;
++		xfree(timerange->weeklyranges);
++		timerange->weeklyranges = new_value;
 +		break;
 +	}
 +	return 0;
@@ -865,10 +866,9 @@
 +	settimeofday(NULL, &new_tz);
 +#endif
 +}
-
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ libnftnl.new/src/expr/webmon.c	2026-09-09 11:00:06.171205571 +0800
-@@ -0,0 +1,333 @@
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ libnftnl.new/src/expr/webmon.c	2026-09-09 20:55:13.133454365 +0800
+@@ -0,0 +1,340 @@
 +#include <stdio.h>
 +#include <stdint.h>
 +#include <string.h>
@@ -918,7 +918,7 @@
 +		{
 +			unsigned char *new_str;
 +			max_read_size = max_read_size + read_block_size;
-+			new_str = (unsigned char*)malloc(max_read_size+1);
++		       	new_str = (unsigned char*)malloc(max_read_size+1);
 +			memcpy(new_str, read_string, bytes_read);
 +			free(read_string);
 +			read_string = new_str;
@@ -971,6 +971,7 @@
 +				 const void *data, uint32_t data_len)
 +{
 +	struct nftnl_expr_webmon *webmon = nftnl_expr_data(e);
++	char *new_value;
 +	switch(type){
 +	case NFTNL_EXPR_WEBMON_FLAGS:
 +		memcpy(&webmon->flags, data, data_len);
@@ -982,19 +983,25 @@
 +		memcpy(&webmon->max_searches, data, data_len);
 +		break;
 +	case NFTNL_EXPR_WEBMON_IPS:
-+		webmon->ips = strdup(data);
-+		if (!webmon->ips)
++		new_value = strdup(data);
++		if (!new_value)
 +			return -1;
++		xfree(webmon->ips);
++		webmon->ips = new_value;
 +		break;
 +	case NFTNL_EXPR_WEBMON_DOMAINLOADFILE:
-+		webmon->domain_load_file = strdup(data);
-+		if (!webmon->domain_load_file)
++		new_value = strdup(data);
++		if (!new_value)
 +			return -1;
++		xfree(webmon->domain_load_file);
++		webmon->domain_load_file = new_value;
 +		break;
 +	case NFTNL_EXPR_WEBMON_SEARCHLOADFILE:
-+		webmon->search_load_file = strdup(data);
-+		if (!webmon->search_load_file)
++		new_value = strdup(data);
++		if (!new_value)
 +			return -1;
++		xfree(webmon->search_load_file);
++		webmon->search_load_file = new_value;
 +		break;
 +	}
 +	return 0;
@@ -1202,10 +1209,9 @@
 +	.build		= nftnl_expr_webmon_build,
 +	.output	= nftnl_expr_webmon_snprintf,
 +};
-
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ libnftnl.new/src/expr/weburl.c	2026-09-09 11:00:04.850845856 +0800
-@@ -0,0 +1,191 @@
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ libnftnl.new/src/expr/weburl.c	2026-09-09 20:55:11.697049401 +0800
+@@ -0,0 +1,194 @@
 +#include <stdio.h>
 +#include <stdint.h>
 +#include <string.h>
@@ -1231,14 +1237,17 @@
 +				 const void *data, uint32_t data_len)
 +{
 +	struct nftnl_expr_weburl *weburl = nftnl_expr_data(e);
++	char *new_value;
 +	switch(type){
 +	case NFTNL_EXPR_WEBURL_FLAGS:
 +		memcpy(&weburl->flags, data, data_len);
 +		break;
 +	case NFTNL_EXPR_WEBURL_MATCH:
-+		weburl->match = strdup(data);
-+		if (!weburl->match)
++		new_value = strdup(data);
++		if (!new_value)
 +			return -1;
++		xfree(weburl->match);
++		weburl->match = new_value;
 +		break;
 +	}
 +	return 0;
@@ -1397,9 +1406,8 @@
 +	.build		= nftnl_expr_weburl_build,
 +	.output	= nftnl_expr_weburl_snprintf,
 +};
-
---- libnftnl.orig/src/expr_ops.c	2026-09-09 11:00:03.367633695 +0800
-+++ libnftnl.new/src/expr_ops.c	2026-09-09 11:00:08.886418287 +0800
+--- libnftnl.orig/src/expr_ops.c	2026-09-09 20:55:09.657007008 +0800
++++ libnftnl.new/src/expr_ops.c	2026-09-09 20:55:16.160461128 +0800
 @@ -31,6 +31,10 @@
  extern struct expr_ops expr_ops_range;
  extern struct expr_ops expr_ops_redir;
@@ -1422,9 +1430,21 @@
  	&expr_ops_rt,
  	&expr_ops_queue,
  	&expr_ops_quota,
-
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ libnftnl.new/include/linux/netfilter/weburl.h	2026-09-09 11:00:04.748547558 +0800
+--- libnftnl.orig/src/Makefile.am	2026-09-09 20:55:09.651897057 +0800
++++ libnftnl.new/src/Makefile.am	2026-09-09 20:55:16.264463455 +0800
+@@ -8,6 +8,10 @@
+ libnftnl_la_SOURCES = utils.c		\
+ 		      batch.c		\
+ 		      flowtable.c	\
++	      expr/bandwidth.c \
++	      expr/timerange.c \
++	      expr/webmon.c \
++	      expr/weburl.c \
+ 		      common.c		\
+ 		      gen.c		\
+ 		      table.c		\
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ libnftnl.new/include/linux/netfilter/weburl.h	2026-09-09 20:55:11.566528820 +0800
 @@ -0,0 +1,15 @@
 +#ifndef _WEBURL_H
 +#define _WEBURL_H
@@ -1441,9 +1461,9 @@
 +#define WEBURL_TEXT_SIZE 1024
 +
 +#endif /* _WEBURL_H */
-
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ libnftnl.new/include/linux/netfilter/timerange.h	2026-09-09 11:00:07.401427965 +0800
+\ 文件末尾没有换行符
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ libnftnl.new/include/linux/netfilter/timerange.h	2026-09-09 20:55:14.392866718 +0800
 @@ -0,0 +1,17 @@
 +#ifndef _TIMERANGE_H
 +#define _TIMERANGE_H
@@ -1462,9 +1482,9 @@
 +#define TIMERANGE_TEXT_SIZE 1024
 +
 +#endif /* _TIMERANGE_H */
-
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ libnftnl.new/include/linux/netfilter/webmon.h	2026-09-09 11:00:06.066296103 +0800
+\ 文件末尾没有换行符
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ libnftnl.new/include/linux/netfilter/webmon.h	2026-09-09 20:55:13.009457035 +0800
 @@ -0,0 +1,26 @@
 +#ifndef _WEBMON_H
 +#define _WEBMON_H
@@ -1492,9 +1512,9 @@
 +#define WEBMON_TEXT_SIZE 1024
 +
 +#endif /* _WEBMON_H */
-
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ libnftnl.new/include/linux/netfilter/bandwidth.h	2026-09-09 11:00:08.802471971 +0800
+\ 文件末尾没有换行符
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ libnftnl.new/include/linux/netfilter/bandwidth.h	2026-09-09 20:55:16.039866836 +0800
 @@ -0,0 +1,31 @@
 +#ifndef _BANDWIDTH_H
 +#define _BANDWIDTH_H
@@ -1527,9 +1547,9 @@
 +#define BANDWIDTH_SUBNET_STR_SIZE 128
 +
 +#endif /* _BANDWIDTH_H */
-
---- libnftnl.orig/include/linux/netfilter/nf_tables.h	2026-09-09 11:00:03.366915834 +0800
-+++ libnftnl.new/include/linux/netfilter/nf_tables.h	2026-09-09 11:00:08.956420029 +0800
+\ 文件末尾没有换行符
+--- libnftnl.orig/include/linux/netfilter/nf_tables.h	2026-09-09 20:55:09.646315403 +0800
++++ libnftnl.new/include/linux/netfilter/nf_tables.h	2026-09-09 20:55:16.236462828 +0800
 @@ -1442,6 +1442,53 @@
  };
  #define NFTA_REJECT_MAX		(__NFTA_REJECT_MAX - 1)
@@ -1584,8 +1604,8 @@
  /**
   * enum nft_nat_types - nf_tables nat expression NAT types
   *
---- libnftnl.orig/include/libnftnl/expr.h	2026-09-09 11:00:03.366280985 +0800
-+++ libnftnl.new/include/libnftnl/expr.h	2026-09-09 11:00:08.781415676 +0800
+--- libnftnl.orig/include/libnftnl/expr.h	2026-09-09 20:55:09.643661039 +0800
++++ libnftnl.new/include/libnftnl/expr.h	2026-09-09 20:55:16.013457839 +0800
 @@ -48,6 +48,50 @@
  int nftnl_expr_fprintf(FILE *fp, const struct nftnl_expr *expr, uint32_t type, uint32_t flags);
  

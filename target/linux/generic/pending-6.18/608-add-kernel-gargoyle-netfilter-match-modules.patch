@@ -1,6 +1,6 @@
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/nft_weburl.c	2026-09-09 11:00:03.738290238 +0800
-@@ -0,0 +1,706 @@
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/nft_weburl.c	2026-09-09 20:55:10.267709627 +0800
+@@ -0,0 +1,688 @@
 +/*  weburl --	An nftables extension to match URLs in HTTP(S) requests
 + *  			This module can match using string match or regular expressions
 + *  			Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -49,8 +49,6 @@
 +MODULE_AUTHOR("Michael Gray");
 +MODULE_DESCRIPTION("Match URL in HTTP(S) requests, designed for use with Gargoyle web interface (www.gargoyle-router.com)");
 +MODULE_ALIAS_NFT_EXPR("weburl");
-+
-+string_map* compiled_map = NULL;
 +
 +#define WEBURL_TEXT_SIZE MAX_TEST_STR
 +static const struct nla_policy nft_weburl_policy[NFTA_WEBURL_MAX + 1] = {
@@ -117,16 +115,6 @@
 +			break;
 +		case WEBURL_REGEX_TYPE:
 +
-+			if(compiled_map == NULL)
-+			{
-+				compiled_map = initialize_map(0);
-+				if(compiled_map == NULL) /* test for malloc failure */
-+				{
-+					return 0;
-+				}
-+			}
-+			r = (struct regexp*)get_map_element(compiled_map, reference);
-+			if(r == NULL)
 +			{
 +				int rlen = strlen(reference);
 +				r= regcomp((char*)reference, &rlen);
@@ -134,9 +122,9 @@
 +				{
 +					return 0;
 +				}
-+				set_map_element(compiled_map, reference, (void*)r);
 +			}
 +			matches = regexec(r, query);
++			kfree(r);
 +			break;
 +		case WEBURL_EXACT_TYPE:
 +			matches = (strstr(query, reference) != NULL) && strlen(query) == strlen(reference);
@@ -691,25 +679,19 @@
 +
 +static int __init init(void)
 +{
-+	compiled_map = NULL;
 +	return nft_register_expr(&nft_weburl_type);
 +}
 +
 +static void __exit fini(void)
 +{
 +	nft_unregister_expr(&nft_weburl_type);
-+	if(compiled_map != NULL)
-+	{
-+		unsigned long num_destroyed;
-+		destroy_map(compiled_map, DESTROY_MODE_FREE_VALUES, &num_destroyed);
-+	}
 +}
 +
 +module_init(init);
 +module_exit(fini);
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/nft_bandwidth.c	2026-09-09 11:00:07.726967158 +0800
-@@ -0,0 +1,3500 @@
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/nft_bandwidth.c	2026-09-09 20:55:14.602134868 +0800
+@@ -0,0 +1,3557 @@
 +/*  bandwidth --	An netfilter module for bandwidth monitoring/control
 + *  			Can be used to efficiently monitor bandwidth and/or implement bandwidth quotas
 + *  			Can be queried using the nftbwctl userspace library
@@ -3668,12 +3650,14 @@
 +		char* subnet = kcalloc(BANDWIDTH_SUBNET_STR_SIZE,sizeof(char),GFP_ATOMIC);
 +		char* subnet6 = kcalloc(BANDWIDTH_SUBNET_STR_SIZE,sizeof(char),GFP_ATOMIC);
 +		struct nft_bandwidth_info *master_priv = (struct nft_bandwidth_info*)kmalloc(sizeof(struct nft_bandwidth_info), GFP_ATOMIC);
++		info_and_maps *new_iam = NULL;
++		int init_ret = -ENOMEM;
 +		priv->ref_count = (unsigned long*)kmalloc(sizeof(unsigned long), GFP_ATOMIC);
 +
-+		if(priv->ref_count == NULL || subnet == NULL || subnet6 == NULL) /* deal with kmalloc failure */
++		if(priv->ref_count == NULL || subnet == NULL || subnet6 == NULL || master_priv == NULL) /* deal with kmalloc failure */
 +		{
 +			printk("nft_bandwidth: kmalloc failure in nft_bandwidth_init!\n");
-+			return -ENOMEM;
++			goto INIT_ERROR;
 +		}
 +		*(priv->ref_count) = 1;
 +
@@ -3753,7 +3737,8 @@
 +					printk("nft_bandwidth: error, \"%s\" is a duplicate id in this IP family, OR, id referenced more than twice in INET\n", priv->id); 
 +					spin_unlock_bh(&bandwidth_lock);
 +					up(&userspace_lock);
-+					return -EINVAL;
++					init_ret = -EINVAL;
++					goto INIT_ERROR;
 +				}
 +				
 +				#ifdef BANDWIDTH_DEBUG
@@ -3774,7 +3759,8 @@
 +					printk("nft_bandwidth: error, \"%s\" is already used in the other IP family, but this rule is not substantially the same\n", priv->id); 
 +					spin_unlock_bh(&bandwidth_lock);
 +					up(&userspace_lock);
-+					return -EINVAL;
++					init_ret = -EINVAL;
++					goto INIT_ERROR;
 +				}
 +				
 +				iam->other_info = master_priv;
@@ -3790,15 +3776,19 @@
 +					printk("nft_bandwidth: kmalloc failure in nft_bandwidth_init!\n");
 +					spin_unlock_bh(&bandwidth_lock);
 +					up(&userspace_lock);
-+					return -ENOMEM;
++					goto INIT_ERROR;
 +				}
++				new_iam = iam;
++				iam->ip_map = NULL;
++				iam->ip_history_map = NULL;
++				iam->ip_family_map = NULL;
 +				iam->ip_map = initialize_string_map(1);
 +				if(iam->ip_map == NULL) /* handle kmalloc failure */
 +				{
 +					printk("nft_bandwidth: kmalloc failure in nft_bandwidth_init!\n");
 +					spin_unlock_bh(&bandwidth_lock);
 +					up(&userspace_lock);
-+					return -ENOMEM;
++					goto INIT_ERROR;
 +				}
 +				iam->ip_history_map = NULL;
 +				if(priv->num_intervals_to_save > 0)
@@ -3809,7 +3799,7 @@
 +						printk("nft_bandwidth: kmalloc failure in nft_bandwidth_init!\n");
 +						spin_unlock_bh(&bandwidth_lock);
 +						up(&userspace_lock);
-+						return -ENOMEM;
++						goto INIT_ERROR;
 +					}
 +				}
 +				iam->ip_family_map = initialize_string_map(1);
@@ -3818,11 +3808,19 @@
 +					printk("nft_bandwidth: kmalloc failure in nft_bandwidth_init!\n");
 +					spin_unlock_bh(&bandwidth_lock);
 +					up(&userspace_lock);
-+					return -ENOMEM;
++					goto INIT_ERROR;
 +				}
 +				
 +				iam->info = master_priv;
 +				set_string_map_element(id_map, priv->id, iam);
++				if(get_string_map_element(id_map, priv->id) != iam)
++				{
++					printk("nft_bandwidth: unable to add id to map\n");
++					spin_unlock_bh(&bandwidth_lock);
++					up(&userspace_lock);
++					goto INIT_ERROR;
++				}
++				new_iam = NULL;
 +				iam->info_family = family;
 +				iam->other_info = NULL;
 +				iam->other_info_family = 0;
@@ -3875,6 +3873,26 @@
 +		}
 +		kfree(subnet);
 +		kfree(subnet6);
++		goto INIT_DONE;
++
++INIT_ERROR:
++		if(new_iam != NULL)
++		{
++			unsigned long num_destroyed;
++			destroy_string_map(new_iam->ip_map, DESTROY_MODE_IGNORE_VALUES, &num_destroyed);
++			destroy_string_map(new_iam->ip_history_map, DESTROY_MODE_IGNORE_VALUES, &num_destroyed);
++			destroy_string_map(new_iam->ip_family_map, DESTROY_MODE_IGNORE_VALUES, &num_destroyed);
++			kfree(new_iam);
++		}
++		kfree(subnet);
++		kfree(subnet6);
++		kfree(priv->ref_count);
++		kfree(master_priv);
++		priv->ref_count = NULL;
++		priv->non_const_self = NULL;
++		return init_ret;
++INIT_DONE:
++		;
 +	}
 +	else
 +	{
@@ -3914,18 +3932,24 @@
 +	const struct nft_bandwidth_info *rule_priv = nft_expr_priv(expr);
 +	struct nft_bandwidth_info *priv = rule_priv->non_const_self;
 +	int retval = 0;
-+	char* subnetstr;
-+	char* subnet6str;
-+	struct in6_addr* subnettest;
++	char* subnetstr = NULL;
++	char* subnet6str = NULL;
++	struct in6_addr* subnettest = NULL;
 +	int ret;
 +
 +	subnetstr = kcalloc(BANDWIDTH_SUBNET_STR_SIZE,sizeof(char),GFP_ATOMIC);
 +	subnet6str = kcalloc(BANDWIDTH_SUBNET_STR_SIZE,sizeof(char),GFP_ATOMIC);
 +	if (subnetstr == NULL || subnet6str == NULL)
-+		return -1;
++	{
++		retval = -ENOMEM;
++		goto DUMP_OUT;
++	}
 +	subnettest = kcalloc(1,sizeof(struct in6_addr),GFP_ATOMIC);
 +	if (subnettest == NULL)
-+		return -1;
++	{
++		retval = -ENOMEM;
++		goto DUMP_OUT;
++	}
 +
 +	if (nla_put_string(skb, NFTA_BANDWIDTH_ID, priv->id))
 +	{
@@ -3995,6 +4019,7 @@
 +		retval = -1;
 +	}
 +
++DUMP_OUT:
 +	kfree(subnetstr);
 +	kfree(subnet6str);
 +	kfree(subnettest);
@@ -4092,7 +4117,7 @@
 +					histories_to_free = (bw_history**)destroy_string_map(iam->ip_history_map, DESTROY_MODE_RETURN_VALUES, &num_destroyed);
 +					
 +					/* num_destroyed will be 0 if histories_to_free is null after malloc failure, so this is safe */
-+					for(history_index = 0; history_index < num_destroyed; history_index++) 
++					for(history_index = 0; histories_to_free != NULL && history_index < num_destroyed; history_index++)
 +					{
 +						bw_history* h = histories_to_free[history_index];
 +						if(h != NULL)
@@ -4101,7 +4126,8 @@
 +							kfree(h);
 +						}
 +					}
-+					
++					kfree(histories_to_free);
++
 +				}
 +				else if(iam->ip_map != NULL && iam->ip_family_map != NULL)
 +				{
@@ -4156,10 +4182,13 @@
 +
 +static int __init init(void)
 +{
++	int ret;
 +	/* Register setsockopt */
-+	if (nf_register_sockopt(&nft_bandwidth_sockopts) < 0)
++	ret = nf_register_sockopt(&nft_bandwidth_sockopts);
++	if (ret < 0)
 +	{
 +		printk("nft_bandwidth: Can't register sockopts. Aborting\n");
++		return ret;
 +	}
 +	bandwidth_record_max = get_bw_record_max();
 +	local_minutes_west = old_minutes_west = sys_tz.tz_minuteswest;
@@ -4176,10 +4205,19 @@
 +	if(id_map == NULL) /* deal with kmalloc failure */
 +	{
 +		printk("id map is null, returning -1\n");
-+		return -1;
++		nf_unregister_sockopt(&nft_bandwidth_sockopts);
++		return -ENOMEM;
 +	}
 +
-+	return nft_register_expr(&nft_bandwidth_type);
++	ret = nft_register_expr(&nft_bandwidth_type);
++	if (ret < 0)
++	{
++		unsigned long num_destroyed;
++		destroy_string_map(id_map, DESTROY_MODE_IGNORE_VALUES, &num_destroyed);
++		id_map = NULL;
++		nf_unregister_sockopt(&nft_bandwidth_sockopts);
++	}
++	return ret;
 +}
 +
 +static void __exit fini(void)
@@ -4197,10 +4235,11 @@
 +			string_map* ip_map = iam->ip_map;
 +			unsigned long num_destroyed;
 +			destroy_string_map(ip_map, DESTROY_MODE_FREE_VALUES, &num_destroyed);
-+			kfree(iam);
-+			/* info portion of iam gets taken care of automatically */
++				kfree(iam);
++				/* info portion of iam gets taken care of automatically */
++			}
++			kfree(iams);
 +		}
-+	}
 +	nf_unregister_sockopt(&nft_bandwidth_sockopts);
 +	nft_unregister_expr(&nft_bandwidth_type);
 +	spin_unlock_bh(&bandwidth_lock);
@@ -4210,8 +4249,8 @@
 +module_init(init);
 +module_exit(fini);
 +
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/nft_webmon.mod.c	2026-09-09 11:00:05.035181456 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/nft_webmon.mod.c	2026-09-09 20:55:11.806632048 +0800
 @@ -0,0 +1,19 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -4232,9 +4271,9 @@
 +__attribute_used__
 +__attribute__((section(".modinfo"))) =
 +"depends=";
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/bandwidth_deps/tree_map.h	2026-09-09 11:00:07.726588751 +0800
-@@ -0,0 +1,1110 @@
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/bandwidth_deps/tree_map.h	2026-09-09 20:55:14.601630594 +0800
+@@ -0,0 +1,1116 @@
 +/*
 + * Copyright © 2008 by Eric Bishop <eric@gargoyle-router.com>
 + * 
@@ -4484,6 +4523,12 @@
 +		}
 +		kv->value = value;
 +		return_value = set_long_map_element(  &(map->lm), hashed_key, kv);
++		if(return_value == NULL && get_long_map_element(&(map->lm), hashed_key) != kv)
++		{
++			free(kv->key);
++			free(kv);
++			return NULL;
++		}
 +		if(return_value != NULL)
 +		{
 +			string_map_key_value* r = (string_map_key_value*)return_value;
@@ -5345,9 +5390,9 @@
 +	}
 +	return hashed_key;
 +}
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/weburl_deps/tree_map.h	2026-09-09 11:00:03.740255543 +0800
-@@ -0,0 +1,1084 @@
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/weburl_deps/tree_map.h	2026-09-09 20:55:10.273083902 +0800
+@@ -0,0 +1,1089 @@
 +/*
 + * Copyright © 2008 by Eric Bishop <eric@gargoyle-router.com>
 + * 
@@ -5584,6 +5629,12 @@
 +		}
 +		kv->value = value;
 +		return_value = set_long_map_element(  &(map->lm), hashed_key, kv);
++		if(return_value == NULL && get_long_map_element(&(map->lm), hashed_key) != kv)
++		{
++			free(kv->key);
++			free(kv);
++			return NULL;
++		}
 +		if(return_value != NULL)
 +		{
 +			string_map_key_value* r = (string_map_key_value*)return_value;
@@ -6431,9 +6482,8 @@
 +	return hashed_key;
 +}
 +
-+
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/weburl_deps/regexp.h	2026-09-09 11:00:03.739764913 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/weburl_deps/regexp.h	2026-09-09 20:55:10.272156857 +0800
 @@ -0,0 +1,40 @@
 +/*
 + * Definitions etc. for regexp(3) routines.
@@ -6475,17 +6525,17 @@
 +void regerror(char *s);
 +
 +#endif
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/weburl_deps/regmagic.h	2026-09-09 11:00:03.740123413 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/weburl_deps/regmagic.h	2026-09-09 20:55:10.272805031 +0800
 @@ -0,0 +1,5 @@
 +/*
 + * The first byte of the regexp internal "program" is actually this magic
 + * number; the start node begins in the second byte.
 + */
 +#define	MAGIC	0234
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/weburl_deps/regexp.c	2026-09-09 11:00:03.739372700 +0800
-@@ -0,0 +1,1219 @@
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/weburl_deps/regexp.c	2026-09-09 20:55:10.267872215 +0800
+@@ -0,0 +1,1224 @@
 +/*
 + * regcomp and regexec -- regsub and regerror are elsewhere
 + * @(#)regexp.c	1.3 of 18 April 87
@@ -6765,8 +6815,14 @@
 +	g.regnpar = 1;
 +	g.regcode = r->program;
 +	regc(&g, MAGIC);
-+	if (reg(&g, 0, &flags) == NULL)
++	if (reg(&g, 0, &flags) == NULL) {
++		#if __KERNEL__
++			kfree(r);
++		#else
++			free(r);
++		#endif
 +		return(NULL);
++	}
 +
 +	/* Dig out information for optimizations. */
 +	r->regstart = '\0';	/* Worst-case defaults. */
@@ -7704,10 +7760,9 @@
 +}
 +#endif
 +
-+
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/nft_webmon.c	2026-09-09 11:00:05.035104019 +0800
-@@ -0,0 +1,2214 @@
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/nft_webmon.c	2026-09-09 20:55:11.806524264 +0800
+@@ -0,0 +1,2252 @@
 +/*  webmon --	An nftables extension module to match URLs in HTTP(S) requests
 + *  		This module records visited URLs and makes them available via procfs
 + *  		Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -9679,7 +9734,7 @@
 +
 +	if(tb[NFTA_WEBMON_IPS] != NULL) nla_strscpy(ipstr, tb[NFTA_WEBMON_IPS], WEBMON_TEXT_SIZE);
 +	if(strlen(ipstr) > 0 && mode == 0)
-+		return -EINVAL;
++		goto PARSE_OUT;
 +	
 +	// Process IPs
 +	priv->ips = kcalloc(WEBMON_MAX_IPS,sizeof(struct in_addr),GFP_ATOMIC);
@@ -9687,7 +9742,7 @@
 +	priv->ip6s = kcalloc(WEBMON_MAX_IPS,sizeof(struct in6_addr),GFP_ATOMIC);
 +	priv->range6s = kcalloc(WEBMON_MAX_IP_RANGES,sizeof(struct nft_webmon_ip6_range),GFP_ATOMIC);
 +	if(priv->ips == NULL || priv->ranges == NULL || priv->ip6s == NULL || priv->range6s == NULL)
-+	    return -EINVAL;
++	    goto PARSE_OUT;
 +	parse_ips_and_ranges(ipstr, priv);
 +
 +	if(tb[NFTA_WEBMON_MAXDOMAINS])
@@ -9738,24 +9793,62 @@
 +       nft_webmon_clear_mapsqueues(WEBMON_SEARCH, max_domain);
 +   }
 +
-+   if(tb[NFTA_WEBMON_DOMAINLOADDATA] != NULL)
-+   {
-+       domain_load_data = kcalloc(WEBMON_DATA_SIZE,sizeof(char),GFP_ATOMIC);
-+       nla_strscpy(domain_load_data, tb[NFTA_WEBMON_DOMAINLOADDATA], WEBMON_DATA_SIZE);
-+       nft_webmon_load_mapsqueues(domain_load_data, ntohl(nla_get_be32(tb[NFTA_WEBMON_DOMAINLOADDATALEN])));
-+       kfree(domain_load_data);
-+   }
-+   if(tb[NFTA_WEBMON_SEARCHLOADDATA] != NULL)
-+   {
-+       search_load_data = kcalloc(WEBMON_DATA_SIZE,sizeof(char),GFP_ATOMIC);
-+       nla_strscpy(search_load_data, tb[NFTA_WEBMON_SEARCHLOADDATA], WEBMON_DATA_SIZE);
-+       nft_webmon_load_mapsqueues(search_load_data, ntohl(nla_get_be32(tb[NFTA_WEBMON_SEARCHLOADDATALEN])));
-+       kfree(search_load_data);
-+   }
++	if(tb[NFTA_WEBMON_DOMAINLOADDATA] != NULL)
++	{
++	    domain_load_data = kcalloc(WEBMON_DATA_SIZE,sizeof(char),GFP_ATOMIC);
++	    if (domain_load_data == NULL)
++	    {
++			valid_arg = 0;
++			goto INIT_OUT;
++	    }
++	    nla_strscpy(domain_load_data, tb[NFTA_WEBMON_DOMAINLOADDATA], WEBMON_DATA_SIZE);
++	    nft_webmon_load_mapsqueues(domain_load_data, ntohl(nla_get_be32(tb[NFTA_WEBMON_DOMAINLOADDATALEN])));
++	    kfree(domain_load_data);
++	    domain_load_data = NULL;
++	}
++	if(tb[NFTA_WEBMON_SEARCHLOADDATA] != NULL)
++	{
++	    search_load_data = kcalloc(WEBMON_DATA_SIZE,sizeof(char),GFP_ATOMIC);
++	    if (search_load_data == NULL)
++	    {
++			valid_arg = 0;
++			goto INIT_OUT;
++	    }
++	    nla_strscpy(search_load_data, tb[NFTA_WEBMON_SEARCHLOADDATA], WEBMON_DATA_SIZE);
++	    nft_webmon_load_mapsqueues(search_load_data, ntohl(nla_get_be32(tb[NFTA_WEBMON_SEARCHLOADDATALEN])));
++	    kfree(search_load_data);
++	    search_load_data = NULL;
++	}
 +
 +	valid_arg = 1;
 +
++INIT_OUT:
++	kfree(domain_load_data);
++	kfree(search_load_data);
++	if (!valid_arg && priv->ref_count != NULL)
++	{
++		spin_lock_bh(&webmon_lock);
++		*(priv->ref_count) = *(priv->ref_count) - 1;
++		if (*(priv->ref_count) == 0)
++		{
++			kfree(priv->ref_count);
++			ref_count = NULL;
++		}
++		priv->ref_count = NULL;
++		spin_unlock_bh(&webmon_lock);
++	}
 +PARSE_OUT:
++	if (!valid_arg)
++	{
++		kfree(priv->ips);
++		kfree(priv->ranges);
++		kfree(priv->ip6s);
++		kfree(priv->range6s);
++		priv->ips = NULL;
++		priv->ranges = NULL;
++		priv->ip6s = NULL;
++		priv->range6s = NULL;
++	}
 +	kfree(ipstr);
 +
 +	return (valid_arg ? 0 : -EINVAL);
@@ -9922,8 +10015,8 @@
 +
 +module_init(init);
 +module_exit(fini);
---- linux.orig/net/netfilter/Kconfig	2026-09-09 10:59:57.284308764 +0800
-+++ linux.new/net/netfilter/Kconfig	2026-09-09 11:00:07.766390428 +0800
+--- linux.orig/net/netfilter/Kconfig	2026-09-09 20:55:06.171421002 +0800
++++ linux.new/net/netfilter/Kconfig	2026-09-09 20:55:14.649427326 +0800
 @@ -1673,6 +1673,42 @@
  
  endif # NETFILTER_XTABLES
@@ -9967,8 +10060,8 @@
  endmenu
  
  source "net/netfilter/ipset/Kconfig"
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/nft_bandwidth.mod.c	2026-09-09 11:00:07.727210389 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/nft_bandwidth.mod.c	2026-09-09 20:55:14.602280374 +0800
 @@ -0,0 +1,19 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -9989,8 +10082,8 @@
 +__attribute_used__
 +__attribute__((section(".modinfo"))) =
 +"depends=";
---- linux.orig/net/netfilter/Makefile	2026-09-09 10:59:57.284795437 +0800
-+++ linux.new/net/netfilter/Makefile	2026-09-09 11:00:07.744389881 +0800
+--- linux.orig/net/netfilter/Makefile	2026-09-09 20:55:06.171887785 +0800
++++ linux.new/net/netfilter/Makefile	2026-09-09 20:55:14.625426790 +0800
 @@ -106,6 +106,10 @@
  endif
  
@@ -10013,8 +10106,8 @@
  obj-$(CONFIG_NETFILTER_XT_MATCH_ADDRTYPE) += xt_addrtype.o
  obj-$(CONFIG_NETFILTER_XT_MATCH_BPF) += xt_bpf.o
  obj-$(CONFIG_NETFILTER_XT_MATCH_CLUSTER) += xt_cluster.o
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/xt_webmon.c	2026-09-09 11:00:03.528277561 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/xt_webmon.c	2026-09-09 20:55:09.967315308 +0800
 @@ -0,0 +1,1763 @@
 +/*  webmon --	A netfilter module to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
@@ -11779,8 +11872,8 @@
 +module_init(init);
 +module_exit(fini);
 +
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/nft_timerange.mod.c	2026-09-09 11:00:06.370096472 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/nft_timerange.mod.c	2026-09-09 20:55:13.225539342 +0800
 @@ -0,0 +1,19 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -11801,9 +11894,9 @@
 +__attribute_used__
 +__attribute__((section(".modinfo"))) =
 +"depends=";
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/xt_weburl.c	2026-09-09 11:00:03.455141279 +0800
-@@ -0,0 +1,598 @@
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/xt_weburl.c	2026-09-09 20:55:09.856263338 +0800
+@@ -0,0 +1,579 @@
 +/*  weburl --	A netfilter module to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
 + *  		Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -11855,8 +11948,6 @@
 +MODULE_DESCRIPTION("Match URL in HTTP(S) requests, designed for use with Gargoyle web interface (www.gargoyle-router.com)");
 +MODULE_ALIAS("ipt_weburl");
 +MODULE_ALIAS("ip6t_weburl");
-+
-+string_map* compiled_map = NULL;
 +
 +int strnicmp(const char * cs,const char * ct,size_t count)
 +{
@@ -11919,16 +12010,6 @@
 +			break;
 +		case WEBURL_REGEX_TYPE:
 +
-+			if(compiled_map == NULL)
-+			{
-+				compiled_map = initialize_map(0);
-+				if(compiled_map == NULL) /* test for malloc failure */
-+				{
-+					return 0;
-+				}
-+			}
-+			r = (struct regexp*)get_map_element(compiled_map, reference);
-+			if(r == NULL)
 +			{
 +				int rlen = strlen(reference);
 +				r= regcomp((char*)reference, &rlen);
@@ -11936,9 +12017,9 @@
 +				{
 +					return 0;
 +				}
-+				set_map_element(compiled_map, reference, (void*)r);
 +			}
 +			matches = regexec(r, query);
++			kfree(r);
 +			break;
 +		case WEBURL_EXACT_TYPE:
 +			matches = (strstr(query, reference) != NULL) && strlen(query) == strlen(reference);
@@ -12384,7 +12465,6 @@
 +
 +static int __init init(void)
 +{
-+	compiled_map = NULL;
 +	return xt_register_matches(xt_weburl_mt_reg, ARRAY_SIZE(xt_weburl_mt_reg));
 +
 +}
@@ -12392,19 +12472,13 @@
 +static void __exit fini(void)
 +{
 +	xt_unregister_matches(xt_weburl_mt_reg, ARRAY_SIZE(xt_weburl_mt_reg));
-+	if(compiled_map != NULL)
-+	{
-+		unsigned long num_destroyed;
-+		destroy_map(compiled_map, DESTROY_MODE_FREE_VALUES, &num_destroyed);
-+	}
 +}
 +
 +module_init(init);
 +module_exit(fini);
-+
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/webmon_deps/tree_map.h	2026-09-09 11:00:05.035237482 +0800
-@@ -0,0 +1,1084 @@
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/webmon_deps/tree_map.h	2026-09-09 20:55:11.806729342 +0800
+@@ -0,0 +1,1089 @@
 +/*
 + * Copyright © 2008 by Eric Bishop <eric@gargoyle-router.com>
 + * 
@@ -12641,6 +12715,12 @@
 +		}
 +		kv->value = value;
 +		return_value = set_long_map_element(  &(map->lm), hashed_key, kv);
++		if(return_value == NULL && get_long_map_element(&(map->lm), hashed_key) != kv)
++		{
++			free(kv->key);
++			free(kv);
++			return NULL;
++		}
 +		if(return_value != NULL)
 +		{
 +			string_map_key_value* r = (string_map_key_value*)return_value;
@@ -13488,9 +13568,8 @@
 +	return hashed_key;
 +}
 +
-+
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/nft_weburl.mod.c	2026-09-09 11:00:03.739316283 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/nft_weburl.mod.c	2026-09-09 20:55:10.267777015 +0800
 @@ -0,0 +1,19 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -13511,8 +13590,8 @@
 +__attribute_used__
 +__attribute__((section(".modinfo"))) =
 +"depends=";
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/xt_bandwidth.mod.c	2026-09-09 11:00:03.673467067 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/xt_bandwidth.mod.c	2026-09-09 20:55:10.178412494 +0800
 @@ -0,0 +1,20 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -13534,9 +13613,9 @@
 +__attribute__((section(".modinfo"))) =
 +"depends=";
 +
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/nft_timerange.c	2026-09-09 11:00:06.370045836 +0800
-@@ -0,0 +1,838 @@
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/nft_timerange.c	2026-09-09 20:55:13.225465753 +0800
+@@ -0,0 +1,850 @@
 +/*  timerange --	An nftables extension to match multiple timeranges within a week
 + *  			Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
 + *
@@ -14163,7 +14242,7 @@
 +static int nft_timerange_init(const struct nft_ctx *ctx, const struct nft_expr *expr, const struct nlattr * const tb[])
 +{
 +	struct nft_timerange_info *priv = nft_expr_priv(expr);
-+	char *hours, *weekdays, *weeklyranges;
++	char *hours = NULL, *weekdays = NULL, *weeklyranges = NULL;
 +	bool invert = false;
 +	int valid_arg = 0;
 +	long* parsed = NULL;
@@ -14176,13 +14255,17 @@
 +	weekdays = kcalloc(TIMERANGE_TEXT_SIZE,sizeof(char),GFP_ATOMIC);
 +	weeklyranges = kcalloc(TIMERANGE_TEXT_SIZE,sizeof(char),GFP_ATOMIC);
 +	if (hours == NULL || weekdays == NULL || weeklyranges == NULL)
-+		return -EINVAL;
-+
++		goto PARSE_OUT;
 +	if(tb[NFTA_TIMERANGE_FLAGS])
 +	{
 +		u32 flag = ntohl(nla_get_be32(tb[NFTA_TIMERANGE_FLAGS]));
 +		if(flag & ~NFT_TIMERANGE_F_INV)
++		{
++			kfree(hours);
++			kfree(weekdays);
++			kfree(weeklyranges);
 +			return -EOPNOTSUPP;
++		}
 +
 +		if(flag & NFT_TIMERANGE_F_INV)
 +			invert = true;
@@ -14210,6 +14293,7 @@
 +			}
 +			priv->ranges[range_index] = -1;
 +			kfree(parsed);
++			parsed = NULL;
 +
 +
 +			valid_arg = 1;
@@ -14229,6 +14313,7 @@
 +				priv->days[day_index] = parsed[day_index];
 +			}
 +			kfree(parsed);
++			parsed = NULL;
 +
 +			valid_arg = 1 ;
 +			flags = flags + WEEKDAYS;
@@ -14253,6 +14338,7 @@
 +			}
 +			priv->ranges[range_index] = -1;
 +			kfree(parsed);
++			parsed = NULL;
 +
 +			valid_arg = 1;
 +			flags = flags+WEEKLY_RANGE;
@@ -14261,6 +14347,7 @@
 +	}
 +
 +PARSE_OUT:
++	kfree(parsed);
 +	kfree(hours);
 +	kfree(weekdays);
 +	kfree(weeklyranges);
@@ -14280,6 +14367,10 @@
 +	hours = kcalloc(TIMERANGE_TEXT_SIZE,sizeof(char),GFP_ATOMIC);
 +	weekdays = kcalloc(TIMERANGE_TEXT_SIZE,sizeof(char),GFP_ATOMIC);
 +	weeklyranges = kcalloc(TIMERANGE_TEXT_SIZE,sizeof(char),GFP_ATOMIC);
++	if (hours == NULL || weekdays == NULL || weeklyranges == NULL) {
++		retval = -ENOMEM;
++		goto DUMP_OUT;
++	}
 +
 +	switch(priv->type)
 +	{
@@ -14375,8 +14466,8 @@
 +
 +module_init(init);
 +module_exit(fini);
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/xt_weburl.mod.c	2026-09-09 11:00:03.455299880 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/xt_weburl.mod.c	2026-09-09 20:55:09.856301951 +0800
 @@ -0,0 +1,20 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -14398,8 +14489,8 @@
 +__attribute__((section(".modinfo"))) =
 +"depends=";
 +
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/xt_timerange.mod.c	2026-09-09 11:00:03.596027462 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/xt_timerange.mod.c	2026-09-09 20:55:10.069443454 +0800
 @@ -0,0 +1,20 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -14421,8 +14512,8 @@
 +__attribute__((section(".modinfo"))) =
 +"depends=";
 +
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/xt_timerange.c	2026-09-09 11:00:03.595982246 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/xt_timerange.c	2026-09-09 20:55:10.069307076 +0800
 @@ -0,0 +1,147 @@
 +/*  timerange --	An xtables extension to match multiple timeranges within a week
 + *  			Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -14571,9 +14662,9 @@
 +module_init(init);
 +module_exit(fini);
 +
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/net/netfilter/xt_bandwidth.c	2026-09-09 11:00:03.673016082 +0800
-@@ -0,0 +1,3105 @@
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/net/netfilter/xt_bandwidth.c	2026-09-09 20:55:10.178258933 +0800
+@@ -0,0 +1,3152 @@
 +/*  bandwidth --	An xtables extension for bandwidth monitoring/control
 + *  			Can be used to efficiently monitor bandwidth and/or implement bandwidth quotas
 + *  			Can be queried using the iptbwctl userspace library
@@ -17230,12 +17321,14 @@
 +	if(info->ref_count == NULL) /* first instance, we're inserting rule */
 +	{
 +		struct xt_bandwidth_info *master_info = (struct xt_bandwidth_info*)kmalloc(sizeof(struct xt_bandwidth_info), GFP_ATOMIC);
++		info_and_maps *new_iam = NULL;
++		int init_ret = -ENOMEM;
 +		info->ref_count = (unsigned long*)kmalloc(sizeof(unsigned long), GFP_ATOMIC);
 +
-+		if(info->ref_count == NULL) /* deal with kmalloc failure */
++		if(info->ref_count == NULL || master_info == NULL) /* deal with kmalloc failure */
 +		{
 +			printk("xt_bandwidth: kmalloc failure in checkentry!\n");
-+			return -ENOMEM;
++			goto INIT_ERROR;
 +		}
 +		*(info->ref_count) = 1;
 +		info->non_const_self = master_info;
@@ -17290,7 +17383,8 @@
 +					printk("xt_bandwidth: error, \"%s\" is a duplicate id in this IP family\n", info->id); 
 +					spin_unlock_bh(&bandwidth_lock);
 +					up(&userspace_lock);
-+					return -EINVAL;
++					init_ret = -EINVAL;
++					goto INIT_ERROR;
 +				}
 +				
 +				#ifdef BANDWIDTH_DEBUG
@@ -17311,7 +17405,8 @@
 +					printk("xt_bandwidth: error, \"%s\" is already used in the other IP family, but this rule is not substantially the same\n", info->id); 
 +					spin_unlock_bh(&bandwidth_lock);
 +					up(&userspace_lock);
-+					return -EINVAL;
++					init_ret = -EINVAL;
++					goto INIT_ERROR;
 +				}
 +				
 +				iam->other_info = master_info;
@@ -17326,15 +17421,19 @@
 +					printk("xt_bandwidth: kmalloc failure in checkentry!\n");
 +					spin_unlock_bh(&bandwidth_lock);
 +					up(&userspace_lock);
-+					return -ENOMEM;
++					goto INIT_ERROR;
 +				}
++				new_iam = iam;
++				iam->ip_map = NULL;
++				iam->ip_history_map = NULL;
++				iam->ip_family_map = NULL;
 +				iam->ip_map = initialize_string_map(1);
 +				if(iam->ip_map == NULL) /* handle kmalloc failure */
 +				{
 +					printk("xt_bandwidth: kmalloc failure in checkentry!\n");
 +					spin_unlock_bh(&bandwidth_lock);
 +					up(&userspace_lock);
-+					return -ENOMEM;
++					goto INIT_ERROR;
 +				}
 +				iam->ip_history_map = NULL;
 +				if(info->num_intervals_to_save > 0)
@@ -17345,7 +17444,7 @@
 +						printk("xt_bandwidth: kmalloc failure in checkentry!\n");
 +						spin_unlock_bh(&bandwidth_lock);
 +						up(&userspace_lock);
-+						return -ENOMEM;
++						goto INIT_ERROR;
 +					}
 +				}
 +				iam->ip_family_map = initialize_string_map(1);
@@ -17354,11 +17453,19 @@
 +					printk("xt_bandwidth: kmalloc failure in checkentry!\n");
 +					spin_unlock_bh(&bandwidth_lock);
 +					up(&userspace_lock);
-+					return -ENOMEM;
++					goto INIT_ERROR;
 +				}
 +				
 +				iam->info = master_info;
 +				set_string_map_element(id_map, info->id, iam);
++				if(get_string_map_element(id_map, info->id) != iam)
++				{
++					printk("xt_bandwidth: unable to add id to map\n");
++					spin_unlock_bh(&bandwidth_lock);
++					up(&userspace_lock);
++					goto INIT_ERROR;
++				}
++				new_iam = NULL;
 +				iam->info_family = family;
 +				iam->other_info = NULL;
 +				iam->other_info_family = 0;
@@ -17409,6 +17516,24 @@
 +			spin_unlock_bh(&bandwidth_lock);
 +			up(&userspace_lock);
 +		}
++		goto INIT_DONE;
++
++INIT_ERROR:
++		if(new_iam != NULL)
++		{
++			unsigned long num_destroyed;
++			destroy_string_map(new_iam->ip_map, DESTROY_MODE_IGNORE_VALUES, &num_destroyed);
++			destroy_string_map(new_iam->ip_history_map, DESTROY_MODE_IGNORE_VALUES, &num_destroyed);
++			destroy_string_map(new_iam->ip_family_map, DESTROY_MODE_IGNORE_VALUES, &num_destroyed);
++			kfree(new_iam);
++		}
++		kfree(info->ref_count);
++		kfree(master_info);
++		info->ref_count = NULL;
++		info->non_const_self = NULL;
++		return init_ret;
++INIT_DONE:
++		;
 +	}
 +	else
 +	{
@@ -17545,7 +17670,7 @@
 +					histories_to_free = (bw_history**)destroy_string_map(iam->ip_history_map, DESTROY_MODE_RETURN_VALUES, &num_destroyed);
 +					
 +					/* num_destroyed will be 0 if histories_to_free is null after malloc failure, so this is safe */
-+					for(history_index = 0; history_index < num_destroyed; history_index++) 
++					for(history_index = 0; histories_to_free != NULL && history_index < num_destroyed; history_index++)
 +					{
 +						bw_history* h = histories_to_free[history_index];
 +						if(h != NULL)
@@ -17554,6 +17679,7 @@
 +							kfree(h);
 +						}
 +					}
++					kfree(histories_to_free);
 +					
 +				}
 +				else if(iam->ip_map != NULL && iam->ip_family_map != NULL)
@@ -17625,10 +17751,13 @@
 +
 +static int __init init(void)
 +{
++	int ret;
 +	/* Register setsockopt */
-+	if (nf_register_sockopt(&xt_bandwidth_sockopts) < 0)
++	ret = nf_register_sockopt(&xt_bandwidth_sockopts);
++	if (ret < 0)
 +	{
 +		printk("xt_bandwidth: Can't register sockopts. Aborting\n");
++		return ret;
 +	}
 +	bandwidth_record_max = get_bw_record_max();
 +	local_minutes_west = old_minutes_west = sys_tz.tz_minuteswest;
@@ -17645,11 +17774,19 @@
 +	if(id_map == NULL) /* deal with kmalloc failure */
 +	{
 +		printk("id map is null, returning -1\n");
-+		return -1;
++		nf_unregister_sockopt(&xt_bandwidth_sockopts);
++		return -ENOMEM;
 +	}
 +
-+
-+	return xt_register_matches(bandwidth_mt_reg, ARRAY_SIZE(bandwidth_mt_reg));
++	ret = xt_register_matches(bandwidth_mt_reg, ARRAY_SIZE(bandwidth_mt_reg));
++	if (ret < 0)
++	{
++		unsigned long num_destroyed;
++		destroy_string_map(id_map, DESTROY_MODE_IGNORE_VALUES, &num_destroyed);
++		id_map = NULL;
++		nf_unregister_sockopt(&xt_bandwidth_sockopts);
++	}
++	return ret;
 +}
 +
 +static void __exit fini(void)
@@ -17670,6 +17807,7 @@
 +			kfree(iam);
 +			/* info portion of iam gets taken care of automatically */
 +		}
++		kfree(iams);
 +	}
 +	nf_unregister_sockopt(&xt_bandwidth_sockopts);
 +	xt_unregister_matches(bandwidth_mt_reg, ARRAY_SIZE(bandwidth_mt_reg));
@@ -17679,8 +17817,8 @@
 +
 +module_init(init);
 +module_exit(fini);
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/include/linux/netfilter/nft_bandwidth.h	2026-09-09 11:00:07.728704591 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/include/linux/netfilter/nft_bandwidth.h	2026-09-09 20:55:14.604934667 +0800
 @@ -0,0 +1,137 @@
 +/*  bandwidth --	An nftables extension for bandwidth monitoring/control
 + *  			Can be used to efficiently monitor bandwidth and/or implement bandwidth quotas
@@ -17819,8 +17957,8 @@
 +	unsigned long* ref_count;
 +};
 +#endif /*_NFT_BANDWIDTH_H*/
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/include/linux/netfilter/xt_webmon.h	2026-09-09 11:00:03.530455636 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/include/linux/netfilter/xt_webmon.h	2026-09-09 20:55:09.971627497 +0800
 @@ -0,0 +1,69 @@
 +/*  webmon --	A netfilter module to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
@@ -17891,8 +18029,8 @@
 +};
 +
 +#endif /*_XT_WEBMON_H*/
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/include/linux/netfilter/nft_timerange.h	2026-09-09 11:00:06.371856753 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/include/linux/netfilter/nft_timerange.h	2026-09-09 20:55:13.227805382 +0800
 @@ -0,0 +1,61 @@
 +/*  timerange --	An nftables extension to match multiple timeranges within a week
 + *  			Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -17955,8 +18093,8 @@
 +char** split_on_separators(char* line_str, char* separators, int num_separators, int max_pieces, int include_remainder_at_max);
 +char* trim_flanking_whitespace(char* str);
 +#endif /*_NFT_TIMERANGE_MT_H*/
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/include/linux/netfilter/xt_timerange.h	2026-09-09 11:00:03.597962297 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/include/linux/netfilter/xt_timerange.h	2026-09-09 20:55:10.072685627 +0800
 @@ -0,0 +1,43 @@
 +/*  timerange --	An xtables extension to match multiple timeranges within a week
 + *  			Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -18001,8 +18139,8 @@
 +	unsigned char invert;
 +};
 +#endif /*_XT_TIMERANGE_H*/
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/include/linux/netfilter/xt_bandwidth.h	2026-09-09 11:00:03.675744424 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/include/linux/netfilter/xt_bandwidth.h	2026-09-09 20:55:10.180905242 +0800
 @@ -0,0 +1,111 @@
 +/*  bandwidth --	An xtables extension for bandwidth monitoring/control
 + *  			Can be used to efficiently monitor bandwidth and/or implement bandwidth quotas
@@ -18115,8 +18253,8 @@
 +
 +};
 +#endif /*_XT_BANDWIDTH_H*/
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/include/linux/netfilter/nft_webmon.h	2026-09-09 11:00:05.037376465 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/include/linux/netfilter/nft_webmon.h	2026-09-09 20:55:11.808998305 +0800
 @@ -0,0 +1,98 @@
 +/*  webmon --	An nftables extension to match URLs in HTTP(S) requests
 + *  			This module records visited URLs and makes them available via procfs
@@ -18216,8 +18354,8 @@
 +	uint32_t* ref_count;
 +};
 +#endif /*_NFT_WEBMON_H*/
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/include/linux/netfilter/nft_weburl.h	2026-09-09 11:00:03.742723610 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/include/linux/netfilter/nft_weburl.h	2026-09-09 20:55:10.276329496 +0800
 @@ -0,0 +1,61 @@
 +/*  weburl --	An nftables extension to match URLs in HTTP(S) requests
 + *  			This module can match using string match or regular expressions
@@ -18280,8 +18418,8 @@
 +	bool invert;
 +};
 +#endif /*_NFT_WEBURL_H*/
---- /dev/null	2026-09-09 10:15:22.730002345 +0800
-+++ linux.new/include/linux/netfilter/xt_weburl.h	2026-09-09 11:00:03.458155350 +0800
+--- /dev/null	2026-09-09 16:04:55.402189989 +0800
++++ linux.new/include/linux/netfilter/xt_weburl.h	2026-09-09 20:55:09.858386365 +0800
 @@ -0,0 +1,45 @@
 +/*  weburl --	A netfilter module to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions

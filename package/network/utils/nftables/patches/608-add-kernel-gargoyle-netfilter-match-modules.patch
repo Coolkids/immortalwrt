@@ -1,5 +1,5 @@
---- nftables.orig/src/netlink_linearize.c	2026-09-09 11:00:03.185129822 +0800
-+++ nftables.new/src/netlink_linearize.c	2026-09-09 11:00:08.219401699 +0800
+--- nftables.orig/src/netlink_linearize.c	2026-09-09 20:55:09.498312092 +0800
++++ nftables.new/src/netlink_linearize.c	2026-09-09 20:55:15.236440459 +0800
 @@ -1210,6 +1210,83 @@
  	nft_rule_add_expr(ctx, nle, &stmt->location);
  }
@@ -99,8 +99,8 @@
  	case STMT_REJECT:
  		return netlink_gen_reject_stmt(ctx, stmt);
  	case STMT_NAT:
---- nftables.orig/src/parser_bison.y	2026-09-09 11:00:03.185596225 +0800
-+++ nftables.new/src/parser_bison.y	2026-09-09 11:00:08.454407543 +0800
+--- nftables.orig/src/parser_bison.y	2026-09-09 20:55:09.498790408 +0800
++++ nftables.new/src/parser_bison.y	2026-09-09 20:55:15.508446541 +0800
 @@ -674,6 +674,55 @@
  %token FULLY_RANDOM		"fully-random"
  %token PERSISTENT		"persistent"
@@ -425,8 +425,8 @@
  nat_stmt		:	nat_stmt_alloc	nat_stmt_args
  			;
  
---- nftables.orig/src/scanner.l	2026-09-09 11:00:03.185967669 +0800
-+++ nftables.new/src/scanner.l	2026-09-09 11:00:08.556410080 +0800
+--- nftables.orig/src/scanner.l	2026-09-09 20:55:09.499303460 +0800
++++ nftables.new/src/scanner.l	2026-09-09 20:55:15.638449450 +0800
 @@ -258,6 +258,10 @@
  %s SCANSTATE_STMT_LOG
  %s SCANSTATE_STMT_NAT
@@ -502,8 +502,8 @@
  "reject"		{ scanner_push_start_cond(yyscanner, SCANSTATE_STMT_REJECT); return _REJECT; }
  <SCANSTATE_STMT_REJECT>{
  	"with"			{ return WITH; }
---- nftables.orig/src/statement.c	2026-09-09 11:00:03.186142531 +0800
-+++ nftables.new/src/statement.c	2026-09-09 11:00:08.641412194 +0800
+--- nftables.orig/src/statement.c	2026-09-09 20:55:09.499640518 +0800
++++ nftables.new/src/statement.c	2026-09-09 20:55:15.780452626 +0800
 @@ -16,6 +16,10 @@
  #include <syslog.h>
  #include <rule.h>
@@ -743,8 +743,8 @@
  static void reject_stmt_print(const struct stmt *stmt, struct output_ctx *octx)
  {
  	nft_print(octx, "reject");
---- nftables.orig/src/netlink_delinearize.c	2026-09-09 11:00:03.184372310 +0800
-+++ nftables.new/src/netlink_delinearize.c	2026-09-09 11:00:08.128399434 +0800
+--- nftables.orig/src/netlink_delinearize.c	2026-09-09 20:55:09.497852353 +0800
++++ nftables.new/src/netlink_delinearize.c	2026-09-09 20:55:15.130438087 +0800
 @@ -1205,6 +1205,77 @@
  	ctx->stmt = stmt;
  }
@@ -835,7 +835,7 @@
  	{ .name = "lookup",	.parse = netlink_parse_lookup },
  	{ .name = "bitwise",	.parse = netlink_parse_bitwise },
 --- nftables.orig/src/evaluate.c	2025-12-05 20:17:57.639743864 +0800
-+++ nftables.new/src/evaluate.c	2026-09-09 11:00:08.038397194 +0800
++++ nftables.new/src/evaluate.c	2026-09-09 20:55:15.015435516 +0800
 @@ -4175,6 +4175,139 @@
  	return stmt_evaluate_reject_family(ctx, stmt);
  }
@@ -992,7 +992,7 @@
  		return stmt_evaluate_nat(ctx, stmt);
  	case STMT_TPROXY:
 --- nftables.orig/include/parser.h	2025-12-05 20:17:57.635743839 +0800
-+++ nftables.new/include/parser.h	2026-09-09 11:00:08.731414433 +0800
++++ nftables.new/include/parser.h	2026-09-09 20:55:15.931456005 +0800
 @@ -86,6 +86,10 @@
  	PARSER_SC_STMT_LOG,
  	PARSER_SC_STMT_NAT,
@@ -1004,8 +1004,8 @@
  	PARSER_SC_STMT_SYNPROXY,
  	PARSER_SC_STMT_TPROXY,
  
---- nftables.orig/include/linux/netfilter/nf_tables.h	2026-09-09 11:00:03.183670971 +0800
-+++ nftables.new/include/linux/netfilter/nf_tables.h	2026-09-09 11:00:08.685413289 +0800
+--- nftables.orig/include/linux/netfilter/nf_tables.h	2026-09-09 20:55:09.495275566 +0800
++++ nftables.new/include/linux/netfilter/nf_tables.h	2026-09-09 20:55:15.842454013 +0800
 @@ -1432,6 +1432,55 @@
  };
  #define NFTA_REJECT_MAX		(__NFTA_REJECT_MAX - 1)
@@ -1062,8 +1062,8 @@
  /**
   * enum nft_nat_types - nf_tables nat expression NAT types
   *
---- nftables.orig/include/statement.h	2026-09-09 11:00:03.183871381 +0800
-+++ nftables.new/include/statement.h	2026-09-09 11:00:07.950395005 +0800
+--- nftables.orig/include/statement.h	2026-09-09 20:55:09.495510491 +0800
++++ nftables.new/include/statement.h	2026-09-09 20:55:14.906433076 +0800
 @@ -125,6 +125,54 @@
  
  extern struct stmt *reject_stmt_alloc(const struct location *loc);
