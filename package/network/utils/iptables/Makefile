@@ -780,6 +780,9 @@ $(eval $(call BuildPlugin,ip6tables-mod-nat,$(IPT_NAT6-m)))
 define Package/iptables-mod-weburl
 $(call Package/iptables/Module, +kmod-ipt-weburl)
   TITLE:=weburl
+  KCONFIG:= \
+    CONFIG_NETFILTER_XT_MATCH_WEBURL=m \
+    CONFIG_NF_TABLES=y
 endef
 $(eval $(call BuildPlugin,iptables-mod-weburl,$(IPT_WEBURL-m)))
 
@@ -787,6 +790,9 @@ $(eval $(call BuildPlugin,iptables-mod-weburl,$(IPT_WEBURL-m)))
 define Package/iptables-mod-webmon
 $(call Package/iptables/Module, +kmod-ipt-webmon)
   TITLE:=webmon
+  KCONFIG:= \
+    CONFIG_NETFILTER_XT_MATCH_WEBMON=m \
+    CONFIG_NF_TABLES=y
 endef
 $(eval $(call BuildPlugin,iptables-mod-webmon,$(IPT_WEBMON-m)))
 
@@ -794,6 +800,9 @@ $(eval $(call BuildPlugin,iptables-mod-webmon,$(IPT_WEBMON-m)))
 define Package/iptables-mod-timerange
 $(call Package/iptables/Module, +kmod-ipt-timerange)
   TITLE:=timerange
+  KCONFIG:= \
+    CONFIG_NETFILTER_XT_MATCH_TIMERANGE=m \
+    CONFIG_NF_TABLES=y
 endef
 $(eval $(call BuildPlugin,iptables-mod-timerange,$(IPT_TIMERANGE-m)))
 
@@ -801,5 +810,8 @@ $(eval $(call BuildPlugin,iptables-mod-timerange,$(IPT_TIMERANGE-m)))
 define Package/iptables-mod-bandwidth
 $(call Package/iptables/Module, +kmod-ipt-bandwidth)
   TITLE:=bandwidth
+  KCONFIG:= \
+    CONFIG_NETFILTER_XT_MATCH_BANDWIDTH=m \
+    CONFIG_NF_TABLES=y
 endef
 $(eval $(call BuildPlugin,iptables-mod-bandwidth,$(IPT_BANDWIDTH-m)))

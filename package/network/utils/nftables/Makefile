@@ -39,6 +39,11 @@ define Package/nftables/Default
   SUBMENU:=Firewall
   TITLE:=nftables userspace utility
   DEPENDS:=+kmod-nft-core +libnftnl
+  KCONFIG:= \
+    CONFIG_NFT_WEBURL=m \
+    CONFIG_NFT_WEBMON=m \
+    CONFIG_NFT_TIMERANGE=m \
+    CONFIG_NFT_BANDWIDTH=m
   URL:=http://netfilter.org/projects/nftables/
   PROVIDES:=nftables
 endef

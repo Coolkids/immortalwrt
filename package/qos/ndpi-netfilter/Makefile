@@ -62,6 +62,19 @@ define KernelPackage/ipt-ndpi
   SUBMENU:=Netfilter Extensions
   TITLE:= nDPI net netfilter module
   DEPENDS:=+kmod-nf-conntrack +kmod-nf-conntrack-netlink +kmod-ipt-conntrack-label
+  KCONFIG:= \
+	CONFIG_FTRACE=y \
+	CONFIG_FUNCTION_TRACER=y \
+	CONFIG_DYNAMIC_FTRACE=y \
+	CONFIG_FPROBE=n \
+	CONFIG_FTRACE_SORT_STARTUP_TEST=n \
+	CONFIG_DYNAMIC_FTRACE_WITH_ARGS=y \
+	CONFIG_KALLSYMS_ALL=y \
+	CONFIG_HAVE_LIVEPATCH=y \
+	CONFIG_LIVEPATCH=y \
+	CONFIG_NF_CONNTRACK=m \
+	CONFIG_NETFILTER_XT_MATCH_CONNLABEL=m \
+
   FILES:= \
 	$(PKG_BUILD_DIR)/ndpi-netfilter/src/xt_ndpi.ko
   AUTOLOAD:=$(call AutoProbe,xt_ndpi)
