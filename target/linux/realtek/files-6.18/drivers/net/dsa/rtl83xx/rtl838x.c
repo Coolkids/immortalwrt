@@ -10,6 +10,7 @@
 #include "l3.h"
 #include "pie.h"
 #include "qos.h"
+#include "mirror.h"
 #include "rtl-otto.h"
 #include "stats.h"
 #include "vlan.h"
@@ -117,23 +118,6 @@ static inline int rtl838x_mac_force_mode_ctrl(int p)
 static inline int rtl838x_mac_port_ctrl(int p)
 {
 	return RTL838X_MAC_PORT_CTRL(p);
-}
-
-static int rtldsa_838x_get_mirror_config(struct rtldsa_mirror_config *config,
-					 int group, int port)
-{
-	config->ctrl = RTL838X_MIR_CTRL + group * 4;
-	config->spm = RTL838X_MIR_SPM_CTRL + group * 4;
-	config->dpm = RTL838X_MIR_DPM_CTRL + group * 4;
-
-	/* Enable mirroring to destination port */
-	config->val = BIT(0);
-	config->val |= port << 4;
-
-	/* Enable mirroring to port across VLANs */
-	config->val |= BIT(11);
-
-	return 0;
 }
 
 static void rtl838x_traffic_set(int source, u64 dest_matrix)
@@ -281,6 +265,8 @@ const struct rtldsa_config rtldsa_838x_cfg = {
 	.num_lag_ids = 8,
 	.cpu_port = RTL838X_CPU_PORT,
 	.fib_entries = 8192,
+	.l2_uc_tbl = RTL8380_TBL_L2_UC,
+	.l2_cam_tbl = RTL8380_TBL_L2_CAM_UC,
 	.mask_port_reg_be = rtl838x_mask_port_reg,
 	.set_port_reg_be = rtl838x_set_port_reg,
 	.get_port_reg_be = rtl838x_get_port_reg,

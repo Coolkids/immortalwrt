@@ -7,6 +7,7 @@
 #include "l2.h"
 #include "pie.h"
 #include "qos.h"
+#include "mirror.h"
 #include "rtl-otto.h"
 #include "stats.h"
 #include "tc.h"
@@ -130,30 +131,6 @@ static inline int rtl931x_mac_port_ctrl(int p)
 static inline int rtl931x_mac_max_len_reg(int p)
 {
 	return RTL931X_MAC_L2_PORT_MAX_LEN_CTRL + (p << 2);
-}
-
-static int rtldsa_931x_get_mirror_config(struct rtldsa_mirror_config *config,
-					 int group, int port)
-{
-	config->ctrl = RTL931X_MIR_CTRL + group * 4;
-	config->spm = RTL931X_MIR_SPM_CTRL + group * 8;
-	config->dpm = RTL931X_MIR_DPM_CTRL + group * 8;
-
-	/* Enable mirroring to destination port */
-	config->val = BIT(0);
-	config->val |= port << 9;
-
-	/* mirror mode: let mirrored packets follow TX settings of
-	 * mirroring port
-	 */
-	config->val |= BIT(5);
-
-	/* direction of traffic to be mirrored when a packet
-	 * hits both SPM and DPM ports: prefer egress
-	 */
-	config->val |= BIT(4);
-
-	return 0;
 }
 
 void rtldsa_931x_print_matrix(void)
@@ -480,6 +457,8 @@ const struct rtldsa_config rtldsa_931x_cfg = {
 	.num_lag_ids = 16,
 	.cpu_port = RTL931X_CPU_PORT,
 	.fib_entries = 16384, /* TODO: has 32K but code cannot handle that */
+	.l2_uc_tbl = RTL9310_TBL_L2_UC,
+	.l2_cam_tbl = RTL9310_TBL_L2_CAM_UC,
 	.mask_port_reg_be = rtl839x_mask_port_reg_be,
 	.set_port_reg_be = rtl839x_set_port_reg_be,
 	.get_port_reg_be = rtl839x_get_port_reg_be,
