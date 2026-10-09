@@ -198,7 +198,8 @@ static bool rteth_838x_decode_tag(struct rteth_frag *frag, struct rteth_dsa_tag 
 	t->crc_error = t->reason == 13;
 
 	pr_debug("Reason: %d\n", t->reason);
-	if (t->reason != 6) /* NIC_RX_REASON_SPECIAL_TRAP */
+	if (t->reason != 2 && /* NIC_RX_REASON_RMA */
+	    t->reason != 6)   /* NIC_RX_REASON_SPECIAL_TRAP */
 		t->l2_offloaded = 1;
 	else
 		t->l2_offloaded = 0;
@@ -230,7 +231,7 @@ static bool rteth_93xx_decode_tag(struct rteth_frag *frag, struct rteth_dsa_tag 
 	t->queue = (frag->cpu_tag[2] >> 11) & 0x1f;
 	t->reason = frag->cpu_tag[7] & 0x3f;
 	t->crc_error = frag->cpu_tag[1] & BIT(6);
-	t->l2_offloaded = (t->reason >= 19 && t->reason <= 28) ? 0 : 1;
+	t->l2_offloaded = (t->reason >= 19 && t->reason <= 28) || t->reason == 55 ? 0 : 1;
 
 	if (t->reason != 63)
 		pr_debug("%s: Reason %d, port %d, queue %d\n", __func__, t->reason, t->port, t->queue);
@@ -777,16 +778,20 @@ static void rteth_839x_hw_init(struct rteth_ctrl *ctrl)
 
 static void rteth_930x_hw_init(struct rteth_ctrl *ctrl)
 {
-	/* Trap MLD and IGMP messages to CPU_PORT */
-	regmap_write(ctrl->map, RTETH_930X_VLAN_APP_PKT_CTRL, 0x12);
+	/* Trap IGMP and MLD to the CPU (IGMP_ACT = MLD_ACT = 1) in every VLAN
+	 * whose group mask selects them
+	 */
+	regmap_write(ctrl->map, RTETH_930X_VLAN_APP_PKT_CTRL, 0x9);
 	/* Flush learned FDB entries on link down of a port */
 	regmap_set_bits(ctrl->map, RTETH_930X_L2_CTRL, BIT(7));
 }
 
 static void rteth_931x_hw_init(struct rteth_ctrl *ctrl)
 {
-	/* Trap MLD and IGMP messages to CPU_PORT */
-	regmap_write(ctrl->map, RTETH_931X_VLAN_APP_PKT_CTRL, 0x12);
+	/* Trap IGMP and MLD to the CPU (IGMP_ACT = MLD_ACT = 1) in every VLAN
+	 * whose group mask selects them
+	 */
+	regmap_write(ctrl->map, RTETH_931X_VLAN_APP_PKT_CTRL, 0x9);
 	/* Set PCIE_PWR_DOWN */
 	regmap_set_bits(ctrl->map, RTETH_931X_PS_SOC_CTRL, BIT(1));
 }
@@ -1182,6 +1187,7 @@ static struct sk_buff *rteth_create_skb(struct rteth_ctrl *ctrl, int ring, int s
 	struct page_pool *pool = ctrl->rx_info[ring].pool;
 	struct net_device *dev = ctrl->dev;
 	unsigned int len = frag->len;
+	struct metadata_dst *md_dst;
 	struct rteth_dsa_tag tag;
 	struct sk_buff *skb;
 
@@ -1197,11 +1203,9 @@ static struct sk_buff *rteth_create_skb(struct rteth_ctrl *ctrl, int ring, int s
 	skb_put(skb, len);
 
 	ctrl->cfg->decode_tag(frag, &tag);
-	if (netdev_uses_dsa(dev)) {
-		if (tag.port < ctrl->cfg->cpu_port)
-			skb_dst_set_noref(skb, &ctrl->dsa_meta[tag.port]->dst);
-		if (tag.l2_offloaded)
-			skb->offload_fwd_mark = 1;
+	if (netdev_uses_dsa(dev) && tag.port < ctrl->cfg->cpu_port) {
+		md_dst = tag.l2_offloaded ? ctrl->dsa_meta[tag.port] : ctrl->dsa_meta_trapped[tag.port];
+		skb_dst_set_noref(skb, &md_dst->dst);
 	}
 
 	if (dev->features & NETIF_F_RXCSUM) {
@@ -1512,22 +1516,20 @@ static int rteth_set_link_ksettings(struct net_device *dev,
 	return phylink_ethtool_ksettings_set(ctrl->phylink, cmd);
 }
 
-static int rteth_83xx_set_features(struct net_device *dev, netdev_features_t features)
+static void rteth_set_rx_mode(struct net_device *dev)
 {
 	struct rteth_ctrl *ctrl = netdev_priv(dev);
 
-	if ((features ^ dev->features) & NETIF_F_RXCSUM)
-		regmap_assign_bits(ctrl->map, ctrl->cfg->mac_l2_port_ctrl, BIT(3), features & NETIF_F_RXCSUM);
-
-	return 0;
+	ctrl->cfg->set_rx_mode(dev);
 }
 
-static int rteth_93xx_set_features(struct net_device *dev, netdev_features_t features)
+static int rteth_set_features(struct net_device *dev, netdev_features_t features)
 {
 	struct rteth_ctrl *ctrl = netdev_priv(dev);
 
 	if ((features ^ dev->features) & NETIF_F_RXCSUM)
-		regmap_assign_bits(ctrl->map, ctrl->cfg->mac_l2_port_ctrl, BIT(4), features & NETIF_F_RXCSUM);
+		regmap_assign_bits(ctrl->map, ctrl->cfg->mac_l2_port_ctrl,
+				   ctrl->cfg->rx_csum_mask, features & NETIF_F_RXCSUM);
 
 	return 0;
 }
@@ -1549,16 +1551,16 @@ static int rteth_setup_tc(struct net_device *dev, enum tc_setup_type type, void 
 	return ds->ops->port_setup_tc(ds, dp->index, type, type_data);
 }
 
-static const struct net_device_ops rteth_838x_netdev_ops = {
+static const struct net_device_ops rteth_netdev_ops = {
 	.ndo_open		= rteth_open,
 	.ndo_stop		= rteth_stop,
 	.ndo_change_mtu		= rteth_change_mtu,
 	.ndo_start_xmit		= rteth_start_xmit,
 	.ndo_set_mac_address	= rteth_set_mac_address,
 	.ndo_validate_addr	= eth_validate_addr,
-	.ndo_set_rx_mode	= rteth_838x_set_rx_mode,
+	.ndo_set_rx_mode	= rteth_set_rx_mode,
 	.ndo_tx_timeout		= rteth_tx_timeout,
-	.ndo_set_features	= rteth_83xx_set_features,
+	.ndo_set_features	= rteth_set_features,
 	.ndo_setup_tc		= rteth_setup_tc,
 };
 
@@ -1598,20 +1600,8 @@ static const struct rteth_cfg rteth_838x_cfg = {
 	.init_mac		= rteth_838x_init_mac,
 	.set_hol		= rteth_83xx_set_hol,
 	.set_max_packet_length	= rteth_838x_set_max_packet_length,
-	.netdev_ops		= &rteth_838x_netdev_ops,
-};
-
-static const struct net_device_ops rteth_839x_netdev_ops = {
-	.ndo_open		= rteth_open,
-	.ndo_stop		= rteth_stop,
-	.ndo_change_mtu		= rteth_change_mtu,
-	.ndo_start_xmit		= rteth_start_xmit,
-	.ndo_set_mac_address	= rteth_set_mac_address,
-	.ndo_validate_addr	= eth_validate_addr,
-	.ndo_set_rx_mode	= rteth_839x_set_rx_mode,
-	.ndo_tx_timeout		= rteth_tx_timeout,
-	.ndo_set_features	= rteth_83xx_set_features,
-	.ndo_setup_tc		= rteth_setup_tc,
+	.set_rx_mode		= rteth_838x_set_rx_mode,
+	.rx_csum_mask		= BIT(3),
 };
 
 static const struct rteth_cfg rteth_839x_cfg = {
@@ -1649,20 +1639,8 @@ static const struct rteth_cfg rteth_839x_cfg = {
 	.set_hol		= rteth_83xx_set_hol,
 	.set_max_packet_length	= rteth_839x_set_max_packet_length,
 	.setup_notify_buffer	= rteth_839x_setup_notify_buffer,
-	.netdev_ops		= &rteth_839x_netdev_ops,
-};
-
-static const struct net_device_ops rteth_930x_netdev_ops = {
-	.ndo_open		= rteth_open,
-	.ndo_stop		= rteth_stop,
-	.ndo_change_mtu		= rteth_change_mtu,
-	.ndo_start_xmit		= rteth_start_xmit,
-	.ndo_set_mac_address	= rteth_set_mac_address,
-	.ndo_validate_addr	= eth_validate_addr,
-	.ndo_set_rx_mode	= rteth_930x_set_rx_mode,
-	.ndo_tx_timeout		= rteth_tx_timeout,
-	.ndo_set_features	= rteth_93xx_set_features,
-	.ndo_setup_tc		= rteth_setup_tc,
+	.set_rx_mode		= rteth_839x_set_rx_mode,
+	.rx_csum_mask		= BIT(3),
 };
 
 static const struct rteth_cfg rteth_930x_cfg = {
@@ -1700,20 +1678,8 @@ static const struct rteth_cfg rteth_930x_cfg = {
 	.init_mac		= rteth_930x_init_mac,
 	.set_hol		= rteth_93xx_set_hol,
 	.set_max_packet_length	= rteth_930x_set_max_packet_length,
-	.netdev_ops		= &rteth_930x_netdev_ops,
-};
-
-static const struct net_device_ops rteth_931x_netdev_ops = {
-	.ndo_open		= rteth_open,
-	.ndo_stop		= rteth_stop,
-	.ndo_change_mtu		= rteth_change_mtu,
-	.ndo_start_xmit		= rteth_start_xmit,
-	.ndo_set_mac_address	= rteth_set_mac_address,
-	.ndo_validate_addr	= eth_validate_addr,
-	.ndo_set_rx_mode	= rteth_931x_set_rx_mode,
-	.ndo_tx_timeout		= rteth_tx_timeout,
-	.ndo_set_features	= rteth_93xx_set_features,
-	.ndo_setup_tc		= rteth_setup_tc,
+	.set_rx_mode		= rteth_930x_set_rx_mode,
+	.rx_csum_mask		= BIT(4),
 };
 
 static const struct rteth_cfg rteth_931x_cfg = {
@@ -1737,7 +1703,7 @@ static const struct rteth_cfg rteth_931x_cfg = {
 	.mac_force_mode_ctrl	= RTETH_931X_MAC_FORCE_MODE_CTRL,
 	.rst_glb_ctrl		= RTETH_931X_RST_GLB_CTRL,
 	.skb_headroom		= RTETH_SKB_HEADROOM_FAST,
-	.mac_reg		= { RTETH_930X_MAC_L2_ADDR_CTRL },
+	.mac_reg		= { RTETH_931X_MAC_L2_ADDR_CTRL },
 	.l2_tbl_flush_ctrl	= RTETH_931X_L2_TBL_FLUSH_CTRL,
 	.confirm_disable_irqs	= rteth_93xx_confirm_disable_irqs,
 	.enable_rx_irq		= rteth_93xx_enable_rx_irq,
@@ -1751,7 +1717,8 @@ static const struct rteth_cfg rteth_931x_cfg = {
 	.init_mac		= rteth_931x_init_mac,
 	.set_hol		= rteth_93xx_set_hol,
 	.set_max_packet_length	= rteth_931x_set_max_packet_length,
-	.netdev_ops		= &rteth_931x_netdev_ops,
+	.set_rx_mode		= rteth_931x_set_rx_mode,
+	.rx_csum_mask		= BIT(4),
 };
 
 static const struct phylink_mac_ops rteth_mac_ops = {
@@ -1765,17 +1732,26 @@ static const struct ethtool_ops rteth_ethtool_ops = {
 	.set_link_ksettings	= rteth_set_link_ksettings,
 };
 
+static struct metadata_dst *rteth_metadata_dst(unsigned int port, bool trapped)
+{
+	struct metadata_dst *md_dst = metadata_dst_alloc(0, METADATA_HW_PORT_MUX, GFP_KERNEL);
+
+	if (!md_dst)
+		return NULL;
+
+	md_dst->u.port_info.port_id = port;
+	md_dst->u.port_info.trapped = trapped;
+
+	return md_dst;
+}
+
 static int rteth_metadata_dst_alloc(struct rteth_ctrl *ctrl)
 {
-	struct metadata_dst *md_dst;
-
 	for (int i = 0; i < ARRAY_SIZE(ctrl->dsa_meta); i++) {
-		md_dst = metadata_dst_alloc(0, METADATA_HW_PORT_MUX, GFP_KERNEL);
-		if (!md_dst)
+		ctrl->dsa_meta[i] = rteth_metadata_dst(i, false);
+		ctrl->dsa_meta_trapped[i] = rteth_metadata_dst(i, true);
+		if (!ctrl->dsa_meta[i] || !ctrl->dsa_meta_trapped[i])
 			return -ENOMEM;
-
-		md_dst->u.port_info.port_id = i;
-		ctrl->dsa_meta[i] = md_dst;
 	}
 
 	return 0;
@@ -1784,10 +1760,10 @@ static int rteth_metadata_dst_alloc(struct rteth_ctrl *ctrl)
 static void rteth_metadata_dst_free(struct rteth_ctrl *ctrl)
 {
 	for (int i = 0; i < ARRAY_SIZE(ctrl->dsa_meta); i++) {
-		if (!ctrl->dsa_meta[i])
-			continue;
-
-		metadata_dst_free(ctrl->dsa_meta[i]);
+		if (ctrl->dsa_meta[i])
+			metadata_dst_free(ctrl->dsa_meta[i]);
+		if (ctrl->dsa_meta_trapped[i])
+			metadata_dst_free(ctrl->dsa_meta_trapped[i]);
 	}
 }
 
@@ -1858,7 +1834,7 @@ static int rteth_probe(struct platform_device *pdev)
 	dev->max_mtu = ctrl->cfg->max_mtu;
 	dev->features = NETIF_F_RXCSUM;
 	dev->hw_features = NETIF_F_RXCSUM;
-	dev->netdev_ops = ctrl->cfg->netdev_ops;
+	dev->netdev_ops = &rteth_netdev_ops;
 
 	/* Obtain device IRQ number */
 	dev->irq = platform_get_irq(pdev, 0);

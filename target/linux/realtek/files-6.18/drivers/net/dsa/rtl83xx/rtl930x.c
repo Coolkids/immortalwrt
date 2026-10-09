@@ -10,11 +10,69 @@
 #include "pie.h"
 #include "qos.h"
 #include "mirror.h"
+#include "mac.h"
 #include "rtl-otto.h"
 #include "stats.h"
 #include "tc.h"
 #include "vlan.h"
 #include "stp.h"
+
+#define RTL930X_MAC_L2_PORT_CTRL(port)		(0x3268 + (((port) << 6)))
+
+/* MAC maximum packet length (jumbo frame) control.
+ *
+ * The switch MAC drops frames whose L2 length exceeds the configured maximum.
+ * A family holds either one register per user port or a single one for the
+ * whole switch. The length is a direct byte value held in two 14-bit fields
+ * (high-speed links in [13:0], 10/100M links in [27:14]); bit 28 selects
+ * whether VLAN tag bytes count towards the limit.
+ */
+
+/* RTL930x holds one register per user port, inside the 64-byte MAC block of
+ * the port. The CPU port has a row of its own, which the ethernet driver owns
+ * and programs from the conduit MTU. Register offsets taken from the
+ * reverse-engineered Realtek register maps at https://svanheule.net/realtek/
+ */
+#define RTL930X_MAC_L2_PORT_MAX_LEN_CTRL(port)	(0x326C + (((port) << 6)))
+
+/* Largest frame each family switches; the length field would allow 16383 */
+#define RTL930X_MAX_FRAME			12288
+
+#define RTL930X_MAC_FORCE_MODE_CTRL		(0xCA1C)
+
+#define RTL930X_MAC_LINK_STS			(0xCB10)
+
+#define RTL930X_EEE_CTRL(p)			(0x3274 + ((p) << 6))
+
+#define RTL930X_TRK_HASH_CTRL			(0x9F80)
+#define RTL930X_TRK_CTRL			(0x9F88)
+
+#define RTL930X_RMA_BPDU_FLD_PMSK		(0x9F18)
+
+#define RTL930X_IMR_GLB				(0xC628)
+#define RTL930X_IMR_PORT_LINK_STS_CHG		(0xC62C)
+#define RTL930X_ISR_GLB				(0xC658)
+#define RTL930X_ISR_PORT_LINK_STS_CHG		(0xC660)
+
+#define RTL930X_LED_GLB_CTRL			(0xCC00)
+
+#define RTL930X_RMA_BPDU_CTRL			(0x9E7C)
+
+#define RTL930X_RMA_PTP_CTRL			(0x9E88)
+
+#define RTL930X_RMA_LLDP_CTRL			(0x9EFC)
+
+#define RTL930X_RMA_EAPOL_CTRL			(0x9F08)
+#define RTL930X_SPCL_TRAP_PORT_CTRL		(0xA1A0)
+
+/* Port LED Control */
+#define RTL930X_LED_PORT_NUM_CTRL(p)		(0xCC04 + (((p >> 4) << 2)))
+#define RTL930X_LED_SET0_0_CTRL			(0xCC28)
+#define RTL930X_LED_PORT_COPR_SET_SEL_CTRL(p)	(0xCC2C + (((p >> 4) << 2)))
+#define RTL930X_LED_PORT_FIB_SET_SEL_CTRL(p)	(0xCC34 + (((p >> 4) << 2)))
+#define RTL930X_LED_PORT_COPR_MASK_CTRL		(0xCC3C)
+#define RTL930X_LED_PORT_FIB_MASK_CTRL		(0xCC40)
+#define RTL930X_LED_PORT_COMBO_MASK_CTRL	(0xCC44)
 
 #define RTL930X_LED_GLB_ACTIVE_LOW				BIT(22)
 #define RTL930X_LED_CLK_SEL_MASK				GENMASK(17, 16)
@@ -31,104 +89,6 @@
 
 /* get shift for given led in any set */
 #define RTL930X_LED_SET_LEDX_SHIFT(x) (16 * (x % 2))
-
-const struct rtldsa_mib_list_item rtldsa_930x_mib_list[] = {
-	MIB_LIST_ITEM("ifOutDiscards", MIB_ITEM(MIB_REG_STD, 0xbc, 1)),
-	MIB_LIST_ITEM("dot1dTpPortInDiscards", MIB_ITEM(MIB_REG_STD, 0xb8, 1)),
-	MIB_LIST_ITEM("DropEvents", MIB_ITEM(MIB_REG_STD, 0x90, 1)),
-	MIB_LIST_ITEM("tx_BroadcastPkts", MIB_ITEM(MIB_REG_STD, 0x8c, 1)),
-	MIB_LIST_ITEM("tx_MulticastPkts", MIB_ITEM(MIB_REG_STD, 0x88, 1)),
-	MIB_LIST_ITEM("tx_CRCAlignErrors", MIB_ITEM(MIB_REG_STD, 0x84, 1)),
-	MIB_LIST_ITEM("tx_UndersizePkts", MIB_ITEM(MIB_REG_STD, 0x7c, 1)),
-	MIB_LIST_ITEM("tx_OversizePkts", MIB_ITEM(MIB_REG_STD, 0x74, 1)),
-	MIB_LIST_ITEM("tx_Fragments", MIB_ITEM(MIB_REG_STD, 0x6c, 1)),
-	MIB_LIST_ITEM("tx_Jabbers", MIB_ITEM(MIB_REG_STD, 0x64, 1)),
-	MIB_LIST_ITEM("tx_Collisions", MIB_ITEM(MIB_REG_STD, 0x5c, 1)),
-	MIB_LIST_ITEM("rx_UndersizeDropPkts", MIB_ITEM(MIB_REG_PRV, 0x7c, 1)),
-	MIB_LIST_ITEM("tx_PktsFlexibleOctetsSet1", MIB_ITEM(MIB_REG_PRV, 0x68, 1)),
-	MIB_LIST_ITEM("rx_PktsFlexibleOctetsSet1", MIB_ITEM(MIB_REG_PRV, 0x64, 1)),
-	MIB_LIST_ITEM("tx_PktsFlexibleOctetsCRCSet1", MIB_ITEM(MIB_REG_PRV, 0x60, 1)),
-	MIB_LIST_ITEM("rx_PktsFlexibleOctetsCRCSet1", MIB_ITEM(MIB_REG_PRV, 0x5c, 1)),
-	MIB_LIST_ITEM("tx_PktsFlexibleOctetsSet0", MIB_ITEM(MIB_REG_PRV, 0x58, 1)),
-	MIB_LIST_ITEM("rx_PktsFlexibleOctetsSet0", MIB_ITEM(MIB_REG_PRV, 0x54, 1)),
-	MIB_LIST_ITEM("tx_PktsFlexibleOctetsCRCSet0", MIB_ITEM(MIB_REG_PRV, 0x50, 1)),
-	MIB_LIST_ITEM("rx_PktsFlexibleOctetsCRCSet0", MIB_ITEM(MIB_REG_PRV, 0x4c, 1)),
-	MIB_LIST_ITEM("LengthFieldError", MIB_ITEM(MIB_REG_PRV, 0x48, 1)),
-	MIB_LIST_ITEM("FalseCarrierTimes", MIB_ITEM(MIB_REG_PRV, 0x44, 1)),
-	MIB_LIST_ITEM("UndersizeOctets", MIB_ITEM(MIB_REG_PRV, 0x40, 1)),
-	MIB_LIST_ITEM("FramingErrors", MIB_ITEM(MIB_REG_PRV, 0x3c, 1)),
-	MIB_LIST_ITEM("ParserErrors", MIB_ITEM(MIB_REG_PRV, 0x38, 1)),
-	MIB_LIST_ITEM("rx_MacDiscards", MIB_ITEM(MIB_REG_PRV, 0x34, 1)),
-	MIB_LIST_ITEM("rx_MacIPGShortDrop", MIB_ITEM(MIB_REG_PRV, 0x30, 1))
-};
-
-const struct rtldsa_mib_desc rtldsa_930x_mib_desc = {
-	.symbol_errors = MIB_ITEM(MIB_REG_STD, 0xa0, 1),
-
-	.if_in_octets = MIB_ITEM(MIB_REG_STD, 0xf8, 2),
-	.if_out_octets = MIB_ITEM(MIB_REG_STD, 0xf0, 2),
-	.if_in_ucast_pkts = MIB_ITEM(MIB_REG_STD, 0xe8, 2),
-	.if_in_mcast_pkts = MIB_ITEM(MIB_REG_STD, 0xe0, 2),
-	.if_in_bcast_pkts = MIB_ITEM(MIB_REG_STD, 0xd8, 2),
-	.if_out_ucast_pkts = MIB_ITEM(MIB_REG_STD, 0xd0, 2),
-	.if_out_mcast_pkts = MIB_ITEM(MIB_REG_STD, 0xc8, 2),
-	.if_out_bcast_pkts = MIB_ITEM(MIB_REG_STD, 0xc0, 2),
-	.if_out_discards = MIB_ITEM(MIB_REG_STD, 0xbc, 1),
-	.single_collisions = MIB_ITEM(MIB_REG_STD, 0xb4, 1),
-	.multiple_collisions = MIB_ITEM(MIB_REG_STD, 0xb0, 1),
-	.deferred_transmissions = MIB_ITEM(MIB_REG_STD, 0xac, 1),
-	.late_collisions = MIB_ITEM(MIB_REG_STD, 0xa8, 1),
-	.excessive_collisions = MIB_ITEM(MIB_REG_STD, 0xa4, 1),
-	.crc_align_errors = MIB_ITEM(MIB_REG_STD, 0x80, 1),
-	.rx_pkts_over_max_octets = MIB_ITEM(MIB_REG_PRV, 0x6c, 1),
-
-	.unsupported_opcodes = MIB_ITEM(MIB_REG_STD, 0x9c, 1),
-
-	.rx_undersize_pkts = MIB_ITEM(MIB_REG_STD, 0x78, 1),
-	.rx_oversize_pkts = MIB_ITEM(MIB_REG_STD, 0x70, 1),
-	.rx_fragments = MIB_ITEM(MIB_REG_STD, 0x68, 1),
-	.rx_jabbers = MIB_ITEM(MIB_REG_STD, 0x60, 1),
-
-	.tx_pkts = {
-		MIB_ITEM(MIB_REG_STD, 0x58, 1),
-		MIB_ITEM(MIB_REG_STD, 0x50, 1),
-		MIB_ITEM(MIB_REG_STD, 0x48, 1),
-		MIB_ITEM(MIB_REG_STD, 0x40, 1),
-		MIB_ITEM(MIB_REG_STD, 0x38, 1),
-		MIB_ITEM(MIB_REG_STD, 0x30, 1),
-		MIB_ITEM(MIB_REG_PRV, 0x78, 1),
-		MIB_ITEM(MIB_REG_PRV, 0x70, 1)
-	},
-	.rx_pkts = {
-		MIB_ITEM(MIB_REG_STD, 0x54, 1),
-		MIB_ITEM(MIB_REG_STD, 0x4c, 1),
-		MIB_ITEM(MIB_REG_STD, 0x44, 1),
-		MIB_ITEM(MIB_REG_STD, 0x3c, 1),
-		MIB_ITEM(MIB_REG_STD, 0x34, 1),
-		MIB_ITEM(MIB_REG_STD, 0x2c, 1),
-		MIB_ITEM(MIB_REG_PRV, 0x74, 1),
-		MIB_ITEM(MIB_REG_PRV, 0x6c, 1),
-	},
-	.rmon_ranges = {
-		{ 0, 64 },
-		{ 65, 127 },
-		{ 128, 255 },
-		{ 256, 511 },
-		{ 512, 1023 },
-		{ 1024, 1518 },
-		{ 1519, 12288 },
-		{ 12289, 65535 }
-	},
-
-	.drop_events = MIB_ITEM(MIB_REG_STD, 0x90, 1),
-	.collisions = MIB_ITEM(MIB_REG_STD, 0x5c, 1),
-
-	.rx_pause_frames = MIB_ITEM(MIB_REG_STD, 0x98, 1),
-	.tx_pause_frames = MIB_ITEM(MIB_REG_STD, 0x94, 1),
-
-	.list_count = ARRAY_SIZE(rtldsa_930x_mib_list),
-	.list = rtldsa_930x_mib_list
-};
 
 void rtldsa_930x_print_matrix(void)
 {
@@ -320,8 +280,6 @@ static void rtl930x_init_eee(struct rtl838x_switch_priv *priv, bool enable)
 	priv->eee_enabled = enable;
 }
 
-#ifdef CONFIG_NET_DSA_RTL83XX_RTL930X_L3_OFFLOAD
-
 // Currently not used
 // static u32 rtl930x_l3_hash6(struct in6_addr *ip6, int algorithm, bool move_dip)
 // {
@@ -424,8 +382,6 @@ static void rtl930x_init_eee(struct rtl838x_switch_priv *priv, bool enable)
 
 // 	return mtu_id;
 // }
-
-#endif /* CONFIG_NET_DSA_RTL83XX_RTL930X_L3_OFFLOAD */
 
 /* A PIE rule logs its matched packets into the LOG table entry that carries
  * its own rule ID, in data word 1 - one entry per rule. Counters handed out
@@ -674,7 +630,7 @@ const struct rtldsa_config rtldsa_930x_cfg = {
 	.l2_ctrl_0 = RTL930X_L2_CTRL,
 	.l2_ctrl_1 = RTL930X_L2_AGE_CTRL,
 	.l2_port_aging_out = RTL930X_L2_PORT_AGE_CTRL,
-	.set_ageing_time = rtl930x_set_ageing_time,
+	.set_ageing_time = otto_l2_930x_set_ageing_time,
 	.l2_tbl_flush_ctrl = RTL930X_L2_TBL_FLUSH_CTRL,
 	.isr_glb_src = RTL930X_ISR_GLB,
 	.isr_port_link_sts_chg = RTL930X_ISR_PORT_LINK_STS_CHG,
@@ -684,13 +640,13 @@ const struct rtldsa_config rtldsa_930x_cfg = {
 	.n_pie_blocks = 16,
 	.pie_rule_id_is_log_counter = true,
 	.port_ignore = 0x3f,
-	.vlan_tables_read = rtl930x_vlan_tables_read,
-	.vlan_set_tagged = rtl930x_vlan_set_tagged,
-	.vlan_set_untagged = rtl930x_vlan_set_untagged,
-	.vlan_profile_get = rtldsa_930x_vlan_profile_get,
-	.vlan_profile_dump = rtldsa_930x_vlan_profile_dump,
-	.vlan_profile_setup = rtl930x_vlan_profile_setup,
-	.vlan_fwd_on_inner = rtl930x_vlan_fwd_on_inner,
+	.vlan_tables_read = otto_vlan_930x_tables_read,
+	.vlan_set_tagged = otto_vlan_930x_set_tagged,
+	.vlan_set_untagged = otto_vlan_930x_set_untagged,
+	.vlan_profile_get = otto_vlan_930x_profile_get,
+	.vlan_profile_dump = otto_vlan_930x_profile_dump,
+	.vlan_profile_setup = otto_vlan_930x_profile_setup,
+	.vlan_fwd_on_inner = otto_vlan_930x_port_forward_on_inner,
 	.set_vlan_igr_filter = rtl930x_set_igr_filter,
 	.set_vlan_egr_filter = rtl930x_set_egr_filter,
 	.stp_get = rtldsa_930x_stp_get,
@@ -703,40 +659,40 @@ const struct rtldsa_config rtldsa_930x_cfg = {
 			    MAC_1000FD | MAC_2500FD | MAC_5000FD | MAC_10000FD,
 	.mac_max_len_reg = rtl930x_mac_max_len_reg,
 	.max_frame = RTL930X_MAX_FRAME,
-	.l2_port_new_salrn = rtl930x_l2_port_new_salrn,
-	.l2_port_new_sa_fwd = rtl930x_l2_port_new_sa_fwd,
+	.l2_port_new_salrn = otto_l2_930x_port_new_salrn,
+	.l2_port_new_sa_fwd = otto_l2_930x_port_new_sa_fwd,
 	.get_mirror_config = rtldsa_930x_get_mirror_config,
 	.port_rate_police_add = rtldsa_930x_port_rate_police_add,
 	.port_rate_police_del = rtldsa_930x_port_rate_police_del,
 	.print_matrix = rtldsa_930x_print_matrix,
-	.read_l2_entry_using_hash = rtl930x_read_l2_entry_using_hash,
-	.write_l2_entry_using_hash = rtl930x_write_l2_entry_using_hash,
-	.read_cam = rtl930x_read_cam,
-	.write_cam = rtl930x_write_cam,
-	.vlan_port_keep_tag_set = rtl930x_vlan_port_keep_tag_set,
-	.vlan_port_pvidmode_set = rtl930x_vlan_port_pvidmode_set,
-	.vlan_port_pvid_set = rtl930x_vlan_port_pvid_set,
-	.fast_age = rtldsa_930x_fast_age,
+	.read_l2_entry_using_hash = otto_l2_930x_read_entry_using_hash,
+	.write_l2_entry_using_hash = otto_l2_930x_write_entry_using_hash,
+	.read_cam = otto_l2_930x_read_cam,
+	.write_cam = otto_l2_930x_write_cam,
+	.vlan_port_keep_tag_set = otto_vlan_930x_port_keep_tag_set,
+	.vlan_port_pvidmode_set = otto_vlan_930x_port_pvid_mode_set,
+	.vlan_port_pvid_set = otto_vlan_930x_port_pvid_set,
+	.fast_age = otto_l2_930x_fast_age,
 	.trk_mbr_ctr = rtl930x_trk_mbr_ctr,
 	.rma_bpdu_fld_pmask = RTL930X_RMA_BPDU_FLD_PMSK,
 	.init_eee = rtl930x_init_eee,
 	.set_mac_eee = rtldsa_930x_set_mac_eee,
-	.l2_hash_seed = rtl930x_l2_hash_seed,
-	.l2_hash_key = rtl930x_l2_hash_key,
-	.read_mcast_pmask = rtl930x_read_mcast_pmask,
-	.write_mcast_pmask = rtl930x_write_mcast_pmask,
+	.l2_hash_seed = otto_l2_930x_hash_seed,
+	.l2_hash_key = otto_l2_930x_hash_key,
+	.read_mcast_pmask = otto_l2_930x_read_mcast_pmask,
+	.write_mcast_pmask = otto_l2_930x_write_mcast_pmask,
 	.pie_init = rtl930x_pie_init,
 	.pie_rule_write = rtl930x_pie_rule_write,
 	.pie_rule_add = rtl930x_pie_rule_add,
 	.pie_rule_rm = rtl930x_pie_rule_rm,
-	.l2_learning_setup = rtl930x_l2_learning_setup,
+	.l2_learning_setup = otto_l2_930x_learning_setup,
 	.packet_cntr_read = rtl930x_packet_cntr_read,
 	.packet_cntr_clear = rtl930x_packet_cntr_clear,
 	.led_init = rtl930x_led_init,
-	.enable_learning = rtldsa_930x_enable_learning,
-	.enable_l2_new_sa_fwd = rtldsa_930x_l2_port_new_sa_fwd,
-	.enable_flood = rtldsa_930x_enable_flood,
-	.enable_bcast_flood = rtldsa_930x_enable_bcast_flood,
+	.enable_learning = otto_l2_930x_enable_learning,
+	.enable_l2_new_sa_fwd = otto_l2_930x_set_port_new_sa_fwd,
+	.enable_flood = otto_l2_930x_enable_flood,
+	.enable_bcast_flood = otto_l2_930x_enable_bcast_flood,
 	.set_receive_management_action = rtldsa_930x_set_receive_management_action,
 	.qos_init = rtldsa_930x_qos_init,
 	.trk_ctrl = RTL930X_TRK_CTRL,
