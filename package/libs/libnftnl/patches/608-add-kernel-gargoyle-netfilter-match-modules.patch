@@ -41,7 +41,7 @@
 +void set_kernel_timezone(void);
 +
 +static int nftnl_expr_bandwidth_set(struct nftnl_expr *e, uint16_t type,
-+				 const void *data, uint32_t data_len)
++				 const void *data, uint32_t data_len, uint32_t byteorder)
 +{
 +	struct nftnl_expr_bandwidth *bandwidth = nftnl_expr_data(e);
 +	char *new_value;
@@ -597,7 +597,7 @@
 +};
 +
 +static int nftnl_expr_timerange_set(struct nftnl_expr *e, uint16_t type,
-+				 const void *data, uint32_t data_len)
++				 const void *data, uint32_t data_len, uint32_t byteorder)
 +{
 +	struct nftnl_expr_timerange *timerange = nftnl_expr_data(e);
 +	char *new_value;
@@ -968,7 +968,7 @@
 +}
 +
 +static int nftnl_expr_webmon_set(struct nftnl_expr *e, uint16_t type,
-+				 const void *data, uint32_t data_len)
++				 const void *data, uint32_t data_len, uint32_t byteorder)
 +{
 +	struct nftnl_expr_webmon *webmon = nftnl_expr_data(e);
 +	char *new_value;
@@ -1234,7 +1234,7 @@
 +};
 +
 +static int nftnl_expr_weburl_set(struct nftnl_expr *e, uint16_t type,
-+				 const void *data, uint32_t data_len)
++				 const void *data, uint32_t data_len, uint32_t byteorder)
 +{
 +	struct nftnl_expr_weburl *weburl = nftnl_expr_data(e);
 +	char *new_value;
