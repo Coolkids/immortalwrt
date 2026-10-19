@@ -1,5 +1,5 @@
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ libnftnl.new/src/expr/bandwidth.c	2026-09-09 20:55:16.183494114 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ libnftnl.new/src/expr/bandwidth.c	2026-10-19 09:59:27.843755046 +0800
 @@ -0,0 +1,566 @@
 +#include <stdio.h>
 +#include <stdint.h>
@@ -567,8 +567,8 @@
 +	settimeofday(NULL, &new_tz);
 +#endif
 +}
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ libnftnl.new/src/expr/timerange.c	2026-09-09 20:55:14.512319113 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ libnftnl.new/src/expr/timerange.c	2026-10-19 09:59:26.014151480 +0800
 @@ -0,0 +1,296 @@
 +#include <stdio.h>
 +#include <stdint.h>
@@ -866,8 +866,8 @@
 +	settimeofday(NULL, &new_tz);
 +#endif
 +}
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ libnftnl.new/src/expr/webmon.c	2026-09-09 20:55:13.133454365 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ libnftnl.new/src/expr/webmon.c	2026-10-19 09:59:24.525639180 +0800
 @@ -0,0 +1,340 @@
 +#include <stdio.h>
 +#include <stdint.h>
@@ -1209,8 +1209,8 @@
 +	.build		= nftnl_expr_webmon_build,
 +	.output	= nftnl_expr_webmon_snprintf,
 +};
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ libnftnl.new/src/expr/weburl.c	2026-09-09 20:55:11.697049401 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ libnftnl.new/src/expr/weburl.c	2026-10-19 09:59:23.145032540 +0800
 @@ -0,0 +1,194 @@
 +#include <stdio.h>
 +#include <stdint.h>
@@ -1406,8 +1406,8 @@
 +	.build		= nftnl_expr_weburl_build,
 +	.output	= nftnl_expr_weburl_snprintf,
 +};
---- libnftnl.orig/src/expr_ops.c	2026-09-09 20:55:09.657007008 +0800
-+++ libnftnl.new/src/expr_ops.c	2026-09-09 20:55:16.160461128 +0800
+--- libnftnl.orig/src/expr_ops.c	2026-10-19 09:59:21.412890841 +0800
++++ libnftnl.new/src/expr_ops.c	2026-10-19 09:59:27.821716126 +0800
 @@ -31,6 +31,10 @@
  extern struct expr_ops expr_ops_range;
  extern struct expr_ops expr_ops_redir;
@@ -1430,8 +1430,8 @@
  	&expr_ops_rt,
  	&expr_ops_queue,
  	&expr_ops_quota,
---- libnftnl.orig/src/Makefile.am	2026-09-09 20:55:09.651897057 +0800
-+++ libnftnl.new/src/Makefile.am	2026-09-09 20:55:16.264463455 +0800
+--- libnftnl.orig/src/Makefile.am	2026-10-19 09:59:21.412677006 +0800
++++ libnftnl.new/src/Makefile.am	2026-10-19 09:59:27.923718506 +0800
 @@ -8,6 +8,10 @@
  libnftnl_la_SOURCES = utils.c		\
  		      batch.c		\
@@ -1443,8 +1443,8 @@
  		      common.c		\
  		      gen.c		\
  		      table.c		\
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ libnftnl.new/include/linux/netfilter/weburl.h	2026-09-09 20:55:11.566528820 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ libnftnl.new/include/linux/netfilter/weburl.h	2026-10-19 09:59:23.039053953 +0800
 @@ -0,0 +1,15 @@
 +#ifndef _WEBURL_H
 +#define _WEBURL_H
@@ -1462,8 +1462,8 @@
 +
 +#endif /* _WEBURL_H */
 \ 文件末尾没有换行符
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ libnftnl.new/include/linux/netfilter/timerange.h	2026-09-09 20:55:14.392866718 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ libnftnl.new/include/linux/netfilter/timerange.h	2026-10-19 09:59:25.905637713 +0800
 @@ -0,0 +1,17 @@
 +#ifndef _TIMERANGE_H
 +#define _TIMERANGE_H
@@ -1483,8 +1483,8 @@
 +
 +#endif /* _TIMERANGE_H */
 \ 文件末尾没有换行符
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ libnftnl.new/include/linux/netfilter/webmon.h	2026-09-09 20:55:13.009457035 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ libnftnl.new/include/linux/netfilter/webmon.h	2026-10-19 09:59:24.383027395 +0800
 @@ -0,0 +1,26 @@
 +#ifndef _WEBMON_H
 +#define _WEBMON_H
@@ -1513,8 +1513,8 @@
 +
 +#endif /* _WEBMON_H */
 \ 文件末尾没有换行符
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ libnftnl.new/include/linux/netfilter/bandwidth.h	2026-09-09 20:55:16.039866836 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ libnftnl.new/include/linux/netfilter/bandwidth.h	2026-10-19 09:59:27.710775251 +0800
 @@ -0,0 +1,31 @@
 +#ifndef _BANDWIDTH_H
 +#define _BANDWIDTH_H
@@ -1548,8 +1548,8 @@
 +
 +#endif /* _BANDWIDTH_H */
 \ 文件末尾没有换行符
---- libnftnl.orig/include/linux/netfilter/nf_tables.h	2026-09-09 20:55:09.646315403 +0800
-+++ libnftnl.new/include/linux/netfilter/nf_tables.h	2026-09-09 20:55:16.236462828 +0800
+--- libnftnl.orig/include/linux/netfilter/nf_tables.h	2026-10-19 09:59:21.412163493 +0800
++++ libnftnl.new/include/linux/netfilter/nf_tables.h	2026-10-19 09:59:27.899717946 +0800
 @@ -1442,6 +1442,53 @@
  };
  #define NFTA_REJECT_MAX		(__NFTA_REJECT_MAX - 1)
@@ -1604,9 +1604,9 @@
  /**
   * enum nft_nat_types - nf_tables nat expression NAT types
   *
---- libnftnl.orig/include/libnftnl/expr.h	2026-09-09 20:55:09.643661039 +0800
-+++ libnftnl.new/include/libnftnl/expr.h	2026-09-09 20:55:16.013457839 +0800
-@@ -48,6 +48,50 @@
+--- libnftnl.orig/include/libnftnl/expr.h	2026-10-19 09:59:21.411571531 +0800
++++ libnftnl.new/include/libnftnl/expr.h	2026-10-19 09:59:27.681712858 +0800
+@@ -49,6 +49,50 @@
  int nftnl_expr_fprintf(FILE *fp, const struct nftnl_expr *expr, uint32_t type, uint32_t flags);
  
  enum {

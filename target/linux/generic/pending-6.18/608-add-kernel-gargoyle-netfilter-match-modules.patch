@@ -1,5 +1,5 @@
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/nft_weburl.c	2026-09-09 20:55:10.267709627 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/nft_weburl.c	2026-10-19 09:59:21.926198182 +0800
 @@ -0,0 +1,688 @@
 +/*  weburl --	An nftables extension to match URLs in HTTP(S) requests
 + *  			This module can match using string match or regular expressions
@@ -689,8 +689,8 @@
 +
 +module_init(init);
 +module_exit(fini);
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/nft_bandwidth.c	2026-09-09 20:55:14.602134868 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/nft_bandwidth.c	2026-10-19 09:59:26.103220976 +0800
 @@ -0,0 +1,3557 @@
 +/*  bandwidth --	An netfilter module for bandwidth monitoring/control
 + *  			Can be used to efficiently monitor bandwidth and/or implement bandwidth quotas
@@ -4249,8 +4249,8 @@
 +module_init(init);
 +module_exit(fini);
 +
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/nft_webmon.mod.c	2026-09-09 20:55:11.806632048 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/nft_webmon.mod.c	2026-10-19 09:59:23.230554981 +0800
 @@ -0,0 +1,19 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -4271,8 +4271,8 @@
 +__attribute_used__
 +__attribute__((section(".modinfo"))) =
 +"depends=";
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/bandwidth_deps/tree_map.h	2026-09-09 20:55:14.601630594 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/bandwidth_deps/tree_map.h	2026-10-19 09:59:26.102879859 +0800
 @@ -0,0 +1,1116 @@
 +/*
 + * Copyright © 2008 by Eric Bishop <eric@gargoyle-router.com>
@@ -5390,8 +5390,8 @@
 +	}
 +	return hashed_key;
 +}
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/weburl_deps/tree_map.h	2026-09-09 20:55:10.273083902 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/weburl_deps/tree_map.h	2026-10-19 09:59:21.929618976 +0800
 @@ -0,0 +1,1089 @@
 +/*
 + * Copyright © 2008 by Eric Bishop <eric@gargoyle-router.com>
@@ -6482,8 +6482,8 @@
 +	return hashed_key;
 +}
 +
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/weburl_deps/regexp.h	2026-09-09 20:55:10.272156857 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/weburl_deps/regexp.h	2026-10-19 09:59:21.927750080 +0800
 @@ -0,0 +1,40 @@
 +/*
 + * Definitions etc. for regexp(3) routines.
@@ -6525,16 +6525,16 @@
 +void regerror(char *s);
 +
 +#endif
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/weburl_deps/regmagic.h	2026-09-09 20:55:10.272805031 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/weburl_deps/regmagic.h	2026-10-19 09:59:21.928466919 +0800
 @@ -0,0 +1,5 @@
 +/*
 + * The first byte of the regexp internal "program" is actually this magic
 + * number; the start node begins in the second byte.
 + */
 +#define	MAGIC	0234
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/weburl_deps/regexp.c	2026-09-09 20:55:10.267872215 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/weburl_deps/regexp.c	2026-10-19 09:59:21.926307690 +0800
 @@ -0,0 +1,1224 @@
 +/*
 + * regcomp and regexec -- regsub and regerror are elsewhere
@@ -7760,8 +7760,8 @@
 +}
 +#endif
 +
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/nft_webmon.c	2026-09-09 20:55:11.806524264 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/nft_webmon.c	2026-10-19 09:59:23.230489848 +0800
 @@ -0,0 +1,2252 @@
 +/*  webmon --	An nftables extension module to match URLs in HTTP(S) requests
 + *  		This module records visited URLs and makes them available via procfs
@@ -10015,9 +10015,9 @@
 +
 +module_init(init);
 +module_exit(fini);
---- linux.orig/net/netfilter/Kconfig	2026-09-09 20:55:06.171421002 +0800
-+++ linux.new/net/netfilter/Kconfig	2026-09-09 20:55:14.649427326 +0800
-@@ -1673,6 +1673,42 @@
+--- linux.orig/net/netfilter/Kconfig	2026-10-19 09:59:18.245703287 +0800
++++ linux.new/net/netfilter/Kconfig	2026-10-19 09:59:26.150677111 +0800
+@@ -1681,6 +1681,42 @@
  
  endif # NETFILTER_XTABLES
  
@@ -10060,8 +10060,8 @@
  endmenu
  
  source "net/netfilter/ipset/Kconfig"
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/nft_bandwidth.mod.c	2026-09-09 20:55:14.602280374 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/nft_bandwidth.mod.c	2026-10-19 09:59:26.103337096 +0800
 @@ -0,0 +1,19 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -10082,8 +10082,8 @@
 +__attribute_used__
 +__attribute__((section(".modinfo"))) =
 +"depends=";
---- linux.orig/net/netfilter/Makefile	2026-09-09 20:55:06.171887785 +0800
-+++ linux.new/net/netfilter/Makefile	2026-09-09 20:55:14.625426790 +0800
+--- linux.orig/net/netfilter/Makefile	2026-10-19 09:59:18.004137404 +0800
++++ linux.new/net/netfilter/Makefile	2026-10-19 09:59:26.126676550 +0800
 @@ -106,6 +106,10 @@
  endif
  
@@ -10106,8 +10106,8 @@
  obj-$(CONFIG_NETFILTER_XT_MATCH_ADDRTYPE) += xt_addrtype.o
  obj-$(CONFIG_NETFILTER_XT_MATCH_BPF) += xt_bpf.o
  obj-$(CONFIG_NETFILTER_XT_MATCH_CLUSTER) += xt_cluster.o
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/xt_webmon.c	2026-09-09 20:55:09.967315308 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/xt_webmon.c	2026-10-19 09:59:21.640849265 +0800
 @@ -0,0 +1,1763 @@
 +/*  webmon --	A netfilter module to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
@@ -11872,8 +11872,8 @@
 +module_init(init);
 +module_exit(fini);
 +
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/nft_timerange.mod.c	2026-09-09 20:55:13.225539342 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/nft_timerange.mod.c	2026-10-19 09:59:24.632719801 +0800
 @@ -0,0 +1,19 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -11894,8 +11894,8 @@
 +__attribute_used__
 +__attribute__((section(".modinfo"))) =
 +"depends=";
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/xt_weburl.c	2026-09-09 20:55:09.856263338 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/xt_weburl.c	2026-10-19 09:59:21.529715273 +0800
 @@ -0,0 +1,579 @@
 +/*  weburl --	A netfilter module to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
@@ -12476,8 +12476,8 @@
 +
 +module_init(init);
 +module_exit(fini);
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/webmon_deps/tree_map.h	2026-09-09 20:55:11.806729342 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/webmon_deps/tree_map.h	2026-10-19 09:59:23.230775817 +0800
 @@ -0,0 +1,1089 @@
 +/*
 + * Copyright © 2008 by Eric Bishop <eric@gargoyle-router.com>
@@ -13568,8 +13568,8 @@
 +	return hashed_key;
 +}
 +
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/nft_weburl.mod.c	2026-09-09 20:55:10.267777015 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/nft_weburl.mod.c	2026-10-19 09:59:21.926251624 +0800
 @@ -0,0 +1,19 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -13590,8 +13590,8 @@
 +__attribute_used__
 +__attribute__((section(".modinfo"))) =
 +"depends=";
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/xt_bandwidth.mod.c	2026-09-09 20:55:10.178412494 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/xt_bandwidth.mod.c	2026-10-19 09:59:21.837704361 +0800
 @@ -0,0 +1,20 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -13613,8 +13613,8 @@
 +__attribute__((section(".modinfo"))) =
 +"depends=";
 +
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/nft_timerange.c	2026-09-09 20:55:13.225465753 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/nft_timerange.c	2026-10-19 09:59:24.632670528 +0800
 @@ -0,0 +1,850 @@
 +/*  timerange --	An nftables extension to match multiple timeranges within a week
 + *  			Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -14466,8 +14466,8 @@
 +
 +module_init(init);
 +module_exit(fini);
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/xt_weburl.mod.c	2026-09-09 20:55:09.856301951 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/xt_weburl.mod.c	2026-10-19 09:59:21.529747474 +0800
 @@ -0,0 +1,20 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -14489,8 +14489,8 @@
 +__attribute__((section(".modinfo"))) =
 +"depends=";
 +
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/xt_timerange.mod.c	2026-09-09 20:55:10.069443454 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/xt_timerange.mod.c	2026-10-19 09:59:21.743903637 +0800
 @@ -0,0 +1,20 @@
 +#include <linux/module.h>
 +#include <linux/vermagic.h>
@@ -14512,8 +14512,8 @@
 +__attribute__((section(".modinfo"))) =
 +"depends=";
 +
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/xt_timerange.c	2026-09-09 20:55:10.069307076 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/xt_timerange.c	2026-10-19 09:59:21.743861157 +0800
 @@ -0,0 +1,147 @@
 +/*  timerange --	An xtables extension to match multiple timeranges within a week
 + *  			Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -14662,8 +14662,8 @@
 +module_init(init);
 +module_exit(fini);
 +
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/net/netfilter/xt_bandwidth.c	2026-09-09 20:55:10.178258933 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/net/netfilter/xt_bandwidth.c	2026-10-19 09:59:21.837597458 +0800
 @@ -0,0 +1,3152 @@
 +/*  bandwidth --	An xtables extension for bandwidth monitoring/control
 + *  			Can be used to efficiently monitor bandwidth and/or implement bandwidth quotas
@@ -17817,8 +17817,8 @@
 +
 +module_init(init);
 +module_exit(fini);
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/include/linux/netfilter/nft_bandwidth.h	2026-09-09 20:55:14.604934667 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/include/linux/netfilter/nft_bandwidth.h	2026-10-19 09:59:26.105714021 +0800
 @@ -0,0 +1,137 @@
 +/*  bandwidth --	An nftables extension for bandwidth monitoring/control
 + *  			Can be used to efficiently monitor bandwidth and/or implement bandwidth quotas
@@ -17957,8 +17957,8 @@
 +	unsigned long* ref_count;
 +};
 +#endif /*_NFT_BANDWIDTH_H*/
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/include/linux/netfilter/xt_webmon.h	2026-09-09 20:55:09.971627497 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/include/linux/netfilter/xt_webmon.h	2026-10-19 09:59:21.644571928 +0800
 @@ -0,0 +1,69 @@
 +/*  webmon --	A netfilter module to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
@@ -18029,8 +18029,8 @@
 +};
 +
 +#endif /*_XT_WEBMON_H*/
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/include/linux/netfilter/nft_timerange.h	2026-09-09 20:55:13.227805382 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/include/linux/netfilter/nft_timerange.h	2026-10-19 09:59:24.635084049 +0800
 @@ -0,0 +1,61 @@
 +/*  timerange --	An nftables extension to match multiple timeranges within a week
 + *  			Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -18093,8 +18093,8 @@
 +char** split_on_separators(char* line_str, char* separators, int num_separators, int max_pieces, int include_remainder_at_max);
 +char* trim_flanking_whitespace(char* str);
 +#endif /*_NFT_TIMERANGE_MT_H*/
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/include/linux/netfilter/xt_timerange.h	2026-09-09 20:55:10.072685627 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/include/linux/netfilter/xt_timerange.h	2026-10-19 09:59:21.746497503 +0800
 @@ -0,0 +1,43 @@
 +/*  timerange --	An xtables extension to match multiple timeranges within a week
 + *  			Originally designed for use with Gargoyle router firmware (gargoyle-router.com)
@@ -18139,8 +18139,8 @@
 +	unsigned char invert;
 +};
 +#endif /*_XT_TIMERANGE_H*/
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/include/linux/netfilter/xt_bandwidth.h	2026-09-09 20:55:10.180905242 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/include/linux/netfilter/xt_bandwidth.h	2026-10-19 09:59:21.839994922 +0800
 @@ -0,0 +1,111 @@
 +/*  bandwidth --	An xtables extension for bandwidth monitoring/control
 + *  			Can be used to efficiently monitor bandwidth and/or implement bandwidth quotas
@@ -18253,8 +18253,8 @@
 +
 +};
 +#endif /*_XT_BANDWIDTH_H*/
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/include/linux/netfilter/nft_webmon.h	2026-09-09 20:55:11.808998305 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/include/linux/netfilter/nft_webmon.h	2026-10-19 09:59:23.232874680 +0800
 @@ -0,0 +1,98 @@
 +/*  webmon --	An nftables extension to match URLs in HTTP(S) requests
 + *  			This module records visited URLs and makes them available via procfs
@@ -18354,8 +18354,8 @@
 +	uint32_t* ref_count;
 +};
 +#endif /*_NFT_WEBMON_H*/
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/include/linux/netfilter/nft_weburl.h	2026-09-09 20:55:10.276329496 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/include/linux/netfilter/nft_weburl.h	2026-10-19 09:59:21.931773721 +0800
 @@ -0,0 +1,61 @@
 +/*  weburl --	An nftables extension to match URLs in HTTP(S) requests
 + *  			This module can match using string match or regular expressions
@@ -18418,8 +18418,8 @@
 +	bool invert;
 +};
 +#endif /*_NFT_WEBURL_H*/
---- /dev/null	2026-09-09 16:04:55.402189989 +0800
-+++ linux.new/include/linux/netfilter/xt_weburl.h	2026-09-09 20:55:09.858386365 +0800
+--- /dev/null	2026-10-19 09:24:33.716550517 +0800
++++ linux.new/include/linux/netfilter/xt_weburl.h	2026-10-19 09:59:21.531784224 +0800
 @@ -0,0 +1,45 @@
 +/*  weburl --	A netfilter module to match URLs in HTTP(S) requests
 + *  		This module can match using string match or regular expressions
