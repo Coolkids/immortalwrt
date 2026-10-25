@@ -135,6 +135,7 @@ function feed(){
 	fi
 	rm -rf ./feeds/*
 	./scripts/feeds update -a
+	rm -rf ./feeds/custom/openwrt-passwall-packages/smartdns
 	delete_dep
 	remove_old_packages
 	apply_patches
