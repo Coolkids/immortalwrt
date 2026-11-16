@@ -9,7 +9,6 @@ PKGS=(
     luci-app-unblockneteasemusic
     luci-theme-argon
 	luci-app-argon-config
-    curl
 )
 
 declare -A PKG_PATHS=(
@@ -19,7 +18,6 @@ declare -A PKG_PATHS=(
     [luci-app-unblockneteasemusic]="feeds/luci/applications/luci-app-unblockneteasemusic"
     [luci-theme-argon]="feeds/luci/themes/luci-theme-argon"
     [luci-app-argon-config]="feeds/luci/applications/luci-app-argon-config"
-    [curl]="feeds/packages/net/curl"
 )
 
 function main(){
