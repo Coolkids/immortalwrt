@@ -9,10 +9,10 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=ndpi-netfilter
-PKG_VERSION:=2026.11.17
+PKG_VERSION:=2026.10.09
 PKG_RELEASE:=1
 
-PKG_SOURCE_COMMIT:=75530e46c6e448611215f63c7c7749edad61f768
+PKG_SOURCE_COMMIT:=075408a5b3b2135dacfb7fe28be7da55943ff31c
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_SOURCE_COMMIT).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/vel21ripn/nDPI/tar.gz/$(PKG_SOURCE_COMMIT)?
 PKG_HASH:=skip
@@ -63,10 +63,17 @@ define KernelPackage/ipt-ndpi
   TITLE:= nDPI net netfilter module
   DEPENDS:=+kmod-nf-conntrack +kmod-nf-conntrack-netlink +kmod-ipt-conntrack-label
   KCONFIG:= \
+	CONFIG_FTRACE=y \
+	CONFIG_FUNCTION_TRACER=y \
+	CONFIG_DYNAMIC_FTRACE=y \
+	CONFIG_FPROBE=n \
+	CONFIG_FTRACE_SORT_STARTUP_TEST=n \
+	CONFIG_DYNAMIC_FTRACE_WITH_ARGS=y \
+	CONFIG_KALLSYMS_ALL=y \
+	CONFIG_HAVE_LIVEPATCH=y \
+	CONFIG_LIVEPATCH=y \
 	CONFIG_NF_CONNTRACK=m \
-	CONFIG_NF_CONNTRACK_LABELS=y \
 	CONFIG_NETFILTER_XT_MATCH_CONNLABEL=m \
-	CONFIG_NF_CT_NETLINK=m
 
   FILES:= \
 	$(PKG_BUILD_DIR)/ndpi-netfilter/src/xt_ndpi.ko
